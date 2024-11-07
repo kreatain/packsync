@@ -16,6 +16,7 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = "Home Page"
         setupActions()
     }
     
@@ -25,8 +26,8 @@ class HomeViewController: UIViewController {
     
     @objc private func handleGetStarted() {
         // Action to perform when the "Get Started" button is tapped
-        print("Get Started button tapped!")
-        // Implement further navigation or action as needed
+        let loginVC = LoginViewController()
+        navigationController?.pushViewController(loginVC, animated: true)
     }
 }
 

@@ -46,7 +46,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Create tab bar controller and set view controllers
         let tabBarController = UITabBarController()
-        tabBarController.viewControllers = [homeNavController, travelsNavController, packingNavController, spendingNavController, billboardNavController, profileNavController]
+        tabBarController.viewControllers = [homeNavController, travelsNavController, spendingNavController, billboardNavController, packingNavController, profileNavController]
         
         // Customize tab bar appearance
         UITabBar.appearance().tintColor = .systemBlue
