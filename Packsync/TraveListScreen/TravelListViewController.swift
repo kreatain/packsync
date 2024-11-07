@@ -20,17 +20,13 @@ class TravelListViewController: UIViewController {
         title = "Travels"
         view.backgroundColor = .white
         
-        travelListView.floatingButtonAddANewTravel.addTarget(self, action: #selector(addTravelButtonTapped), for: .touchUpInside)
-        
-        // Add any additional navigation bar items if needed
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped))
+        // Add A New Traver button navigation to the AddANewTraverl Screen
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTravelButtonTapped))
     }
     
     @objc func addTravelButtonTapped() {
         let addTravelViewController = AddANewTraverlViewController()
         navigationController?.pushViewController(addTravelViewController, animated: true)
     }
-    @objc func addTapped() {
-        // Handle add button tap
-    }
+
 }
