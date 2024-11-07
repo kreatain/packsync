@@ -37,16 +37,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let iconConfig = UIImage.SymbolConfiguration(pointSize: 20, weight: .regular, scale: .default)
         
         // Set up tab bar items with resized icons
-        homeNavController.tabBarItem = UITabBarItem(title: "Home", image: UIImage(systemName: "house", withConfiguration: iconConfig), tag: 0)
-        travelsNavController.tabBarItem = UITabBarItem(title: "Travels", image: UIImage(systemName: "airplane", withConfiguration: iconConfig), tag: 1)
-        packingNavController.tabBarItem = UITabBarItem(title: "Packing", image: UIImage(systemName: "bag", withConfiguration: iconConfig), tag: 2)
-        spendingNavController.tabBarItem = UITabBarItem(title: "Spending", image: UIImage(systemName: "dollarsign.circle", withConfiguration: iconConfig), tag: 3)
-        billboardNavController.tabBarItem = UITabBarItem(title: "Billboard", image: UIImage(systemName: "signpost.right", withConfiguration: iconConfig), tag: 4)
+        
+        travelsNavController.tabBarItem = UITabBarItem(title: "Travels", image: UIImage(systemName: "airplane", withConfiguration: iconConfig), tag: 0)
+        packingNavController.tabBarItem = UITabBarItem(title: "Packing", image: UIImage(systemName: "bag", withConfiguration: iconConfig), tag: 1)
+        spendingNavController.tabBarItem = UITabBarItem(title: "Spending", image: UIImage(systemName: "dollarsign.circle", withConfiguration: iconConfig), tag: 2)
+        billboardNavController.tabBarItem = UITabBarItem(title: "Billboard", image: UIImage(systemName: "signpost.right", withConfiguration: iconConfig), tag: 3)
+        homeNavController.tabBarItem = UITabBarItem(title: "Login/Signup", image: UIImage(systemName: "house", withConfiguration: iconConfig), tag: 0)
         profileNavController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person", withConfiguration: iconConfig), tag: 5)
         
         // Create tab bar controller and set view controllers
         let tabBarController = UITabBarController()
-        tabBarController.viewControllers = [homeNavController, travelsNavController, spendingNavController, billboardNavController, packingNavController, profileNavController]
+        tabBarController.viewControllers = [ travelsNavController, packingNavController, spendingNavController, billboardNavController, profileNavController, homeNavController,]
         
         // Customize tab bar appearance
         UITabBar.appearance().tintColor = .systemBlue
