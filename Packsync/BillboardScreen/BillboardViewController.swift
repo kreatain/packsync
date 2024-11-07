@@ -1,17 +1,18 @@
 //
-//  PackingListViewController.swift
+//  BillboardViewController.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/6/24.
 //
 
 import UIKit
 
-class PackingListViewController: UIViewController {
+class BillboardViewController: UIViewController {
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Packing"
+        title = "Billboard"
         view.backgroundColor = .white
         
         // Add any additional navigation bar items if needed
@@ -21,4 +22,5 @@ class PackingListViewController: UIViewController {
     @objc func addTapped() {
         // Handle add button tap
     }
+
 }
