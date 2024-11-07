@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Create view controllers for each screen
         let homeVC = HomeViewController()
-        let travelsVC = TravelListViewController()
+        let travelsVC = TravelViewController()
         let packingVC = PackingListViewController()
         let spendingVC = SpendingViewController()
         let billboardVC = BillboardViewController()

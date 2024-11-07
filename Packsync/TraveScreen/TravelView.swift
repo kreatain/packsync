@@ -1,5 +1,5 @@
 //
-//  TravelListView.swift
+//  TravelView.swift
 //  Packsync
 //
 //  Created by 许多 on 10/24/24.
@@ -9,7 +9,7 @@
 
 import UIKit
 
-class TravelListView: UIView {
+class TravelView: UIView {
     
     let welcomeLabel: UILabel = {
         let label = UILabel()

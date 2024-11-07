@@ -18,7 +18,7 @@ class AddANewTraverlViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Add a new travel"
+        title = "Add a new travel plan"
         
         
 

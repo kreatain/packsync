@@ -6,12 +6,12 @@
 //
 import UIKit
 
-class TravelListViewController: UIViewController {
+class TravelViewController: UIViewController {
     
-    let travelListView = TravelListView()
+    let travelView = TravelView()
     
     override func loadView() {
-        view = travelListView
+        view = travelView
     }
     
     override func viewDidLoad() {
@@ -24,9 +24,9 @@ class TravelListViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTravelButtonTapped))
         
         //MARK: tapping the floating add login button...
-        travelListView.floatingButtonLogin.addTarget(self, action: #selector(addLoginButtonTapped), for: .touchUpInside)
+        travelView.floatingButtonLogin.addTarget(self, action: #selector(addLoginButtonTapped), for: .touchUpInside)
         
-        travelListView.getStartedButton.addTarget(self, action: #selector(handleGetStarted), for: .touchUpInside)
+        travelView.getStartedButton.addTarget(self, action: #selector(handleGetStarted), for: .touchUpInside)
            
     }
     
