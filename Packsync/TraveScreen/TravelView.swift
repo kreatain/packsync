@@ -5,84 +5,46 @@
 //  Created by 许多 on 10/24/24.
 //
 
-
-
 import UIKit
 
 class TravelView: UIView {
     
-    let welcomeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Welcome to TravelCrew!"
-        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
+    var tableViewTravelPlans: UITableView!
     
-    let getStartedButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Get Started", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 10
-        button.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    var floatingButtonLogin: UIButton!
+    var labelText1: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
         
-        setupFloatingButtonLoginl()
-        setupView()
+        setupTableViewTravelPlans()
+        setupLabelText1()
         initConstraints()
     }
     
-    private func setupView() {
-        backgroundColor = .white
-        addSubview(welcomeLabel)
-        addSubview(getStartedButton)
-        
-        NSLayoutConstraint.activate([
-            // Welcome Label Constraints
-            welcomeLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
-            welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            
-            // Get Started Button Constraints
-            getStartedButton.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor, constant: 20),
-            getStartedButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            getStartedButton.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
-        ])
+    func setupLabelText1() {
+        labelText1 = UILabel()
+        labelText1.font = .boldSystemFont(ofSize: 18)
+        labelText1.textAlignment = .center
+        labelText1.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelText1)
     }
     
-    //MARK: initializing the UI elements...
-    func setupFloatingButtonLoginl(){
-        floatingButtonLogin = UIButton(type: .system)
-        floatingButtonLogin.setTitle("", for: .normal)
-        floatingButtonLogin.setImage(UIImage(systemName: "person.crop.circle.fill.badge.plus")?.withRenderingMode(.alwaysOriginal), for: .normal)
-        floatingButtonLogin.contentHorizontalAlignment = .fill
-        floatingButtonLogin.contentVerticalAlignment = .fill
-        floatingButtonLogin.imageView?.contentMode = .scaleAspectFit
-        floatingButtonLogin.layer.cornerRadius = 16
-        floatingButtonLogin.imageView?.layer.shadowOffset = .zero
-        floatingButtonLogin.imageView?.layer.shadowRadius = 0.8
-        floatingButtonLogin.imageView?.layer.shadowOpacity = 0.7
-        floatingButtonLogin.imageView?.clipsToBounds = true
-        floatingButtonLogin.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(floatingButtonLogin)
+    func setupTableViewTravelPlans(){
+        tableViewTravelPlans = UITableView()
+        tableViewTravelPlans.register(TravelPlanTableViewCell.self, forCellReuseIdentifier: Configs.tableViewTravelPlansID)
+        tableViewTravelPlans.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(tableViewTravelPlans)
     }
     
-    //MARK: setting up constraints...
     func initConstraints(){
         NSLayoutConstraint.activate([
-            floatingButtonLogin.widthAnchor.constraint(equalToConstant: 48),
-            floatingButtonLogin.heightAnchor.constraint(equalToConstant: 48),
-            floatingButtonLogin.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            floatingButtonLogin.trailingAnchor.constraint(equalTo: self.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            labelText1.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 15),
+            labelText1.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            
+            tableViewTravelPlans.leadingAnchor.constraint(equalTo: leadingAnchor),
+            tableViewTravelPlans.trailingAnchor.constraint(equalTo: trailingAnchor),
+            tableViewTravelPlans.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     

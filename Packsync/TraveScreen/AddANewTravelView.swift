@@ -1,5 +1,5 @@
 //
-//  AddANewTraverlView.swift
+//  AddANewTravelView.swift
 //  Packsync
 //
 //  Created by Xi Jia on 11/7/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AddANewTraverlView: UIView {
+class AddANewTravelView: UIView {
     
     var scrollView: UIScrollView!
     var contentView: UIView!
@@ -100,19 +100,58 @@ class AddANewTraverlView: UIView {
     func setuptextFieldTravelStartDate() {
         textFieldTravelStartDate = UITextField()
         textFieldTravelStartDate.placeholder = "Travel start date"
-        textFieldTravelStartDate.keyboardType = .default
         textFieldTravelStartDate.borderStyle = .roundedRect
         textFieldTravelStartDate.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(textFieldTravelStartDate)
+        
+        // Create date picker
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .dateAndTime
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+        
+        // Set date picker as input view for the text field
+        textFieldTravelStartDate.inputView = datePicker
+        
+        // Create toolbar with Done button
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(doneButtonTapped))
+        toolbar.setItems([UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), doneButton], animated: false)
+        
+        // Set toolbar as input accessory view for the text field
+        textFieldTravelStartDate.inputAccessoryView = toolbar
     }
-    
+
     func setuptextFieldTravelEndDate() {
         textFieldTravelEndDate = UITextField()
         textFieldTravelEndDate.placeholder = "Travel end date"
         textFieldTravelEndDate.borderStyle = .roundedRect
         textFieldTravelEndDate.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(textFieldTravelEndDate)
+        
+        // Create date picker
+        let datePicker = UIDatePicker()
+        datePicker.datePickerMode = .dateAndTime
+        datePicker.preferredDatePickerStyle = .wheels
+        datePicker.addTarget(self, action: #selector(endDateChanged), for: .valueChanged)
+        
+        // Set date picker as input view for the text field
+        textFieldTravelEndDate.inputView = datePicker
+        
+        // Create toolbar with Done button
+        let toolbar = UIToolbar()
+        toolbar.sizeToFit()
+        let doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(endDateDoneButtonTapped))
+        toolbar.setItems([UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil), doneButton], animated: false)
+        
+        // Set toolbar as input accessory view for the text field
+        textFieldTravelEndDate.inputAccessoryView = toolbar
     }
+
+
+
+    // You can reuse the formatDate function from the previous example
     
     func setupTextFieldCountryAndCity() {
         textFieldCountryAndCity = UITextField()
@@ -180,6 +219,28 @@ class AddANewTraverlView: UIView {
             buttonAdd.heightAnchor.constraint(equalToConstant: 44),
             buttonAdd.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
+    }
+    
+    @objc func dateChanged(datePicker: UIDatePicker) {
+        textFieldTravelStartDate.text = formatDate(datePicker.date)
+    }
+
+    @objc func doneButtonTapped() {
+        textFieldTravelStartDate.resignFirstResponder()
+    }
+    
+    @objc func endDateChanged(datePicker: UIDatePicker) {
+        textFieldTravelEndDate.text = formatDate(datePicker.date)
+    }
+
+    @objc func endDateDoneButtonTapped() {
+        textFieldTravelEndDate.resignFirstResponder()
+    }
+
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, yyyy HH:mm"
+        return formatter.string(from: date)
     }
     
     required init?(coder: NSCoder) {

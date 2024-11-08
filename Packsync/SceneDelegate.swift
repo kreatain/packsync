@@ -18,7 +18,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
         
         // Create view controllers for each screen
-        let homeVC = HomeViewController()
         let travelsVC = TravelViewController()
         let packingVC = PackingListViewController()
         let spendingVC = SpendingViewController()
@@ -26,7 +25,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let profileVC = ProfileViewController()
         
         // Embed each view controller in a navigation controller
-        let homeNavController = UINavigationController(rootViewController: homeVC)
         let travelsNavController = UINavigationController(rootViewController: travelsVC)
         let packingNavController = UINavigationController(rootViewController: packingVC)
         let spendingNavController = UINavigationController(rootViewController: spendingVC)
@@ -42,12 +40,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         packingNavController.tabBarItem = UITabBarItem(title: "Packing", image: UIImage(systemName: "bag", withConfiguration: iconConfig), tag: 1)
         spendingNavController.tabBarItem = UITabBarItem(title: "Spending", image: UIImage(systemName: "dollarsign.circle", withConfiguration: iconConfig), tag: 2)
         billboardNavController.tabBarItem = UITabBarItem(title: "Billboard", image: UIImage(systemName: "signpost.right", withConfiguration: iconConfig), tag: 3)
-        homeNavController.tabBarItem = UITabBarItem(title: "Login/Signup", image: UIImage(systemName: "house", withConfiguration: iconConfig), tag: 0)
         profileNavController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person", withConfiguration: iconConfig), tag: 5)
         
         // Create tab bar controller and set view controllers
         let tabBarController = UITabBarController()
-        tabBarController.viewControllers = [ travelsNavController, packingNavController, spendingNavController, billboardNavController, profileNavController, homeNavController,]
+        tabBarController.viewControllers = [ travelsNavController, packingNavController, spendingNavController, billboardNavController, profileNavController,]
         
         // Customize tab bar appearance
         UITabBar.appearance().tintColor = .systemBlue

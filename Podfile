@@ -8,6 +8,10 @@ target 'Packsync' do
   # Pods for Packsync
   pod 'Alamofire'
 
+pod 'Firebase/Auth'
+pod 'Firebase/Firestore'
+pod 'Firebase/Storage'
+
   target 'PacksyncTests' do
     inherit! :search_paths
     # Pods for testing
