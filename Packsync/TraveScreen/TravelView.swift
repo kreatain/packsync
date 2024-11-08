@@ -36,19 +36,7 @@ class TravelView: UIView {
         tableViewTravelPlans.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tableViewTravelPlans)
     }
-    
-//    func initConstraints(){
-//        NSLayoutConstraint.activate([
-//            labelText1.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
-//            labelText1.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
-//            labelText1.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
-//            
-//            tableViewTravelPlans.topAnchor.constraint(equalTo: labelText1.bottomAnchor, constant: 8),
-//            tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-//            tableViewTravelPlans.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-//            tableViewTravelPlans.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
-//        ])
-//    }
+
     func initConstraints(){
         NSLayoutConstraint.activate([
             labelText1.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),

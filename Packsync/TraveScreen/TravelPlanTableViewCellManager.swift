@@ -18,5 +18,15 @@ extension TravelViewController: UITableViewDelegate, UITableViewDataSource{
         cell.configure(with: travel)
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let selectedTravel = travelPlanList[indexPath.row]
+        let detailVC = TravelDetailViewController()
+        detailVC.travel = selectedTravel
+        navigationController?.pushViewController(detailVC, animated: true)
+    }
+    
 }
 

@@ -44,14 +44,14 @@ class TravelPlanTableViewCell: UITableViewCell {
     
     func setupLabelTravelTitle(){
         labelTravelTitle = UILabel()
-        labelTravelTitle.font = UIFont.boldSystemFont(ofSize: 16)
+        labelTravelTitle.font = UIFont.boldSystemFont(ofSize: 14)
         labelTravelTitle.translatesAutoresizingMaskIntoConstraints = false
         wrapperCellView.addSubview(labelTravelTitle)
     }
     
     func setupLabelDateRange(){
         labelDateRange = UILabel()
-        labelDateRange.font = UIFont.systemFont(ofSize: 14)
+        labelDateRange.font = UIFont.systemFont(ofSize: 10)
         labelDateRange.textColor = .darkGray
         labelDateRange.translatesAutoresizingMaskIntoConstraints = false
         wrapperCellView.addSubview(labelDateRange)
@@ -59,7 +59,7 @@ class TravelPlanTableViewCell: UITableViewCell {
     
     func setupLabelCountryAndCity(){
         labelCountryAndCity = UILabel()
-        labelCountryAndCity.font = UIFont.systemFont(ofSize: 14)
+        labelCountryAndCity.font = UIFont.systemFont(ofSize: 10)
         labelCountryAndCity.textColor = .darkGray
         labelCountryAndCity.translatesAutoresizingMaskIntoConstraints = false
         wrapperCellView.addSubview(labelCountryAndCity)
@@ -88,8 +88,27 @@ class TravelPlanTableViewCell: UITableViewCell {
     }
 
     func configure(with travel: Travel) {
-        labelTravelTitle.text = travel.travelTitle
-        labelDateRange.text = "\(travel.travelStartDate) - \(travel.travelEndDate)"
-        labelCountryAndCity.text = travel.countryAndCity
+        labelTravelTitle.text = "Travel Plan: \(travel.travelTitle)"
+        
+        // Format the dates to only include year, month, and date
+        let formattedStartDate = formatDate(travel.travelStartDate)
+        let formattedEndDate = formatDate(travel.travelEndDate)
+        
+        labelDateRange.text = "Travel Date: \(formattedStartDate) - \(formattedEndDate)"
+        labelCountryAndCity.text = "Country and City: \(travel.countryAndCity)"
+    }
+
+    private func formatDate(_ dateString: String) -> String {
+        let inputFormatter = DateFormatter()
+        inputFormatter.dateFormat = "MMM dd, yyyy HH:mm"
+        
+        let outputFormatter = DateFormatter()
+        outputFormatter.dateFormat = "yyyy-MM-dd"
+        
+        if let date = inputFormatter.date(from: dateString) {
+            return outputFormatter.string(from: date)
+        }
+        
+        return dateString // Return original string if parsing fails
     }
 }

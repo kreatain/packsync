@@ -88,8 +88,8 @@ class TravelViewController: UIViewController {
         super.viewWillDisappear(animated)
         Auth.auth().removeStateDidChangeListener(handleAuth!)
     }
-    
-    func fetchTravelPlans() {
+
+    func fetchTravelPlans(){
         database.collection("travelPlans").getDocuments { [weak self] (querySnapshot, error) in
             if let error = error {
                 print("Error getting documents: \(error)")
@@ -97,11 +97,28 @@ class TravelViewController: UIViewController {
                 self?.travelPlanList = querySnapshot?.documents.compactMap { document in
                     try? document.data(as: Travel.self)
                 } ?? []
+                
+                // Sort the travelPlans array by travelStartDate
+                self?.travelPlanList.sort { (travel1, travel2) -> Bool in
+                    guard let date1 = self?.dateFromString(travel1.travelStartDate),
+                          let date2 = self?.dateFromString(travel2.travelStartDate) else {
+                        return false
+                    }
+                    return date1 < date2
+                }
+                
                 DispatchQueue.main.async {
                     self?.travelView.tableViewTravelPlans.reloadData()
                 }
             }
         }
+    }
+
+    // Helper method to convert string to Date
+    func dateFromString(_ dateString: String) -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyyy HH:mm" // Adjust this format to match your date string format
+        return dateFormatter.date(from: dateString)
     }
 
 }
