@@ -38,16 +38,16 @@ class TravelViewController: UIViewController {
         view.backgroundColor = .white
         
         //MARK: patching table view delegate and data source...
-        travelView.tableViewTravelPlans.delegate = self
         travelView.tableViewTravelPlans.dataSource = self
+        travelView.tableViewTravelPlans.delegate = self
         
         //MARK: removing the separator line...
         travelView.tableViewTravelPlans.separatorStyle = .none
         
         // Add A New Traver button navigation to the AddANewTraverl Screen
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTravelButtonTapped))
-           
-        setupTravelPlansListener()
+        
+        fetchTravelPlans()
     }
     
     @objc func addTravelButtonTapped() {
@@ -58,7 +58,7 @@ class TravelViewController: UIViewController {
     // a lifecycle method where you can handle the logic before the screen is loaded.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        fetchTravelPlans()
         //MARK: handling if the Authentication state is changed (sign in, sign out, register)...
         handleAuth = Auth.auth().addStateDidChangeListener{ auth, user in
             if user == nil{
@@ -89,32 +89,17 @@ class TravelViewController: UIViewController {
         Auth.auth().removeStateDidChangeListener(handleAuth!)
     }
     
-    func setupTravelPlansListener() {
-        let db = Firestore.firestore()
-        listener = db.collection("travelPlans").addSnapshotListener { [weak self] (querySnapshot, error) in
-            guard let self = self else { return }
-            
+    func fetchTravelPlans() {
+        database.collection("travelPlans").getDocuments { [weak self] (querySnapshot, error) in
             if let error = error {
                 print("Error getting documents: \(error)")
-                return
-            }
-            
-            guard let documents = querySnapshot?.documents else {
-                print("No documents")
-                return
-            }
-            
-            self.travelPlanList = documents.compactMap { document -> Travel? in
-                do {
-                    return try document.data(as: Travel.self)
-                } catch {
-                    print("Error decoding document: \(error)")
-                    return nil
+            } else {
+                self?.travelPlanList = querySnapshot?.documents.compactMap { document in
+                    try? document.data(as: Travel.self)
+                } ?? []
+                DispatchQueue.main.async {
+                    self?.travelView.tableViewTravelPlans.reloadData()
                 }
-            }
-            
-            DispatchQueue.main.async {
-                self.travelView.tableViewTravelPlans.reloadData()
             }
         }
     }
