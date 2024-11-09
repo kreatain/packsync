@@ -2,7 +2,7 @@
 //  TravelView.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/7/24.
 //
 
 import UIKit
@@ -36,15 +36,17 @@ class TravelView: UIView {
         tableViewTravelPlans.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tableViewTravelPlans)
     }
-    
+
     func initConstraints(){
         NSLayoutConstraint.activate([
-            labelText1.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 15),
-            labelText1.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12),
+            labelText1.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
+            labelText1.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
+            labelText1.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
             
-            tableViewTravelPlans.leadingAnchor.constraint(equalTo: leadingAnchor),
-            tableViewTravelPlans.trailingAnchor.constraint(equalTo: trailingAnchor),
-            tableViewTravelPlans.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
+            tableViewTravelPlans.topAnchor.constraint(equalTo: labelText1.bottomAnchor, constant: 8),
+            tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            tableViewTravelPlans.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+            tableViewTravelPlans.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
         ])
     }
     

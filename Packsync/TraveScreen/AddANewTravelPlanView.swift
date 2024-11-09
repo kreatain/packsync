@@ -1,5 +1,5 @@
 //
-//  AddANewTravelView.swift
+//  AddANewTravelPlanView.swift
 //  Packsync
 //
 //  Created by Xi Jia on 11/7/24.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AddANewTravelView: UIView {
+class AddANewTravelPlanView: UIView {
     
     var scrollView: UIScrollView!
     var contentView: UIView!

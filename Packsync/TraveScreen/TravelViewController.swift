@@ -2,7 +2,7 @@
 //  TravelListViewController.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/7/24.
 //
 
 import UIKit
@@ -38,16 +38,16 @@ class TravelViewController: UIViewController {
         view.backgroundColor = .white
         
         //MARK: patching table view delegate and data source...
-        travelView.tableViewTravelPlans.delegate = self
         travelView.tableViewTravelPlans.dataSource = self
+        travelView.tableViewTravelPlans.delegate = self
         
         //MARK: removing the separator line...
         travelView.tableViewTravelPlans.separatorStyle = .none
         
         // Add A New Traver button navigation to the AddANewTraverl Screen
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTravelButtonTapped))
-           
-        setupTravelPlansListener()
+        
+        fetchTravelPlans()
     }
     
     @objc func addTravelButtonTapped() {
@@ -58,7 +58,7 @@ class TravelViewController: UIViewController {
     // a lifecycle method where you can handle the logic before the screen is loaded.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        fetchTravelPlans()
         //MARK: handling if the Authentication state is changed (sign in, sign out, register)...
         handleAuth = Auth.auth().addStateDidChangeListener{ auth, user in
             if user == nil{
@@ -88,35 +88,37 @@ class TravelViewController: UIViewController {
         super.viewWillDisappear(animated)
         Auth.auth().removeStateDidChangeListener(handleAuth!)
     }
-    
-    func setupTravelPlansListener() {
-        let db = Firestore.firestore()
-        listener = db.collection("travelPlans").addSnapshotListener { [weak self] (querySnapshot, error) in
-            guard let self = self else { return }
-            
+
+    func fetchTravelPlans(){
+        database.collection("travelPlans").getDocuments { [weak self] (querySnapshot, error) in
             if let error = error {
                 print("Error getting documents: \(error)")
-                return
-            }
-            
-            guard let documents = querySnapshot?.documents else {
-                print("No documents")
-                return
-            }
-            
-            self.travelPlanList = documents.compactMap { document -> Travel? in
-                do {
-                    return try document.data(as: Travel.self)
-                } catch {
-                    print("Error decoding document: \(error)")
-                    return nil
+            } else {
+                self?.travelPlanList = querySnapshot?.documents.compactMap { document in
+                    try? document.data(as: Travel.self)
+                } ?? []
+                
+                // Sort the travelPlans array by travelStartDate
+                self?.travelPlanList.sort { (travel1, travel2) -> Bool in
+                    guard let date1 = self?.dateFromString(travel1.travelStartDate),
+                          let date2 = self?.dateFromString(travel2.travelStartDate) else {
+                        return false
+                    }
+                    return date1 < date2
+                }
+                
+                DispatchQueue.main.async {
+                    self?.travelView.tableViewTravelPlans.reloadData()
                 }
             }
-            
-            DispatchQueue.main.async {
-                self.travelView.tableViewTravelPlans.reloadData()
-            }
         }
+    }
+
+    // Helper method to convert string to Date
+    func dateFromString(_ dateString: String) -> Date? {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyyy HH:mm" // Adjust this format to match your date string format
+        return dateFormatter.date(from: dateString)
     }
 
 }

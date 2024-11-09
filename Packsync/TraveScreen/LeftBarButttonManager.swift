@@ -2,7 +2,7 @@
 //  LeftBarButttonManager.swift
 //  Packsync
 //
-//  Created by Xi Jia on 11/8/24.
+//  Created by Xi Jia on 11/7/24.
 //
 
 import UIKit
