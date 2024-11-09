@@ -16,7 +16,7 @@ class TravelViewController: UIViewController {
     
     var travelPlanList = [Travel]()
     
-    var listener: ListenerRegistration?
+//    var listener: ListenerRegistration?
     
     let database = Firestore.firestore()
     
@@ -34,7 +34,7 @@ class TravelViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "TravelCrew"
+        title = "Travel Plans"
         view.backgroundColor = .white
         
         //MARK: patching table view delegate and data source...
@@ -45,9 +45,18 @@ class TravelViewController: UIViewController {
         travelView.tableViewTravelPlans.separatorStyle = .none
         
         // Add A New Traver button navigation to the AddANewTraverl Screen
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTravelButtonTapped))
+//        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTravelButtonTapped))
+        
+        travelView.buttonAddTravelPlan.addTarget(self, action: #selector(addTravelButtonTapped), for: .touchUpInside)
+        
         
         fetchTravelPlans()
+        
+        // Add auth state listener
+          Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
+              self?.handleAuthStateChange(user: user)
+          }
+    
     }
     
     @objc func addTravelButtonTapped() {
@@ -64,7 +73,7 @@ class TravelViewController: UIViewController {
             if user == nil{
                 //MARK: not signed in...
                 self.currentUser = nil
-                self.travelView.labelText1.text = "Welcome to TravelCrew! Please Sign In"
+                self.travelView.labelText.text = "Welcome to TravelCrew! Please Sign In"
 
                 
                 //MARK: Reset tableView...
@@ -75,7 +84,7 @@ class TravelViewController: UIViewController {
             }else{
                 //MARK: the user is signed in...
                 self.currentUser = user
-                self.travelView.labelText1.text = "Welcome \(user?.displayName ?? "Anonymous")!"
+                self.travelView.labelText.text = "Welcome \(user?.displayName ?? "Anonymous")!"
 
                 //MARK: Logout bar button...
                 self.setupLeftBarButton(isLoggedin: true)
@@ -120,5 +129,61 @@ class TravelViewController: UIViewController {
         dateFormatter.dateFormat = "MMM dd, yyyy HH:mm" // Adjust this format to match your date string format
         return dateFormatter.date(from: dateString)
     }
+    
+    func handleLogout() {
+        do {
+            try Auth.auth().signOut()
+            // Clear the travel plans data
+            travelPlanList.removeAll()
+            // Reload the table view to reflect the empty data
+            travelView.tableViewTravelPlans.reloadData()
+            // Hide the table view
+            travelView.tableViewTravelPlans.isHidden = true
+            // Show a message or a login button
+            showLoginPrompt()
+        } catch {
+            print("Error signing out: \(error.localizedDescription)")
+        }
+    }
+
+    func showLoginPrompt() {
+        // Create and configure a login button or message
+        let loginButton = UIButton(type: .system)
+        loginButton.setTitle("Login", for: .normal)
+        loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        loginButton.translatesAutoresizingMaskIntoConstraints = false
+        travelView.addSubview(loginButton)
+        
+        NSLayoutConstraint.activate([
+            loginButton.centerXAnchor.constraint(equalTo: travelView.centerXAnchor),
+            loginButton.centerYAnchor.constraint(equalTo: travelView.centerYAnchor)
+        ])
+    }
+
+    @objc func loginButtonTapped() {
+        // Navigate to login screen or present login view controller
+        // This depends on your app's navigation structure
+    }
+    
+    func handleAuthStateChange(user: FirebaseAuth.User?) {
+        setupLeftBarButton(isLoggedin: user != nil)
+        if let user = user {
+            // User is logged in
+            fetchTravelPlans()
+            travelView.tableViewTravelPlans.isHidden = false
+            travelView.buttonAddTravelPlan.isHidden = false
+            travelView.labelText.isHidden = true
+        } else {
+            // User is logged out
+            travelPlanList.removeAll()
+            travelView.tableViewTravelPlans.reloadData()
+            travelView.tableViewTravelPlans.isHidden = true
+            travelView.buttonAddTravelPlan.isHidden = true
+            travelView.labelText.isHidden = false
+            travelView.labelText.text = "Please sign in to view your travel plans."
+        }
+    }
 
 }
+        
+

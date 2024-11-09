@@ -91,33 +91,37 @@ extension TravelViewController {
     @objc func onLogOutBarButtonTapped(){
         let logoutAlert = UIAlertController(title: "Logging out!", message: "Are you sure want to log out?",
             preferredStyle: .actionSheet)
-        logoutAlert.addAction(UIAlertAction(title: "Yes, log out!", style: .default, handler: {(_) in
-                do{
-                    // If the user taps on the action 'Yes, Log out!' we call the Firebase authentication service to log the current user out.
-                    try Auth.auth().signOut()
-                }catch{
-                    print("Error occured!")
-                }
-            })
-        )
-        // If the user wats to stay logged in, they can tap 'Cancel.'
+        logoutAlert.addAction(UIAlertAction(title: "Yes, log out!", style: .default, handler: { [weak self] (_) in
+            do {
+                try Auth.auth().signOut()
+                // The auth state listener in TravelViewController will handle UI updates
+            } catch {
+                print("Error occured during logout: \(error.localizedDescription)")
+                self?.showAlert(title: "Logout Error", message: "An error occurred while logging out. Please try again.")
+            }
+        }))
         logoutAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         
         self.present(logoutAlert, animated: true)
     }
     
     func signInToFirebase(email: String, password: String){
-            //MARK: can you display progress indicator here?
-            //MARK: authenticating the user...
-            Auth.auth().signIn(withEmail: email, password: password, completion: {(result, error) in
-                if error == nil{
-                    //MARK: user authenticated...
-                    //MARK: can you hide the progress indicator here?
-                }else{
-                    //MARK: alert that no user found or password wrong...
-                }
-            })
+        Auth.auth().signIn(withEmail: email, password: password) { [weak self] (result, error) in
+            if let error = error {
+                // Show alert for authentication error
+                self?.showAlert(title: "Sign In Error", message: error.localizedDescription)
+            } else {
+                // Authentication successful, UI will be updated by the auth state listener
+                self?.dismiss(animated: true, completion: nil)
+            }
         }
+    }
+
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
     
 }
 
