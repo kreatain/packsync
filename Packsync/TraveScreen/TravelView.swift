@@ -11,23 +11,27 @@ class TravelView: UIView {
     
     var tableViewTravelPlans: UITableView!
     
-    var labelText1: UILabel!
+    var labelText: UILabel!
+    
+    var buttonAddTravelPlan: UIButton!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
         
         setupTableViewTravelPlans()
-        setupLabelText1()
+        setupLabelText()
+        setupButtonAddTravelPlan()
+        
         initConstraints()
     }
     
-    func setupLabelText1() {
-        labelText1 = UILabel()
-        labelText1.font = .boldSystemFont(ofSize: 18)
-        labelText1.textAlignment = .center
-        labelText1.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(labelText1)
+    func setupLabelText() {
+        labelText = UILabel()
+        labelText.font = .boldSystemFont(ofSize: 18)
+        labelText.textAlignment = .center
+        labelText.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelText)
     }
     
     func setupTableViewTravelPlans(){
@@ -36,17 +40,49 @@ class TravelView: UIView {
         tableViewTravelPlans.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tableViewTravelPlans)
     }
+    
+    func setupButtonAddTravelPlan() {
+        buttonAddTravelPlan = UIButton(type: .system)
+        buttonAddTravelPlan.setTitle("Add Travel Plan", for: .normal)
+        buttonAddTravelPlan.backgroundColor = .systemBlue
+        buttonAddTravelPlan.setTitleColor(.white, for: .normal)
+        buttonAddTravelPlan.layer.cornerRadius = 8
+        buttonAddTravelPlan.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonAddTravelPlan)
+    }
 
+//    func initConstraints(){
+//        NSLayoutConstraint.activate([
+//            labelText.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
+//            labelText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
+//            labelText.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
+//            
+//            buttonAddTravelPlan.topAnchor.constraint(equalTo: labelText.bottomAnchor, constant: 16),
+//            buttonAddTravelPlan.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+//            buttonAddTravelPlan.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.6),
+//            buttonAddTravelPlan.heightAnchor.constraint(equalToConstant: 44),
+//            
+//            tableViewTravelPlans.topAnchor.constraint(equalTo: buttonAddTravelPlan.bottomAnchor, constant: 16),
+//            tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+//            tableViewTravelPlans.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+//            tableViewTravelPlans.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
+//        ])
+//    }
     func initConstraints(){
         NSLayoutConstraint.activate([
-            labelText1.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
-            labelText1.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
-            labelText1.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
+            labelText.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
+            labelText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
+            labelText.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
             
-            tableViewTravelPlans.topAnchor.constraint(equalTo: labelText1.bottomAnchor, constant: 8),
+            tableViewTravelPlans.topAnchor.constraint(equalTo: labelText.bottomAnchor, constant: 16),
             tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             tableViewTravelPlans.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            tableViewTravelPlans.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
+            tableViewTravelPlans.bottomAnchor.constraint(equalTo: buttonAddTravelPlan.topAnchor, constant: -16),
+            
+            buttonAddTravelPlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            buttonAddTravelPlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            buttonAddTravelPlan.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            buttonAddTravelPlan.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
     
@@ -54,3 +90,4 @@ class TravelView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
