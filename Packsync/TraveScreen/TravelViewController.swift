@@ -2,7 +2,7 @@
 //  TravelListViewController.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/7/24.
 //
 
 import UIKit

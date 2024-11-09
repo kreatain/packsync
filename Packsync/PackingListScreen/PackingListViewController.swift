@@ -2,45 +2,75 @@
 //  PackingListViewController.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/8/24.
 //
+
 import UIKit
-class PackingListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+import FirebaseFirestore
+
+class PackingListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PackingListViewControllerDelegate {
+    
+    let packingListView = PackingListView()
     var travel: Travel?
     var packingItems: [PackingItem] = []
-    let packingListView = PackingListView()
     
     override func loadView() {
         view = packingListView
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         title = "Packing List"
         
-        if let travel = travel {
-            packingListView.configure(with: travel)
-            fetchPackingItems(for: travel)
-        }
+        packingListView.tableViewPackingList.delegate = self
+        packingListView.tableViewPackingList.dataSource = self
         
-//        packingListView.tableViewPackingList.delegate = self
-//        packingListView.tableViewPackingList.dataSource = self
+        packingListView.buttonAddPackingItem.addTarget(self, action: #selector(addPackingItemButtonTapped), for: .touchUpInside)
         
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addPackingItem))
+        fetchPackingItems()
     }
     
-    func fetchPackingItems(for travel: Travel) {
-        // Implement Firestore fetch logic here
-        // Update packingItems array and reload table view
+    @objc func addPackingItemButtonTapped() {
+        let addPackingItemVC = AddPackingItemViewController()
+        addPackingItemVC.travel = self.travel
+        addPackingItemVC.delegate = self
+        let navController = UINavigationController(rootViewController: addPackingItemVC)
+        present(navController, animated: true, completion: nil)
     }
     
-    @objc func addPackingItem() {
-        // Implement the logic to add a new packing item
-        // You might want to show an alert with a text field to enter the item name
+    func fetchPackingItems() {
+        guard let travel = travel else { return }
+        
+        let db = Firestore.firestore()
+        db.collection("packingItem")
+            .whereField("creatorEmail", isEqualTo: travel.creatorEmail)
+            .whereField("travelTitle", isEqualTo: travel.travelTitle)
+            .addSnapshotListener { [weak self] querySnapshot, error in
+                guard let documents = querySnapshot?.documents else {
+                    print("Error fetching documents: \(error?.localizedDescription ?? "Unknown error")")
+                    return
+                }
+                
+                self?.packingItems = documents.compactMap { queryDocumentSnapshot in
+                    try? queryDocumentSnapshot.data(as: PackingItem.self)
+                }
+                
+                // Sort the packingItems array
+                self?.packingItems.sort { (item1, item2) -> Bool in
+                    let firstWord1 = item1.name.components(separatedBy: " ").first ?? ""
+                    let firstWord2 = item2.name.components(separatedBy: " ").first ?? ""
+                    return firstWord1.localizedCaseInsensitiveCompare(firstWord2) == .orderedAscending
+                }
+                
+                DispatchQueue.main.async {
+                    self?.packingListView.tableViewPackingList.reloadData()
+                }
+            }
     }
     
-    // UITableViewDataSource methods
+    // MARK: - UITableViewDataSource
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return packingItems.count
     }
@@ -48,16 +78,15 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath)
         let item = packingItems[indexPath.row]
-        cell.textLabel?.text = item.name
+        cell.textLabel?.text = "\(item.name) (count: \(item.itemNumber ?? "1"))"
         cell.accessoryType = item.isPacked ? .checkmark : .none
         return cell
     }
     
-    // UITableViewDelegate methods
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Toggle the packed status of the item
-        packingItems[indexPath.row].isPacked.toggle()
-        tableView.reloadRows(at: [indexPath], with: .automatic)
-        // Update the item in Firestore
+    // MARK: - PackingListViewControllerDelegate
+    
+    func didAddPackingItem(_ item: PackingItem) {
+//        packingItems.append(item)
+        packingListView.tableViewPackingList.reloadData()
     }
 }

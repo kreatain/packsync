@@ -2,7 +2,7 @@
 //  TravelDetailViewController.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/8/24.
 //
 
 import UIKit
@@ -31,6 +31,8 @@ class TravelDetailViewController: UIViewController {
         
         // navigate to the packing list screen
         detailView.buttonPackingList.addTarget(self, action: #selector(packingListButtonTapped), for: .touchUpInside)
+        
+        detailView.buttonInviteFriend.addTarget(self, action: #selector(inviteFriendButtonTapped), for: .touchUpInside)
     }
     
     @objc func editTravelPlan() {
@@ -55,6 +57,12 @@ class TravelDetailViewController: UIViewController {
         packingListVC.travel = self.travel // Pass the current travel to the packing list
         navigationController?.pushViewController(packingListVC, animated: true)
     }
+    
+    @objc func inviteFriendButtonTapped() {
+        let inviteFriendVC = InviteFriendViewController()
+        navigationController?.pushViewController(inviteFriendVC, animated: true)
+    }
+    
 }
 
 protocol EditTravelViewControllerDelegate: AnyObject {

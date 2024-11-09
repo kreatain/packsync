@@ -2,7 +2,7 @@
 //  TravelDetailView.swift
 //  Packsync
 //
-//  Created by 许多 on 10/24/24.
+//  Created by Xi Jia on 11/8/24.
 //
 
 import UIKit
@@ -14,6 +14,7 @@ class TravelDetailView: UIView {
     var labelCountryAndCity: UILabel!
     
     var buttonPackingList: UIButton!
+    var buttonInviteFriend: UIButton!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,6 +25,7 @@ class TravelDetailView: UIView {
         setupLabelCountryAndCity()
         
         setupButtonPackingList()
+        setupButtonInviteFriend()
         
         initConstraints()
     }
@@ -58,6 +60,16 @@ class TravelDetailView: UIView {
         buttonPackingList.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(buttonPackingList)
     }
+    
+    func setupButtonInviteFriend() {
+        buttonInviteFriend = UIButton(type: .system)
+        buttonInviteFriend.setTitle("Invite Friend", for: .normal)
+        buttonInviteFriend.backgroundColor = .systemGreen
+        buttonInviteFriend.setTitleColor(.white, for: .normal)
+        buttonInviteFriend.layer.cornerRadius = 8
+        buttonInviteFriend.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonInviteFriend)
+    }
 
     
     func initConstraints() {
@@ -78,7 +90,12 @@ class TravelDetailView: UIView {
             buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
-            buttonPackingList.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            
+            buttonInviteFriend.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
+            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
+            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
     
