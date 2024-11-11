@@ -19,6 +19,24 @@ class AddPackingItemViewController: UIViewController {
         addPackingItemView.buttonAdd.addTarget(self, action: #selector(addItemButtonTapped), for: .touchUpInside)
     }
     
+//    @objc func addItemButtonTapped() {
+//        guard let itemName = addPackingItemView.textFieldItemName.text, !itemName.isEmpty,
+//              let itemNumber = addPackingItemView.textFieldItemCount.text, !itemNumber.isEmpty,
+//              let travel = travel else {
+//            showAlert(message: "Please enter both item name and count.")
+//            return
+//        }
+//        
+//        let newItem = PackingItem(
+//            creatorEmail: travel.creatorEmail,
+//            travelTitle: travel.travelTitle,
+//            name: itemName,
+//            itemNumber: itemNumber
+//        )
+//        
+//        savePackingItemToFirestore(newItem)
+//    }
+//
     @objc func addItemButtonTapped() {
         guard let itemName = addPackingItemView.textFieldItemName.text, !itemName.isEmpty,
               let itemNumber = addPackingItemView.textFieldItemCount.text, !itemNumber.isEmpty,
@@ -28,15 +46,16 @@ class AddPackingItemViewController: UIViewController {
         }
         
         let newItem = PackingItem(
+            id: UUID().uuidString,
             creatorEmail: travel.creatorEmail,
             travelTitle: travel.travelTitle,
             name: itemName,
+            isPacked: addPackingItemView.switchIsPacked.isOn,
             itemNumber: itemNumber
         )
         
         savePackingItemToFirestore(newItem)
     }
-    
     func savePackingItemToFirestore(_ item: PackingItem) {
         let db = Firestore.firestore()
         
