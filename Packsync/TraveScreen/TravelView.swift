@@ -51,23 +51,6 @@ class TravelView: UIView {
         self.addSubview(buttonAddTravelPlan)
     }
 
-//    func initConstraints(){
-//        NSLayoutConstraint.activate([
-//            labelText.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
-//            labelText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
-//            labelText.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
-//            
-//            buttonAddTravelPlan.topAnchor.constraint(equalTo: labelText.bottomAnchor, constant: 16),
-//            buttonAddTravelPlan.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-//            buttonAddTravelPlan.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.6),
-//            buttonAddTravelPlan.heightAnchor.constraint(equalToConstant: 44),
-//            
-//            tableViewTravelPlans.topAnchor.constraint(equalTo: buttonAddTravelPlan.bottomAnchor, constant: 16),
-//            tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-//            tableViewTravelPlans.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-//            tableViewTravelPlans.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
-//        ])
-//    }
     func initConstraints(){
         NSLayoutConstraint.activate([
             labelText.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
