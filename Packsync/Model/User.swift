@@ -10,4 +10,7 @@ struct User: Codable {
     let email: String
     let password: String
     var displayName: String?
+    // TravelIds: []
+    // PendingInvites: []
+    // Pic
 }
