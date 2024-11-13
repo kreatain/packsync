@@ -29,10 +29,16 @@ class TravelDetailViewController: UIViewController {
         // Add an edit button to the navigation bar
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editTravelPlan))
         
+        detailView.buttonSetAsActivePlan.addTarget(self, action: #selector(setAsActivePlanButtonTapped), for: .touchUpInside)
+        
         // navigate to the packing list screen
         detailView.buttonPackingList.addTarget(self, action: #selector(packingListButtonTapped), for: .touchUpInside)
         
         detailView.buttonInviteFriend.addTarget(self, action: #selector(inviteFriendButtonTapped), for: .touchUpInside)
+        
+        detailView.buttonSpending.addTarget(self, action: #selector(spendingButtonTapped), for: .touchUpInside)
+        
+        detailView.buttonBillboard.addTarget(self, action: #selector(billboardButtonTapped), for: .touchUpInside)
     }
     
     @objc func editTravelPlan() {
@@ -45,6 +51,11 @@ class TravelDetailViewController: UIViewController {
         editVC.delegate = self
         let navController = UINavigationController(rootViewController: editVC)
         present(navController, animated: true, completion: nil)
+    }
+    
+    @objc func setAsActivePlanButtonTapped() {
+//        let setAsActivePlanVC = InviteFriendViewController()
+//        navigationController?.pushViewController(inviteFriendVC, animated: true)
     }
     
     @objc func packingListButtonTapped() {
@@ -61,6 +72,16 @@ class TravelDetailViewController: UIViewController {
     @objc func inviteFriendButtonTapped() {
         let inviteFriendVC = InviteFriendViewController()
         navigationController?.pushViewController(inviteFriendVC, animated: true)
+    }
+    
+    @objc func spendingButtonTapped() {
+        let spendingVC = SpendingViewController()
+        navigationController?.pushViewController(spendingVC, animated: true)
+    }
+    
+    @objc func billboardButtonTapped() {
+        let billboardVC = BillboardViewController()
+        navigationController?.pushViewController(billboardVC, animated: true)
     }
     
 }
