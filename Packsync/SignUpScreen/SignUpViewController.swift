@@ -14,7 +14,6 @@ import FirebaseDatabase // Import FirebaseDatabase to interact with Realtime Dat
 class SignUpViewController: UIViewController {
 
     let signUpView = SignUpView()
-    
     let childProgressView = ProgressSpinnerViewController()
     
     override func loadView() {
