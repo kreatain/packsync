@@ -3,10 +3,67 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4CC0792B2CE42AD4009364D8 /* ActivePlanNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */; };
+		4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */; };
+		4CC0792D2CE42AD4009364D8 /* AddPackingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DF2CE42AD4009364D8 /* AddPackingItemView.swift */; };
+		4CC0792E2CE42AD4009364D8 /* AddPackingItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E02CE42AD4009364D8 /* AddPackingItemViewController.swift */; };
+		4CC0792F2CE42AD4009364D8 /* BillboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E22CE42AD4009364D8 /* BillboardView.swift */; };
+		4CC079302CE42AD4009364D8 /* BillboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E32CE42AD4009364D8 /* BillboardViewController.swift */; };
+		4CC079312CE42AD4009364D8 /* EditPackingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E52CE42AD4009364D8 /* EditPackingItemView.swift */; };
+		4CC079322CE42AD4009364D8 /* EditPackingItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E62CE42AD4009364D8 /* EditPackingItemViewController.swift */; };
+		4CC079332CE42AD4009364D8 /* FriendsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E82CE42AD4009364D8 /* FriendsListView.swift */; };
+		4CC079342CE42AD4009364D8 /* FriendsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E92CE42AD4009364D8 /* FriendsListViewController.swift */; };
+		4CC079352CE42AD4009364D8 /* InviteFriendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EB2CE42AD4009364D8 /* InviteFriendView.swift */; };
+		4CC079362CE42AD4009364D8 /* InviteFriendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EC2CE42AD4009364D8 /* InviteFriendViewController.swift */; };
+		4CC079372CE42AD4009364D8 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EE2CE42AD4009364D8 /* Category.swift */; };
+		4CC079382CE42AD4009364D8 /* GroupExpense.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EF2CE42AD4009364D8 /* GroupExpense.swift */; };
+		4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F02CE42AD4009364D8 /* Invitation.swift */; };
+		4CC0793A2CE42AD4009364D8 /* PackingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F12CE42AD4009364D8 /* PackingItem.swift */; };
+		4CC0793B2CE42AD4009364D8 /* SpendingItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F22CE42AD4009364D8 /* SpendingItem.swift */; };
+		4CC0793C2CE42AD4009364D8 /* Travel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F32CE42AD4009364D8 /* Travel.swift */; };
+		4CC0793D2CE42AD4009364D8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F42CE42AD4009364D8 /* User.swift */; };
+		4CC0793E2CE42AD4009364D8 /* PackingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F62CE42AD4009364D8 /* PackingListView.swift */; };
+		4CC0793F2CE42AD4009364D8 /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F72CE42AD4009364D8 /* PackingListViewController.swift */; };
+		4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F92CE42AD4009364D8 /* ProfileView.swift */; };
+		4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078FA2CE42AD4009364D8 /* ProfileViewController.swift */; };
+		4CC079422CE42AD4009364D8 /* ProgressSpinnerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078FC2CE42AD4009364D8 /* ProgressSpinnerDelegate.swift */; };
+		4CC079432CE42AD4009364D8 /* ProgressSpinnerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078FD2CE42AD4009364D8 /* ProgressSpinnerViewController.swift */; };
+		4CC079442CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078FF2CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift */; };
+		4CC079452CE42AD4009364D8 /* SignUpFirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079002CE42AD4009364D8 /* SignUpFirebaseManager.swift */; };
+		4CC079462CE42AD4009364D8 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079012CE42AD4009364D8 /* SignUpView.swift */; };
+		4CC079472CE42AD4009364D8 /* SignUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079022CE42AD4009364D8 /* SignUpViewController.swift */; };
+		4CC079482CE42AD4009364D8 /* BudgetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079042CE42AD4009364D8 /* BudgetViewController.swift */; };
+		4CC079492CE42AD4009364D8 /* ExpensesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079062CE42AD4009364D8 /* ExpensesViewController.swift */; };
+		4CC0794A2CE42AD4009364D8 /* OverviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079082CE42AD4009364D8 /* OverviewViewController.swift */; };
+		4CC0794B2CE42AD4009364D8 /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0790A2CE42AD4009364D8 /* SplitViewController.swift */; };
+		4CC0794C2CE42AD4009364D8 /* SpendingFirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0790C2CE42AD4009364D8 /* SpendingFirebaseManager.swift */; };
+		4CC0794D2CE42AD4009364D8 /* SpendingFirestoreExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0790D2CE42AD4009364D8 /* SpendingFirestoreExtensions.swift */; };
+		4CC0794E2CE42AD4009364D8 /* SpendingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0790E2CE42AD4009364D8 /* SpendingView.swift */; };
+		4CC0794F2CE42AD4009364D8 /* SpendingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0790F2CE42AD4009364D8 /* SpendingViewController.swift */; };
+		4CC079502CE42AD4009364D8 /* EditTravelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079112CE42AD4009364D8 /* EditTravelDetailView.swift */; };
+		4CC079512CE42AD4009364D8 /* EditTravelDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079122CE42AD4009364D8 /* EditTravelDetailViewController.swift */; };
+		4CC079522CE42AD4009364D8 /* TravelDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079132CE42AD4009364D8 /* TravelDetailView.swift */; };
+		4CC079532CE42AD4009364D8 /* TravelDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079142CE42AD4009364D8 /* TravelDetailViewController.swift */; };
+		4CC079542CE42AD4009364D8 /* ActivePlanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079162CE42AD4009364D8 /* ActivePlanViewController.swift */; };
+		4CC079552CE42AD4009364D8 /* AddANewTravelPlanController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079172CE42AD4009364D8 /* AddANewTravelPlanController.swift */; };
+		4CC079562CE42AD4009364D8 /* AddANewTravelPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079182CE42AD4009364D8 /* AddANewTravelPlanView.swift */; };
+		4CC079572CE42AD4009364D8 /* LeftBarButttonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079192CE42AD4009364D8 /* LeftBarButttonManager.swift */; };
+		4CC079582CE42AD4009364D8 /* TravelPlanTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791A2CE42AD4009364D8 /* TravelPlanTableViewCell.swift */; };
+		4CC079592CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791B2CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift */; };
+		4CC0795A2CE42AD4009364D8 /* TravelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791C2CE42AD4009364D8 /* TravelView.swift */; };
+		4CC0795B2CE42AD4009364D8 /* TravelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791D2CE42AD4009364D8 /* TravelViewController.swift */; };
+		4CC0795C2CE42AD4009364D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791F2CE42AD4009364D8 /* AppDelegate.swift */; };
+		4CC0795D2CE42AD4009364D8 /* Configs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079212CE42AD4009364D8 /* Configs.swift */; };
+		4CC0795E2CE42AD4009364D8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079282CE42AD4009364D8 /* SceneDelegate.swift */; };
+		4CC0795F2CE42AD4009364D8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079292CE42AD4009364D8 /* ViewController.swift */; };
+		4CC079602CE42AD4009364D8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4CC079202CE42AD4009364D8 /* Assets.xcassets */; };
+		4CC079612CE42AD4009364D8 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4CC079222CE42AD4009364D8 /* GoogleService-Info.plist */; };
+		4CC079632CE42AD4009364D8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CC079252CE42AD4009364D8 /* LaunchScreen.storyboard */; };
+		4CC079642CE42AD4009364D8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4CC079272CE42AD4009364D8 /* Main.storyboard */; };
 		6236C52ED6F9FDC6B051139B /* Pods_PacksyncTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B899A5F4CAC2071E1963521 /* Pods_PacksyncTests.framework */; };
 		629125534CD46C572C41036B /* Pods_Packsync.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B58C29F627AEFE88848C97EE /* Pods_Packsync.framework */; };
 		94BFD571C364E2F861C438BF /* Pods_Packsync_PacksyncUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8ED0CE592D869E2411A3DE66 /* Pods_Packsync_PacksyncUITests.framework */; };
@@ -32,6 +89,64 @@
 /* Begin PBXFileReference section */
 		010872923AF6786A876453AC /* Pods-PacksyncTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PacksyncTests.release.xcconfig"; path = "Target Support Files/Pods-PacksyncTests/Pods-PacksyncTests.release.xcconfig"; sourceTree = "<group>"; };
 		417A1F4FED55E21A08E652A3 /* Pods-Packsync.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync.debug.xcconfig"; path = "Target Support Files/Pods-Packsync/Pods-Packsync.debug.xcconfig"; sourceTree = "<group>"; };
+		4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivePlanNotification.swift; sourceTree = "<group>"; };
+		4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanManager.swift; sourceTree = "<group>"; };
+		4CC078DF2CE42AD4009364D8 /* AddPackingItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPackingItemView.swift; sourceTree = "<group>"; };
+		4CC078E02CE42AD4009364D8 /* AddPackingItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPackingItemViewController.swift; sourceTree = "<group>"; };
+		4CC078E22CE42AD4009364D8 /* BillboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillboardView.swift; sourceTree = "<group>"; };
+		4CC078E32CE42AD4009364D8 /* BillboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillboardViewController.swift; sourceTree = "<group>"; };
+		4CC078E52CE42AD4009364D8 /* EditPackingItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPackingItemView.swift; sourceTree = "<group>"; };
+		4CC078E62CE42AD4009364D8 /* EditPackingItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPackingItemViewController.swift; sourceTree = "<group>"; };
+		4CC078E82CE42AD4009364D8 /* FriendsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsListView.swift; sourceTree = "<group>"; };
+		4CC078E92CE42AD4009364D8 /* FriendsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsListViewController.swift; sourceTree = "<group>"; };
+		4CC078EB2CE42AD4009364D8 /* InviteFriendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendView.swift; sourceTree = "<group>"; };
+		4CC078EC2CE42AD4009364D8 /* InviteFriendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendViewController.swift; sourceTree = "<group>"; };
+		4CC078EE2CE42AD4009364D8 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
+		4CC078EF2CE42AD4009364D8 /* GroupExpense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupExpense.swift; sourceTree = "<group>"; };
+		4CC078F02CE42AD4009364D8 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
+		4CC078F12CE42AD4009364D8 /* PackingItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItem.swift; sourceTree = "<group>"; };
+		4CC078F22CE42AD4009364D8 /* SpendingItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingItem.swift; sourceTree = "<group>"; };
+		4CC078F32CE42AD4009364D8 /* Travel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Travel.swift; sourceTree = "<group>"; };
+		4CC078F42CE42AD4009364D8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		4CC078F62CE42AD4009364D8 /* PackingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListView.swift; sourceTree = "<group>"; };
+		4CC078F72CE42AD4009364D8 /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
+		4CC078F92CE42AD4009364D8 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		4CC078FA2CE42AD4009364D8 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		4CC078FC2CE42AD4009364D8 /* ProgressSpinnerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSpinnerDelegate.swift; sourceTree = "<group>"; };
+		4CC078FD2CE42AD4009364D8 /* ProgressSpinnerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressSpinnerViewController.swift; sourceTree = "<group>"; };
+		4CC078FF2CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterProgressIndicatorManager.swift; sourceTree = "<group>"; };
+		4CC079002CE42AD4009364D8 /* SignUpFirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpFirebaseManager.swift; sourceTree = "<group>"; };
+		4CC079012CE42AD4009364D8 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		4CC079022CE42AD4009364D8 /* SignUpViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpViewController.swift; sourceTree = "<group>"; };
+		4CC079042CE42AD4009364D8 /* BudgetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewController.swift; sourceTree = "<group>"; };
+		4CC079062CE42AD4009364D8 /* ExpensesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpensesViewController.swift; sourceTree = "<group>"; };
+		4CC079082CE42AD4009364D8 /* OverviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewViewController.swift; sourceTree = "<group>"; };
+		4CC0790A2CE42AD4009364D8 /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		4CC0790C2CE42AD4009364D8 /* SpendingFirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingFirebaseManager.swift; sourceTree = "<group>"; };
+		4CC0790D2CE42AD4009364D8 /* SpendingFirestoreExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingFirestoreExtensions.swift; sourceTree = "<group>"; };
+		4CC0790E2CE42AD4009364D8 /* SpendingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingView.swift; sourceTree = "<group>"; };
+		4CC0790F2CE42AD4009364D8 /* SpendingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpendingViewController.swift; sourceTree = "<group>"; };
+		4CC079112CE42AD4009364D8 /* EditTravelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTravelDetailView.swift; sourceTree = "<group>"; };
+		4CC079122CE42AD4009364D8 /* EditTravelDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTravelDetailViewController.swift; sourceTree = "<group>"; };
+		4CC079132CE42AD4009364D8 /* TravelDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelDetailView.swift; sourceTree = "<group>"; };
+		4CC079142CE42AD4009364D8 /* TravelDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelDetailViewController.swift; sourceTree = "<group>"; };
+		4CC079162CE42AD4009364D8 /* ActivePlanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivePlanViewController.swift; sourceTree = "<group>"; };
+		4CC079172CE42AD4009364D8 /* AddANewTravelPlanController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddANewTravelPlanController.swift; sourceTree = "<group>"; };
+		4CC079182CE42AD4009364D8 /* AddANewTravelPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddANewTravelPlanView.swift; sourceTree = "<group>"; };
+		4CC079192CE42AD4009364D8 /* LeftBarButttonManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftBarButttonManager.swift; sourceTree = "<group>"; };
+		4CC0791A2CE42AD4009364D8 /* TravelPlanTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanTableViewCell.swift; sourceTree = "<group>"; };
+		4CC0791B2CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanTableViewCellManager.swift; sourceTree = "<group>"; };
+		4CC0791C2CE42AD4009364D8 /* TravelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelView.swift; sourceTree = "<group>"; };
+		4CC0791D2CE42AD4009364D8 /* TravelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelViewController.swift; sourceTree = "<group>"; };
+		4CC0791F2CE42AD4009364D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		4CC079202CE42AD4009364D8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4CC079212CE42AD4009364D8 /* Configs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configs.swift; sourceTree = "<group>"; };
+		4CC079222CE42AD4009364D8 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		4CC079232CE42AD4009364D8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		4CC079242CE42AD4009364D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		4CC079262CE42AD4009364D8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		4CC079282CE42AD4009364D8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		4CC079292CE42AD4009364D8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		5B899A5F4CAC2071E1963521 /* Pods_PacksyncTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PacksyncTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		737AC4022CCB2C78005F0B42 /* Packsync.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Packsync.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		737AC4182CCB2C79005F0B42 /* PacksyncTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PacksyncTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -44,25 +159,7 @@
 		FFAAFE02DC54AAFC36E0CADA /* Pods-Packsync-PacksyncUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync-PacksyncUITests.release.xcconfig"; path = "Target Support Files/Pods-Packsync-PacksyncUITests/Pods-Packsync-PacksyncUITests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		737AC42A2CCB2C79005F0B42 /* Exceptions for "Packsync" folder in "Packsync" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 737AC4012CCB2C78005F0B42 /* Packsync */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		737AC4042CCB2C78005F0B42 /* Packsync */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				737AC42A2CCB2C79005F0B42 /* Exceptions for "Packsync" folder in "Packsync" target */,
-			);
-			path = Packsync;
-			sourceTree = "<group>";
-		};
 		737AC41B2CCB2C79005F0B42 /* PacksyncTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = PacksyncTests;
@@ -113,10 +210,219 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		4CC078DE2CE42AD4009364D8 /* ActivePlanSetup */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */,
+				4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */,
+			);
+			path = ActivePlanSetup;
+			sourceTree = "<group>";
+		};
+		4CC078E12CE42AD4009364D8 /* AddPackingItemScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078DF2CE42AD4009364D8 /* AddPackingItemView.swift */,
+				4CC078E02CE42AD4009364D8 /* AddPackingItemViewController.swift */,
+			);
+			path = AddPackingItemScreen;
+			sourceTree = "<group>";
+		};
+		4CC078E42CE42AD4009364D8 /* BillboardScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078E22CE42AD4009364D8 /* BillboardView.swift */,
+				4CC078E32CE42AD4009364D8 /* BillboardViewController.swift */,
+			);
+			path = BillboardScreen;
+			sourceTree = "<group>";
+		};
+		4CC078E72CE42AD4009364D8 /* EditPackingItemScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078E52CE42AD4009364D8 /* EditPackingItemView.swift */,
+				4CC078E62CE42AD4009364D8 /* EditPackingItemViewController.swift */,
+			);
+			path = EditPackingItemScreen;
+			sourceTree = "<group>";
+		};
+		4CC078EA2CE42AD4009364D8 /* FriendsListScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078E82CE42AD4009364D8 /* FriendsListView.swift */,
+				4CC078E92CE42AD4009364D8 /* FriendsListViewController.swift */,
+			);
+			path = FriendsListScreen;
+			sourceTree = "<group>";
+		};
+		4CC078ED2CE42AD4009364D8 /* InviteFriendScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078EB2CE42AD4009364D8 /* InviteFriendView.swift */,
+				4CC078EC2CE42AD4009364D8 /* InviteFriendViewController.swift */,
+			);
+			path = InviteFriendScreen;
+			sourceTree = "<group>";
+		};
+		4CC078F52CE42AD4009364D8 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078EE2CE42AD4009364D8 /* Category.swift */,
+				4CC078EF2CE42AD4009364D8 /* GroupExpense.swift */,
+				4CC078F02CE42AD4009364D8 /* Invitation.swift */,
+				4CC078F12CE42AD4009364D8 /* PackingItem.swift */,
+				4CC078F22CE42AD4009364D8 /* SpendingItem.swift */,
+				4CC078F32CE42AD4009364D8 /* Travel.swift */,
+				4CC078F42CE42AD4009364D8 /* User.swift */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		4CC078F82CE42AD4009364D8 /* PackingListScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078F62CE42AD4009364D8 /* PackingListView.swift */,
+				4CC078F72CE42AD4009364D8 /* PackingListViewController.swift */,
+			);
+			path = PackingListScreen;
+			sourceTree = "<group>";
+		};
+		4CC078FB2CE42AD4009364D8 /* ProfileScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078F92CE42AD4009364D8 /* ProfileView.swift */,
+				4CC078FA2CE42AD4009364D8 /* ProfileViewController.swift */,
+			);
+			path = ProfileScreen;
+			sourceTree = "<group>";
+		};
+		4CC078FE2CE42AD4009364D8 /* Progress Indicator */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078FC2CE42AD4009364D8 /* ProgressSpinnerDelegate.swift */,
+				4CC078FD2CE42AD4009364D8 /* ProgressSpinnerViewController.swift */,
+			);
+			path = "Progress Indicator";
+			sourceTree = "<group>";
+		};
+		4CC079032CE42AD4009364D8 /* SignUpScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078FF2CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift */,
+				4CC079002CE42AD4009364D8 /* SignUpFirebaseManager.swift */,
+				4CC079012CE42AD4009364D8 /* SignUpView.swift */,
+				4CC079022CE42AD4009364D8 /* SignUpViewController.swift */,
+			);
+			path = SignUpScreen;
+			sourceTree = "<group>";
+		};
+		4CC079052CE42AD4009364D8 /* BudgetView */ = {
+			isa = PBXGroup;
+			children = (
+				4CC079042CE42AD4009364D8 /* BudgetViewController.swift */,
+			);
+			path = BudgetView;
+			sourceTree = "<group>";
+		};
+		4CC079072CE42AD4009364D8 /* ExpenseView */ = {
+			isa = PBXGroup;
+			children = (
+				4CC079062CE42AD4009364D8 /* ExpensesViewController.swift */,
+			);
+			path = ExpenseView;
+			sourceTree = "<group>";
+		};
+		4CC079092CE42AD4009364D8 /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				4CC079082CE42AD4009364D8 /* OverviewViewController.swift */,
+			);
+			path = Overview;
+			sourceTree = "<group>";
+		};
+		4CC0790B2CE42AD4009364D8 /* SplitView */ = {
+			isa = PBXGroup;
+			children = (
+				4CC0790A2CE42AD4009364D8 /* SplitViewController.swift */,
+			);
+			path = SplitView;
+			sourceTree = "<group>";
+		};
+		4CC079102CE42AD4009364D8 /* SpendingScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC079052CE42AD4009364D8 /* BudgetView */,
+				4CC079072CE42AD4009364D8 /* ExpenseView */,
+				4CC079092CE42AD4009364D8 /* Overview */,
+				4CC0790B2CE42AD4009364D8 /* SplitView */,
+				4CC0790C2CE42AD4009364D8 /* SpendingFirebaseManager.swift */,
+				4CC0790D2CE42AD4009364D8 /* SpendingFirestoreExtensions.swift */,
+				4CC0790E2CE42AD4009364D8 /* SpendingView.swift */,
+				4CC0790F2CE42AD4009364D8 /* SpendingViewController.swift */,
+			);
+			path = SpendingScreen;
+			sourceTree = "<group>";
+		};
+		4CC079152CE42AD4009364D8 /* TravelDetailScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC079112CE42AD4009364D8 /* EditTravelDetailView.swift */,
+				4CC079122CE42AD4009364D8 /* EditTravelDetailViewController.swift */,
+				4CC079132CE42AD4009364D8 /* TravelDetailView.swift */,
+				4CC079142CE42AD4009364D8 /* TravelDetailViewController.swift */,
+			);
+			path = TravelDetailScreen;
+			sourceTree = "<group>";
+		};
+		4CC0791E2CE42AD4009364D8 /* TraveScreen */ = {
+			isa = PBXGroup;
+			children = (
+				4CC079162CE42AD4009364D8 /* ActivePlanViewController.swift */,
+				4CC079172CE42AD4009364D8 /* AddANewTravelPlanController.swift */,
+				4CC079182CE42AD4009364D8 /* AddANewTravelPlanView.swift */,
+				4CC079192CE42AD4009364D8 /* LeftBarButttonManager.swift */,
+				4CC0791A2CE42AD4009364D8 /* TravelPlanTableViewCell.swift */,
+				4CC0791B2CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift */,
+				4CC0791C2CE42AD4009364D8 /* TravelView.swift */,
+				4CC0791D2CE42AD4009364D8 /* TravelViewController.swift */,
+			);
+			path = TraveScreen;
+			sourceTree = "<group>";
+		};
+		4CC0792A2CE42AD4009364D8 /* Packsync */ = {
+			isa = PBXGroup;
+			children = (
+				4CC078DE2CE42AD4009364D8 /* ActivePlanSetup */,
+				4CC078E12CE42AD4009364D8 /* AddPackingItemScreen */,
+				4CC078E42CE42AD4009364D8 /* BillboardScreen */,
+				4CC078E72CE42AD4009364D8 /* EditPackingItemScreen */,
+				4CC078EA2CE42AD4009364D8 /* FriendsListScreen */,
+				4CC078ED2CE42AD4009364D8 /* InviteFriendScreen */,
+				4CC078F52CE42AD4009364D8 /* Model */,
+				4CC078F82CE42AD4009364D8 /* PackingListScreen */,
+				4CC078FB2CE42AD4009364D8 /* ProfileScreen */,
+				4CC078FE2CE42AD4009364D8 /* Progress Indicator */,
+				4CC079032CE42AD4009364D8 /* SignUpScreen */,
+				4CC079102CE42AD4009364D8 /* SpendingScreen */,
+				4CC079152CE42AD4009364D8 /* TravelDetailScreen */,
+				4CC0791E2CE42AD4009364D8 /* TraveScreen */,
+				4CC0791F2CE42AD4009364D8 /* AppDelegate.swift */,
+				4CC079202CE42AD4009364D8 /* Assets.xcassets */,
+				4CC079212CE42AD4009364D8 /* Configs.swift */,
+				4CC079222CE42AD4009364D8 /* GoogleService-Info.plist */,
+				4CC079232CE42AD4009364D8 /* Info.plist */,
+				4CC079252CE42AD4009364D8 /* LaunchScreen.storyboard */,
+				4CC079272CE42AD4009364D8 /* Main.storyboard */,
+				4CC079282CE42AD4009364D8 /* SceneDelegate.swift */,
+				4CC079292CE42AD4009364D8 /* ViewController.swift */,
+			);
+			path = Packsync;
+			sourceTree = "<group>";
+		};
 		737AC3F92CCB2C78005F0B42 = {
 			isa = PBXGroup;
 			children = (
-				737AC4042CCB2C78005F0B42 /* Packsync */,
+				4CC0792A2CE42AD4009364D8 /* Packsync */,
 				737AC41B2CCB2C79005F0B42 /* PacksyncTests */,
 				737AC4252CCB2C79005F0B42 /* PacksyncUITests */,
 				737AC4032CCB2C78005F0B42 /* Products */,
@@ -164,9 +470,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				737AC4042CCB2C78005F0B42 /* Packsync */,
 			);
 			name = Packsync;
 			productName = Packsync;
@@ -249,8 +552,6 @@
 				Base,
 			);
 			mainGroup = 737AC3F92CCB2C78005F0B42;
-			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 737AC4032CCB2C78005F0B42 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -267,6 +568,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CC079602CE42AD4009364D8 /* Assets.xcassets in Resources */,
+				4CC079612CE42AD4009364D8 /* GoogleService-Info.plist in Resources */,
+				4CC079632CE42AD4009364D8 /* LaunchScreen.storyboard in Resources */,
+				4CC079642CE42AD4009364D8 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -394,6 +699,59 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CC0792B2CE42AD4009364D8 /* ActivePlanNotification.swift in Sources */,
+				4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */,
+				4CC0792D2CE42AD4009364D8 /* AddPackingItemView.swift in Sources */,
+				4CC0792E2CE42AD4009364D8 /* AddPackingItemViewController.swift in Sources */,
+				4CC0792F2CE42AD4009364D8 /* BillboardView.swift in Sources */,
+				4CC079302CE42AD4009364D8 /* BillboardViewController.swift in Sources */,
+				4CC079312CE42AD4009364D8 /* EditPackingItemView.swift in Sources */,
+				4CC079322CE42AD4009364D8 /* EditPackingItemViewController.swift in Sources */,
+				4CC079332CE42AD4009364D8 /* FriendsListView.swift in Sources */,
+				4CC079342CE42AD4009364D8 /* FriendsListViewController.swift in Sources */,
+				4CC079352CE42AD4009364D8 /* InviteFriendView.swift in Sources */,
+				4CC079362CE42AD4009364D8 /* InviteFriendViewController.swift in Sources */,
+				4CC079372CE42AD4009364D8 /* Category.swift in Sources */,
+				4CC079382CE42AD4009364D8 /* GroupExpense.swift in Sources */,
+				4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */,
+				4CC0793A2CE42AD4009364D8 /* PackingItem.swift in Sources */,
+				4CC0793B2CE42AD4009364D8 /* SpendingItem.swift in Sources */,
+				4CC0793C2CE42AD4009364D8 /* Travel.swift in Sources */,
+				4CC0793D2CE42AD4009364D8 /* User.swift in Sources */,
+				4CC0793E2CE42AD4009364D8 /* PackingListView.swift in Sources */,
+				4CC0793F2CE42AD4009364D8 /* PackingListViewController.swift in Sources */,
+				4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */,
+				4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */,
+				4CC079422CE42AD4009364D8 /* ProgressSpinnerDelegate.swift in Sources */,
+				4CC079432CE42AD4009364D8 /* ProgressSpinnerViewController.swift in Sources */,
+				4CC079442CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift in Sources */,
+				4CC079452CE42AD4009364D8 /* SignUpFirebaseManager.swift in Sources */,
+				4CC079462CE42AD4009364D8 /* SignUpView.swift in Sources */,
+				4CC079472CE42AD4009364D8 /* SignUpViewController.swift in Sources */,
+				4CC079482CE42AD4009364D8 /* BudgetViewController.swift in Sources */,
+				4CC079492CE42AD4009364D8 /* ExpensesViewController.swift in Sources */,
+				4CC0794A2CE42AD4009364D8 /* OverviewViewController.swift in Sources */,
+				4CC0794B2CE42AD4009364D8 /* SplitViewController.swift in Sources */,
+				4CC0794C2CE42AD4009364D8 /* SpendingFirebaseManager.swift in Sources */,
+				4CC0794D2CE42AD4009364D8 /* SpendingFirestoreExtensions.swift in Sources */,
+				4CC0794E2CE42AD4009364D8 /* SpendingView.swift in Sources */,
+				4CC0794F2CE42AD4009364D8 /* SpendingViewController.swift in Sources */,
+				4CC079502CE42AD4009364D8 /* EditTravelDetailView.swift in Sources */,
+				4CC079512CE42AD4009364D8 /* EditTravelDetailViewController.swift in Sources */,
+				4CC079522CE42AD4009364D8 /* TravelDetailView.swift in Sources */,
+				4CC079532CE42AD4009364D8 /* TravelDetailViewController.swift in Sources */,
+				4CC079542CE42AD4009364D8 /* ActivePlanViewController.swift in Sources */,
+				4CC079552CE42AD4009364D8 /* AddANewTravelPlanController.swift in Sources */,
+				4CC079562CE42AD4009364D8 /* AddANewTravelPlanView.swift in Sources */,
+				4CC079572CE42AD4009364D8 /* LeftBarButttonManager.swift in Sources */,
+				4CC079582CE42AD4009364D8 /* TravelPlanTableViewCell.swift in Sources */,
+				4CC079592CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift in Sources */,
+				4CC0795A2CE42AD4009364D8 /* TravelView.swift in Sources */,
+				4CC0795B2CE42AD4009364D8 /* TravelViewController.swift in Sources */,
+				4CC0795C2CE42AD4009364D8 /* AppDelegate.swift in Sources */,
+				4CC0795D2CE42AD4009364D8 /* Configs.swift in Sources */,
+				4CC0795E2CE42AD4009364D8 /* SceneDelegate.swift in Sources */,
+				4CC0795F2CE42AD4009364D8 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -426,6 +784,25 @@
 		};
 /* End PBXTargetDependency section */
 
+/* Begin PBXVariantGroup section */
+		4CC079252CE42AD4009364D8 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4CC079242CE42AD4009364D8 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		4CC079272CE42AD4009364D8 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4CC079262CE42AD4009364D8 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
 		737AC42C2CCB2C79005F0B42 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -443,6 +820,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -472,6 +850,7 @@
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

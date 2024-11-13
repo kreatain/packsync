@@ -8,8 +8,10 @@ target 'Packsync' do
   # Pods for Packsync
   pod 'Alamofire'
 
+# Firebase pods
 pod 'Firebase/Auth'
 pod 'Firebase/Firestore'
+pod 'Firebase/Database'
 pod 'Firebase/Storage'
 
   target 'PacksyncTests' do

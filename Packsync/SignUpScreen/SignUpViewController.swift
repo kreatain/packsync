@@ -8,6 +8,8 @@
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseDatabase // Import FirebaseDatabase to interact with Realtime Database
+
 
 class SignUpViewController: UIViewController {
 
@@ -29,6 +31,7 @@ class SignUpViewController: UIViewController {
         //MARK: creating a new user on Firebase...
         signUpNewAccount()
     }
+    
     
     
 }
