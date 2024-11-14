@@ -2,7 +2,7 @@
 //  EditPackingItemView.swift
 //  Packsync
 //
-//  Created by Xi Jia on 11/8/24.
+//  Created by Xi Jia on 11/13/24.
 //
 
 import UIKit
