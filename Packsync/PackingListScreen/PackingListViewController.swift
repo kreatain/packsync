@@ -49,11 +49,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         guard let travel = travel else { return }
 
         let db = Firestore.firestore()
-
         db.collection("trips").document(travel.id).collection("packingItems")
-
-        db.collection("packingItem")
-
             .whereField("creatorId", isEqualTo: travel.creatorId)
             .whereField("travelId", isEqualTo: travel.id)
             .addSnapshotListener { [weak self] querySnapshot, error in
@@ -68,14 +64,9 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
                     let name = data["name"] as? String ?? ""
                     let itemNumber = data["itemNumber"] as? String ?? ""
                     let isPacked = data["isPacked"] as? Bool ?? false
-
                     let isPackedBy = data["isPackedBy"] as? String
 
                     return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber)
-
-                    
-                    return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, itemNumber: itemNumber)
-
                 }
                 
                 DispatchQueue.main.async {
@@ -84,32 +75,8 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
             }
     }
     
-
     
     @objc func checkboxTapped(_ sender: UIButton) {
-
-    // MARK: - UITableViewDataSource
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return packingItems.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath)
-        let item = packingItems[indexPath.row]
-        cell.textLabel?.text = "\(item.name) (count: \(item.itemNumber ?? "1"))"
-        
-        let switchView = UISwitch(frame: .zero)
-        switchView.setOn(item.isPacked, animated: false)
-        switchView.tag = indexPath.row
-        switchView.addTarget(self, action: #selector(self.switchChanged(_:)), for: .valueChanged)
-        cell.accessoryView = switchView
-        
-        return cell
-    }
-    
-    @objc func switchChanged(_ sender: UISwitch) {
-
         let index = sender.tag
         guard index < packingItems.count else {
             print("Error: Invalid index")
@@ -119,14 +86,12 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         packingItems[index].isPacked.toggle()
         sender.isSelected = packingItems[index].isPacked
         
-
         // Update the item in Firestore
         guard let travel = travel else {
             print("Error: Travel object is nil")
             return
         }
         
-
         let db = Firestore.firestore()
         let id = packingItems[index].id
         let currentUser = Auth.auth().currentUser
