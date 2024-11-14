@@ -14,8 +14,49 @@ class SpendingFirebaseManager {
     
     private init() {} // Private initializer for singleton
     
-    // MARK: - Fetch Budget Categories
-    /// Fetches budget categories for a specific trip.
+    // MARK: - Fetch Categories with Spending Item IDs for a Specific Trip
+    /// Fetches categories and their associated spending item IDs for a specific trip.
+    func fetchCategories(for travelId: String, completion: @escaping ([Category]) -> Void) {
+        db.collection("trips").document(travelId).collection("budgetCategories")
+            .getDocuments { (snapshot, error) in
+                if let error = error {
+                    print("Error fetching categories: \(error.localizedDescription)")
+                    completion([])
+                    return
+                }
+                
+                let categories = snapshot?.documents.compactMap { document -> Category? in
+                    var category = try? document.data(as: Category.self)
+                    category?.id = document.documentID // Ensure the category ID is set
+                    return category
+                } ?? []
+                
+                completion(categories)
+            }
+    }
+    
+    // MARK: - Fetch Spending Items for a Category
+    /// Fetches all spending items associated with a specific category in a trip.
+    func fetchSpendingItems(for travelId: String, categoryId: String, completion: @escaping ([SpendingItem]) -> Void) {
+        db.collection("trips").document(travelId)
+            .collection("budgetCategories").document(categoryId)
+            .collection("spendingItems").getDocuments { (snapshot, error) in
+                if let error = error {
+                    print("Error fetching spending items: \(error.localizedDescription)")
+                    completion([])
+                    return
+                }
+                
+                let spendingItems = snapshot?.documents.compactMap { document in
+                    try? document.data(as: SpendingItem.self)
+                } ?? []
+                
+                completion(spendingItems)
+            }
+    }
+    
+    // MARK: - Fetch Budget Categories (Without Spending Items)
+    /// Fetches budget categories for a specific trip with their IDs.
     func fetchBudgetCategories(tripId: String, completion: @escaping ([Category]) -> Void) {
         db.collection("trips").document(tripId).collection("budgetCategories")
             .getDocuments { (snapshot, error) in
@@ -71,7 +112,7 @@ class SpendingFirebaseManager {
     func updateGroupBalance(tripId: String, groupExpense: GroupExpense, completion: @escaping (Bool) -> Void) {
         do {
             try db.collection("trips").document(tripId)
-                .collection("groupExpenses").document(groupExpense.memberEmail)
+                .collection("groupExpenses").document(groupExpense.id)
                 .setData(from: groupExpense)
             completion(true)
         } catch let error {
@@ -123,26 +164,6 @@ class SpendingFirebaseManager {
                 }
             }
         }
-    }
-    
-    // MARK: - Fetch Spending Items for a Category
-    /// Fetches all spending items under a specific budget category within a trip.
-    func fetchSpendingItems(tripId: String, categoryId: String, completion: @escaping ([SpendingItem]) -> Void) {
-        db.collection("trips").document(tripId)
-            .collection("budgetCategories").document(categoryId)
-            .collection("spendingItems").getDocuments { (snapshot, error) in
-                if let error = error {
-                    print("Error fetching spending items: \(error.localizedDescription)")
-                    completion([])
-                    return
-                }
-                
-                let spendingItems = snapshot?.documents.compactMap { doc in
-                    try? doc.data(as: SpendingItem.self)
-                } ?? []
-                
-                completion(spendingItems)
-            }
     }
     
     // MARK: - Update Spending Item

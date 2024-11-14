@@ -42,7 +42,7 @@ class TravelDetailViewController: UIViewController {
         }
         let editVC = EditTravelDetailViewController()
         editVC.travel = travel
-        editVC.delegate = self
+        editVC.delegate = self // Now conforms to EditTravelDetailDelegate
         let navController = UINavigationController(rootViewController: editVC)
         present(navController, animated: true, completion: nil)
     }
@@ -52,9 +52,8 @@ class TravelDetailViewController: UIViewController {
             print("No travel plan available")
             return
         }
-        // Create and push the PackingListViewController
         let packingListVC = PackingListViewController()
-        packingListVC.travel = self.travel // Pass the current travel to the packing list
+        packingListVC.travel = self.travel
         navigationController?.pushViewController(packingListVC, animated: true)
     }
     
@@ -62,14 +61,10 @@ class TravelDetailViewController: UIViewController {
         let inviteFriendVC = InviteFriendViewController()
         navigationController?.pushViewController(inviteFriendVC, animated: true)
     }
-    
 }
 
-protocol EditTravelViewControllerDelegate: AnyObject {
-    func didUpdateTravel(_ travel: Travel)
-    func didDeleteTravel(_ travel: Travel)
-}
-extension TravelDetailViewController: EditTravelViewControllerDelegate {
+// Ensure this conforms to EditTravelDetailDelegate
+extension TravelDetailViewController: EditTravelDetailDelegate {
     func didUpdateTravel(_ travel: Travel) {
         self.travel = travel
         detailView.configure(with: travel)

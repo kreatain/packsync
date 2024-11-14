@@ -145,12 +145,7 @@ class TravelPlanTableViewCell: UITableViewCell {
         guard let activeTravelPlan = TravelPlanManager.shared.activeTravelPlan else {
             return false
         }
-        
-        return travel.creatorEmail == activeTravelPlan.creatorEmail &&
-               travel.travelTitle == activeTravelPlan.travelTitle &&
-               travel.travelStartDate == activeTravelPlan.travelStartDate &&
-               travel.travelEndDate == activeTravelPlan.travelEndDate &&
-               travel.countryAndCity == activeTravelPlan.countryAndCity
+        return travel.id == activeTravelPlan.id
     }
 
     // MARK: - Button Action

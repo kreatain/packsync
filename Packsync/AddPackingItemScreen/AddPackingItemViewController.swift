@@ -19,24 +19,6 @@ class AddPackingItemViewController: UIViewController {
         addPackingItemView.buttonAdd.addTarget(self, action: #selector(addItemButtonTapped), for: .touchUpInside)
     }
     
-//    @objc func addItemButtonTapped() {
-//        guard let itemName = addPackingItemView.textFieldItemName.text, !itemName.isEmpty,
-//              let itemNumber = addPackingItemView.textFieldItemCount.text, !itemNumber.isEmpty,
-//              let travel = travel else {
-//            showAlert(message: "Please enter both item name and count.")
-//            return
-//        }
-//        
-//        let newItem = PackingItem(
-//            creatorEmail: travel.creatorEmail,
-//            travelTitle: travel.travelTitle,
-//            name: itemName,
-//            itemNumber: itemNumber
-//        )
-//        
-//        savePackingItemToFirestore(newItem)
-//    }
-//
     @objc func addItemButtonTapped() {
         guard let itemName = addPackingItemView.textFieldItemName.text, !itemName.isEmpty,
               let itemNumber = addPackingItemView.textFieldItemCount.text, !itemNumber.isEmpty,
@@ -45,10 +27,11 @@ class AddPackingItemViewController: UIViewController {
             return
         }
         
+        // Create new PackingItem using travel's creatorId and travelId
         let newItem = PackingItem(
             id: UUID().uuidString,
-            creatorEmail: travel.creatorEmail,
-            travelTitle: travel.travelTitle,
+            creatorId: travel.creatorId,
+            travelId: travel.id,
             name: itemName,
             isPacked: addPackingItemView.switchIsPacked.isOn,
             itemNumber: itemNumber
@@ -56,11 +39,17 @@ class AddPackingItemViewController: UIViewController {
         
         savePackingItemToFirestore(newItem)
     }
+    
     func savePackingItemToFirestore(_ item: PackingItem) {
+        guard let travel = travel else {
+            showAlert(message: "Travel information is missing.")
+            return
+        }
+        
         let db = Firestore.firestore()
         
         do {
-            try db.collection("packingItem").addDocument(from: item) { error in
+            try db.collection("trips").document(travel.id).collection("packingItems").addDocument(from: item) { error in
                 if let error = error {
                     print("Error adding document: \(error)")
                     self.showAlert(message: "Failed to add item. Please try again.")

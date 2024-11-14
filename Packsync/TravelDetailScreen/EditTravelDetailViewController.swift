@@ -1,16 +1,9 @@
-//
-//  EditTravelDetailViewController.swift
-//  Packsync
-//
-//  Created by Xi Jia on 11/8/24.
-//
-
 import UIKit
 import FirebaseFirestore
 
 class EditTravelDetailViewController: UIViewController {
     var travel: Travel?
-    weak var delegate: EditTravelViewControllerDelegate?
+    weak var delegate: EditTravelDetailDelegate? // Renamed delegate
     
     let editTravelView = EditTravelDetailView()
     
@@ -31,7 +24,6 @@ class EditTravelDetailViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(saveEdit))
         
         editTravelView.buttonSave.addTarget(self, action: #selector(saveEdit), for: .touchUpInside)
-        
         editTravelView.buttonDelete.addTarget(self, action: #selector(onDeleteTapped), for: .touchUpInside)
     }
     
@@ -44,43 +36,38 @@ class EditTravelDetailViewController: UIViewController {
               let updatedStartDate = editTravelView.textFieldTravelStartDate.text,
               let updatedEndDate = editTravelView.textFieldTravelEndDate.text,
               let updatedCountryAndCity = editTravelView.textFieldCountryAndCity.text,
-              let creatorEmail = travel?.creatorEmail else {
+              let creatorId = travel?.creatorId else {
             print("Invalid input")
             return
         }
         
-        let updatedTravel = Travel(creatorEmail: creatorEmail,
-                                   travelTitle: updatedTitle,
-                                   travelStartDate: formatDateForFirestore(updatedStartDate),
-                                   travelEndDate: formatDateForFirestore(updatedEndDate),
-                                   countryAndCity: updatedCountryAndCity)
+        let updatedTravel = Travel(
+            id: travel?.id ?? UUID().uuidString,
+            creatorId: creatorId,
+            travelTitle: updatedTitle,
+            travelStartDate: formatDateForFirestore(updatedStartDate),
+            travelEndDate: formatDateForFirestore(updatedEndDate),
+            countryAndCity: updatedCountryAndCity,
+            categoryIds: travel?.categoryIds ?? [],
+            expenseIds: travel?.expenseIds ?? [],
+            participantIds: travel?.participantIds ?? []
+        )
         
-        // Update Firestore
         let db = Firestore.firestore()
-        db.collection("travelPlans").whereField("creatorEmail", isEqualTo: creatorEmail)
-            .whereField("travelTitle", isEqualTo: travel?.travelTitle ?? "")
-            .getDocuments { [weak self] (querySnapshot, error) in
-                if let error = error {
-                    print("Error getting documents: \(error)")
-                } else {
-                    for document in querySnapshot!.documents {
-                        document.reference.updateData([
-                            "travelTitle": updatedTitle,
-                            "travelStartDate": updatedTravel.travelStartDate,
-                            "travelEndDate": updatedTravel.travelEndDate,
-                            "countryAndCity": updatedCountryAndCity
-                        ]) { err in
-                            if let err = err {
-                                print("Error updating document: \(err)")
-                            } else {
-                                print("Document successfully updated")
-                                self?.delegate?.didUpdateTravel(updatedTravel)
-                                self?.dismiss(animated: true, completion: nil)
-                            }
-                        }
-                    }
-                }
+        db.collection("travelPlans").document(travel?.id ?? "").updateData([
+            "travelTitle": updatedTitle,
+            "travelStartDate": updatedTravel.travelStartDate,
+            "travelEndDate": updatedTravel.travelEndDate,
+            "countryAndCity": updatedCountryAndCity
+        ]) { [weak self] error in
+            if let error = error {
+                print("Error updating document: \(error)")
+            } else {
+                print("Document successfully updated")
+                self?.delegate?.didUpdateTravel(updatedTravel)
+                self?.dismiss(animated: true, completion: nil)
             }
+        }
     }
     
     func formatDateForFirestore(_ dateString: String) -> String {
@@ -94,11 +81,10 @@ class EditTravelDetailViewController: UIViewController {
             return outputFormatter.string(from: date)
         }
         
-        return dateString // Return original string if parsing fails
+        return dateString
     }
     
     @objc func onDeleteTapped() {
-        // Show a confirmation alert
         let alert = UIAlertController(title: "Delete Travel Plan", message: "Are you sure you want to delete this travel plan?", preferredStyle: .alert)
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
@@ -113,49 +99,19 @@ class EditTravelDetailViewController: UIViewController {
         guard let travel = travel else { return }
         
         let db = Firestore.firestore()
-        db.collection("travelPlans")
-            .whereField("creatorEmail", isEqualTo: travel.creatorEmail)
-            .whereField("travelTitle", isEqualTo: travel.travelTitle)
-            .getDocuments { [weak self] (querySnapshot, error) in
-                if let error = error {
-                    print("Error getting documents: \(error)")
-                    return
-                }
-                
-                guard let documents = querySnapshot?.documents, !documents.isEmpty else {
-                    print("No matching documents")
-                    return
-                }
-                
-                // Assuming there's only one matching document
-                let document = documents[0]
-                document.reference.delete { error in
-                    if let error = error {
-                        print("Error removing document: \(error)")
-                    } else {
-                        print("Document successfully removed!")
-                        // Notify the delegate that the travel plan was deleted
-                        self?.delegate?.didDeleteTravel(travel)
-                        // Dismiss the edit view controller
-                        self?.dismiss(animated: true, completion: nil)
-                    }
-                }
+        db.collection("travelPlans").document(travel.id).delete { [weak self] error in
+            if let error = error {
+                print("Error removing document: \(error)")
+            } else {
+                print("Document successfully removed!")
+                self?.delegate?.didDeleteTravel(travel)
+                self?.dismiss(animated: true, completion: nil)
             }
+        }
     }
 }
 
-//protocol EditTravelDetailViewControllerDelegate: AnyObject {
-//    func didUpdateTravel(_ travel: Travel)
-//    func didDeleteTravel(_ travel: Travel)
-//}
-//
-//extension TravelDetailViewController: EditTravelDetailViewControllerDelegate {
-//    func didUpdateTravel(_ travel: Travel) {
-//        self.travel = travel
-//        updateUI()
-//    }
-//    
-//    func didDeleteTravel(_ travel: Travel) {
-//        navigationController?.popViewController(animated: true)
-//    }
-//}
+protocol EditTravelDetailDelegate: AnyObject {
+    func didUpdateTravel(_ travel: Travel)
+    func didDeleteTravel(_ travel: Travel)
+}
