@@ -7,8 +7,9 @@
 
 import UIKit
 import FirebaseFirestore
+import FirebaseAuth
 
-class PackingListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PackingListViewControllerDelegate,EditPackingItemViewControllerDelegate {
+class PackingListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, PackingListViewControllerDelegate, EditPackingItemViewControllerDelegate {
     
     let packingListView = PackingListView()
     var travel: Travel?
@@ -43,65 +44,81 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         let navController = UINavigationController(rootViewController: addPackingItemVC)
         present(navController, animated: true, completion: nil)
     }
-    
-//    func fetchPackingItems() {
-//        guard let travel = travel else { return }
-//        
-//        let db = Firestore.firestore()
-//        db.collection("packingItem")
-//            .whereField("creatorEmail", isEqualTo: travel.creatorEmail)
-//            .whereField("travelTitle", isEqualTo: travel.travelTitle)
-//            .addSnapshotListener { [weak self] querySnapshot, error in
-//                guard let documents = querySnapshot?.documents else {
-//                    print("Error fetching documents: \(error?.localizedDescription ?? "Unknown error")")
-//                    return
-//                }
-//                
-//                self?.packingItems = documents.compactMap { queryDocumentSnapshot in
-//                    try? queryDocumentSnapshot.data(as: PackingItem.self)
-//                }
-//                
-//                // Sort the packingItems array
-//                self?.packingItems.sort { (item1, item2) -> Bool in
-//                    let firstWord1 = item1.name.components(separatedBy: " ").first ?? ""
-//                    let firstWord2 = item2.name.components(separatedBy: " ").first ?? ""
-//                    return firstWord1.localizedCaseInsensitiveCompare(firstWord2) == .orderedAscending
-//                }
-//                
-//                DispatchQueue.main.async {
-//                    self?.packingListView.tableViewPackingList.reloadData()
-//                }
-//            }
-//    }
+
     func fetchPackingItems() {
         guard let travel = travel else { return }
-        
+
         let db = Firestore.firestore()
-        db.collection("packingItem")
-            .whereField("creatorEmail", isEqualTo: travel.creatorEmail)
-            .whereField("travelTitle", isEqualTo: travel.travelTitle)
+        db.collection("trips").document(travel.id).collection("packingItems")
+            .whereField("creatorId", isEqualTo: travel.creatorId)
+            .whereField("travelId", isEqualTo: travel.id)
             .addSnapshotListener { [weak self] querySnapshot, error in
                 guard let documents = querySnapshot?.documents else {
                     print("Error fetching documents: \(error?.localizedDescription ?? "Unknown error")")
                     return
                 }
-                
+               
                 self?.packingItems = documents.compactMap { queryDocumentSnapshot in
                     let data = queryDocumentSnapshot.data()
                     let id = queryDocumentSnapshot.documentID
                     let name = data["name"] as? String ?? ""
                     let itemNumber = data["itemNumber"] as? String ?? ""
                     let isPacked = data["isPacked"] as? Bool ?? false
-                    
-                    return PackingItem(id: id, creatorEmail: travel.creatorEmail, travelTitle: travel.travelTitle, name: name, isPacked: isPacked, itemNumber: itemNumber)
+                    let isPackedBy = data["isPackedBy"] as? String
+
+                    return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber)
                 }
-                
-                // Sort the packingItems array if needed
                 
                 DispatchQueue.main.async {
                     self?.packingListView.tableViewPackingList.reloadData()
                 }
             }
+    }
+    
+    
+    @objc func checkboxTapped(_ sender: UIButton) {
+        let index = sender.tag
+        guard index < packingItems.count else {
+            print("Error: Invalid index")
+            return
+        }
+        
+        packingItems[index].isPacked.toggle()
+        sender.isSelected = packingItems[index].isPacked
+        
+        // Update the item in Firestore
+        guard let travel = travel else {
+            print("Error: Travel object is nil")
+            return
+        }
+        
+        let db = Firestore.firestore()
+        let id = packingItems[index].id
+        let currentUser = Auth.auth().currentUser
+        let displayName = currentUser?.displayName ?? "Unknown User"
+        let updateData: [String: Any] = [
+            "isPacked": packingItems[index].isPacked,
+            "isPackedBy": packingItems[index].isPacked ? displayName : NSNull()
+        ]
+        
+        db.collection("trips").document(travel.id).collection("packingItems").document(id).updateData(updateData) { [weak self] error in
+            if let error = error {
+                print("Error updating document: \(error)")
+                // Revert the change if the update fails
+                DispatchQueue.main.async {
+                    self?.packingItems[index].isPacked.toggle()
+                    sender.isSelected = self?.packingItems[index].isPacked ?? false
+                }
+            } else {
+                print("Document successfully updated")
+                // Update the local packingItems array
+                self?.packingItems[index].isPackedBy = self?.packingItems[index].isPacked == true ? displayName : nil
+                // Refresh the UI
+                DispatchQueue.main.async {
+                    self?.packingListView.tableViewPackingList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+                }
+            }
+        }
     }
     
     // MARK: - UITableViewDataSource
@@ -110,73 +127,20 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         return packingItems.count
     }
     
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath)
-//        let item = packingItems[indexPath.row]
-//        cell.textLabel?.text = "\(item.name) (count: \(item.itemNumber ?? "1"))"
-//        cell.accessoryType = item.isPacked ? .checkmark : .none
-//        return cell
-//    }
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//            let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath)
-//            let item = packingItems[indexPath.row]
-//            cell.textLabel?.text = "\(item.name) (count: \(item.itemNumber ?? "1"))"
-//            cell.accessoryType = item.isPacked ? .checkmark : .none
-//            
-//            // Add a switch for isPacked
-//            let switchView = UISwitch(frame: .zero)
-//            switchView.setOn(item.isPacked, animated: true)
-//            switchView.tag = indexPath.row
-//            switchView.addTarget(self, action: #selector(self.switchChanged(_:)), for: .valueChanged)
-//            cell.accessoryView = switchView
-//            
-//            return cell
-//        }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath)
-        let item = packingItems[indexPath.row]
-        cell.textLabel?.text = "\(item.name) (count: \(item.itemNumber ?? "1"))"
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath) as? PackingItemCell else {
+            fatalError("Unable to dequeue PackingItemCell")
+        }
         
-        // Add a switch for isPacked
-        let switchView = UISwitch(frame: .zero)
-        switchView.setOn(item.isPacked, animated: false)
-        switchView.tag = indexPath.row
-        switchView.addTarget(self, action: #selector(self.switchChanged(_:)), for: .valueChanged)
-        cell.accessoryView = switchView
+        let item = packingItems[indexPath.row]
+        cell.configure(with: item)
+        cell.checkboxButton.tag = indexPath.row
+        cell.checkboxButton.addTarget(self, action: #selector(checkboxTapped(_:)), for: .touchUpInside)
         
         return cell
     }
     
-//    @objc func switchChanged(_ sender: UISwitch) {
-//        let index = sender.tag
-//        packingItems[index].isPacked = sender.isOn
-//        
-//        // Update the item in Firestore
-//        let db = Firestore.firestore()
-//        let id = packingItems[index].id
-//        db.collection("packingItem").document(id).updateData(["isPacked": sender.isOn]) { error in
-//            if let error = error {
-//                print("Error updating document: \(error)")
-//            } else {
-//                print("Document successfully updated")
-//            }
-//        }
-//    }
-    @objc func switchChanged(_ sender: UISwitch) {
-        let index = sender.tag
-        packingItems[index].isPacked = sender.isOn
-        
-        // Update the item in Firestore
-        let db = Firestore.firestore()
-        let id = packingItems[index].id
-        db.collection("packingItem").document(id).updateData(["isPacked": sender.isOn]) { error in
-            if let error = error {
-                print("Error updating document: \(error)")
-            } else {
-                print("Document successfully updated")
-            }
-        }
-    }
+    // MARK: - PackingListViewControllerDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = packingItems[indexPath.row]
@@ -186,11 +150,10 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         let navController = UINavigationController(rootViewController: editPackingItemVC)
         present(navController, animated: true, completion: nil)
     }
-    
-    // MARK: - PackingListViewControllerDelegate
+
+
 
     func didAddPackingItem(_ item: PackingItem) {
-        // packingItems.append(item)
         packingListView.tableViewPackingList.reloadData()
     }
     
