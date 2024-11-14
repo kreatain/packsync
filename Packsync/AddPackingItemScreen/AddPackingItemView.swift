@@ -2,7 +2,7 @@
 //  AddPackingItemView.swift
 //  Packsync
 //
-//  Created by Xi Jia on 11/8/24.
+//  Created by Xi Jia on 11/13/24.
 //
 
 import UIKit
@@ -14,18 +14,13 @@ class AddPackingItemView: UIView {
     var textFieldItemCount: UITextField!
     var buttonAdd: UIButton!
     
-    var switchIsPacked: UISwitch!
-    var labelIsPacked: UILabel!
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
         
-//        setupLabelTitle()
         setupTextFieldItemName()
         setupTextFieldItemCount()
         setupButtonAdd()
-        setupSwitchIsPacked()
         
         initConstraints()
     }
@@ -70,24 +65,10 @@ class AddPackingItemView: UIView {
         self.addSubview(buttonAdd)
     }
     
-    func setupSwitchIsPacked() {
-        switchIsPacked = UISwitch()
-        switchIsPacked.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(switchIsPacked)
-        
-        labelIsPacked = UILabel()
-        labelIsPacked.text = "Is Packed"
-        labelIsPacked.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(labelIsPacked)
-    }
-    
     func initConstraints() {
         NSLayoutConstraint.activate([
-//            labelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
-//            labelTitle.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-//            labelTitle.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+
             textFieldItemName.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
-//            textFieldItemName.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: 20),
             textFieldItemName.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             textFieldItemName.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             textFieldItemName.heightAnchor.constraint(equalToConstant: 44),
@@ -96,12 +77,6 @@ class AddPackingItemView: UIView {
             textFieldItemCount.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             textFieldItemCount.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             textFieldItemCount.heightAnchor.constraint(equalToConstant: 44),
-            
-            labelIsPacked.topAnchor.constraint(equalTo: textFieldItemCount.bottomAnchor, constant: 20),
-            labelIsPacked.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            
-            switchIsPacked.centerYAnchor.constraint(equalTo: labelIsPacked.centerYAnchor),
-            switchIsPacked.leadingAnchor.constraint(equalTo: labelIsPacked.trailingAnchor, constant: 20),
             
             buttonAdd.topAnchor.constraint(equalTo: textFieldItemCount.bottomAnchor, constant: 20),
             buttonAdd.centerXAnchor.constraint(equalTo: self.centerXAnchor),

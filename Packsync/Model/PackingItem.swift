@@ -12,6 +12,7 @@ struct PackingItem: Codable {
     var travelId: String // ID of the travel plan the item is associated with
     var name: String
     var isPacked: Bool
+    var isPackedBy: String?
     var itemNumber: String // Quantity or count of the item
     
     init(
@@ -20,6 +21,7 @@ struct PackingItem: Codable {
         travelId: String,
         name: String,
         isPacked: Bool = false,
+        isPackedBy: String? = nil, 
         itemNumber: String
     ) {
         self.id = id
@@ -27,6 +29,7 @@ struct PackingItem: Codable {
         self.travelId = travelId
         self.name = name
         self.isPacked = isPacked
+        self.isPackedBy = isPackedBy
         self.itemNumber = itemNumber
     }
 }

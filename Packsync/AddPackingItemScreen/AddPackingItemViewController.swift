@@ -1,5 +1,13 @@
+//
+//  AddPackingItemViewController.swift
+//  Packsync
+//
+//  Created by Xi Jia on 11/13/24.
+//
+
 import UIKit
 import FirebaseFirestore
+import FirebaseAuth
 
 class AddPackingItemViewController: UIViewController {
     
@@ -33,7 +41,8 @@ class AddPackingItemViewController: UIViewController {
             creatorId: travel.creatorId,
             travelId: travel.id,
             name: itemName,
-            isPacked: addPackingItemView.switchIsPacked.isOn,
+            isPacked: false,
+            isPackedBy: nil,  // Initially, the item is not packed by anyone
             itemNumber: itemNumber
         )
         

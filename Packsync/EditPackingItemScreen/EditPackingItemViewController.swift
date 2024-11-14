@@ -2,7 +2,7 @@
 //  EditPackingItemViewController.swift
 //  Packsync
 //
-//  Created by Xi Jia on 11/8/24.
+//  Created by Xi Jia on 11/13/24.
 //
 
 import UIKit
@@ -31,6 +31,8 @@ class EditPackingItemViewController: UIViewController {
         editPackingItemView.buttonSave.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
         editPackingItemView.buttonDelete.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "back", style: .plain, target: self, action: #selector(backButtonTapped))
+        
         if let item = packingItem {
             editPackingItemView.textFieldItemName.text = item.name
             editPackingItemView.textFieldItemCount.text = item.itemNumber
@@ -48,7 +50,7 @@ class EditPackingItemViewController: UIViewController {
         updatedItem.itemNumber = count
         
         let db = Firestore.firestore()
-        db.collection("packingItem").document(updatedItem.id).setData([
+        db.collection("trips").document(updatedItem.travelId).collection("packingItems").document(updatedItem.id).setData([
             "name": updatedItem.name,
             "itemNumber": updatedItem.itemNumber
         ], merge: true) { [weak self] error in
@@ -66,7 +68,7 @@ class EditPackingItemViewController: UIViewController {
         guard let item = packingItem else { return }
         
         let db = Firestore.firestore()
-        db.collection("packingItem").document(item.id).delete() { [weak self] error in
+        db.collection("trips").document(item.travelId).collection("packingItems").document(item.id).delete() { [weak self] error in
             if let error = error {
                 print("Error removing document: \(error)")
             } else {
@@ -75,5 +77,9 @@ class EditPackingItemViewController: UIViewController {
                 self?.dismiss(animated: true, completion: nil)
             }
         }
+    }
+    
+    @objc func backButtonTapped() {
+        dismiss(animated: true, completion: nil)
     }
 }

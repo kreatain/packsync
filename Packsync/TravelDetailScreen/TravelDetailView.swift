@@ -13,8 +13,11 @@ class TravelDetailView: UIView {
     var labelDateRange: UILabel!
     var labelCountryAndCity: UILabel!
     
+    var buttonSetAsActivePlan: UIButton!
     var buttonPackingList: UIButton!
     var buttonInviteFriend: UIButton!
+    var buttonSpending: UIButton!
+    var buttonBillboard: UIButton!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -24,10 +27,23 @@ class TravelDetailView: UIView {
         setupLabelDateRange()
         setupLabelCountryAndCity()
         
+        setupButtonSetAsActivePlan()
         setupButtonPackingList()
         setupButtonInviteFriend()
+        setupButtonBillboard()
+        setupButtonSpending()
         
         initConstraints()
+    }
+    
+    func setupButtonSetAsActivePlan() {
+        buttonSetAsActivePlan = UIButton(type: .system)
+        buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
+        buttonSetAsActivePlan.backgroundColor = .systemGreen
+        buttonSetAsActivePlan.setTitleColor(.white, for: .normal)
+        buttonSetAsActivePlan.layer.cornerRadius = 8
+        buttonSetAsActivePlan.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonSetAsActivePlan)
     }
     
     func setupLabelTravelTitle() {
@@ -70,7 +86,26 @@ class TravelDetailView: UIView {
         buttonInviteFriend.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(buttonInviteFriend)
     }
-
+    
+    func setupButtonSpending() {
+        buttonSpending = UIButton(type: .system)
+        buttonSpending.setTitle("Spending", for: .normal)
+        buttonSpending.backgroundColor = .systemGreen
+        buttonSpending.setTitleColor(.white, for: .normal)
+        buttonSpending.layer.cornerRadius = 8
+        buttonSpending.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonSpending)
+    }
+    
+    func setupButtonBillboard() {
+        buttonBillboard = UIButton(type: .system)
+        buttonBillboard.setTitle("Billboard", for: .normal)
+        buttonBillboard.backgroundColor = .systemGreen
+        buttonBillboard.setTitleColor(.white, for: .normal)
+        buttonBillboard.layer.cornerRadius = 8
+        buttonBillboard.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonBillboard)
+    }
     
     func initConstraints() {
         NSLayoutConstraint.activate([
@@ -86,7 +121,22 @@ class TravelDetailView: UIView {
             labelCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
-            buttonPackingList.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
+//            buttonPackingList.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
+//            buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+//            buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+//            buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
+//            
+//            buttonInviteFriend.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
+//            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+//            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+//            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
+//            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
+            buttonSetAsActivePlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            buttonSetAsActivePlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            buttonSetAsActivePlan.heightAnchor.constraint(equalToConstant: 44),
+            
+            buttonPackingList.topAnchor.constraint(equalTo: buttonSetAsActivePlan.bottomAnchor, constant: 20),
             buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
@@ -95,7 +145,17 @@ class TravelDetailView: UIView {
             buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
-            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            
+            buttonSpending.topAnchor.constraint(equalTo: buttonInviteFriend.bottomAnchor, constant: 20),
+            buttonSpending.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            buttonSpending.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            buttonSpending.heightAnchor.constraint(equalToConstant: 44),
+            
+            buttonBillboard.topAnchor.constraint(equalTo: buttonSpending.bottomAnchor, constant: 20),
+            buttonBillboard.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            buttonBillboard.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            buttonBillboard.heightAnchor.constraint(equalToConstant: 44),
+            buttonBillboard.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
     
