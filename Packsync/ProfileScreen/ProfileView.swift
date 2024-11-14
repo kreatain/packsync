@@ -46,6 +46,9 @@ class ProfileView: UIView {
         textField.textColor = .black
         textField.textAlignment = .center
         textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
+        textField.adjustsFontSizeToFitWidth = true  // Adjusts font size when text is too long
+        textField.minimumScaleFactor = 0.5  // Minimum scale factor for font size adjustment
+        textField.lineBreakMode = .byTruncatingTail  // Truncate text with ellipsis if it's too long
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -56,6 +59,9 @@ class ProfileView: UIView {
         textField.textColor = .black
         textField.textAlignment = .center
         textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
+        textField.adjustsFontSizeToFitWidth = true  // Adjusts font size when text is too long
+        textField.minimumScaleFactor = 0.5  // Minimum scale factor for font size adjustment
+        textField.lineBreakMode = .byTruncatingTail  // Truncate text with ellipsis if it's too long
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
@@ -119,3 +125,4 @@ class ProfileView: UIView {
         editPhotoLabel.isHidden = !enabled
     }
 }
+

@@ -29,7 +29,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         super.viewDidLoad()
         setupActions()
         postLogin() // Use FirebaseAuth directly for name and email initially
-        loadUserProfile() // Only to load the profileImageUrl from Firestore
+        loadUserProfile() // Load profile image from Firestore on login
         
         title = "PROFILE DETAIL"
         
@@ -62,7 +62,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         profileView.nameTextField.text = "Name: \(currentUser.displayName ?? "No Name")"
         profileView.emailTextField.text = "Email: \(currentUser.email ?? "No Email")"
 
-        // Load additional data (like profile image URL) from Firestore
+        // Load profile image URL from Firestore
         loadUserProfile()
     }
 
@@ -129,22 +129,33 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     }
 
     private func loadUserProfile() {
-        guard let userID = Auth.auth().currentUser?.uid else { return }
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("User ID not found.")
+            return
+        }
         
-        // Access Firestore to retrieve the profile image URL only
-        firestore.collection("users").document(userID).getDocument { snapshot, error in
+        let userRef = firestore.collection("users").document(userID)
+        userRef.getDocument { document, error in
             if let error = error {
-                print("Error loading user profile: \(error.localizedDescription)")
+                print("Failed to load user profile: \(error.localizedDescription)")
                 return
             }
-            guard let data = snapshot?.data() else { return }
-
-            // Check if profileImageUrl exists in Firestore
-            if let profileImageUrl = data["profileImageUrl"] as? String {
-                self.loadProfileImage(urlString: profileImageUrl)
+            
+            if let document = document, let data = document.data() {
+                if let profileImageUrl = data["profileImageUrl"] as? String {
+                    print("Retrieved profile image URL: \(profileImageUrl)") // Debug log
+                    self.loadProfileImage(urlString: profileImageUrl)
+                } else {
+                    print("No profileImageUrl found in Firestore document.")
+                    // Optionally, you can set a default image here
+                    self.profileView.profileImageView.image = UIImage(named: "defaultProfileImage")
+                }
+            } else {
+                print("Document data not found for user ID: \(userID)")
             }
         }
     }
+
 
     private func saveProfileChanges() {
         guard let userID = Auth.auth().currentUser?.uid,
@@ -228,23 +239,36 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     }
 
     private func uploadProfileImage(_ image: UIImage) {
-        guard let userID = Auth.auth().currentUser?.uid, let imageData = image.jpegData(compressionQuality: 0.75) else { return }
+        guard let userID = Auth.auth().currentUser?.uid,
+              let imageData = image.jpegData(compressionQuality: 0.75) else { return }
+        
         let storageRef = Storage.storage().reference().child("profile_images").child("\(userID).jpg")
         storageRef.putData(imageData, metadata: nil) { _, error in
             if let error = error {
                 print("Failed to upload image: \(error.localizedDescription)")
                 return
             }
+            
+            // Retrieve download URL after upload
             storageRef.downloadURL { url, error in
                 guard let profileImageUrl = url?.absoluteString else {
                     print("Failed to retrieve download URL: \(error?.localizedDescription ?? "No error")")
                     return
                 }
-                // Save the URL to Firestore
-                self.firestore.collection("users").document(userID).setData(["profileImageUrl": profileImageUrl], merge: true)
+                
+                // Save the image URL to Firestore
+                let userRef = Firestore.firestore().collection("users").document(userID)
+                userRef.setData(["profileImageUrl": profileImageUrl], merge: true) { error in
+                    if let error = error {
+                        print("Failed to save image URL to Firestore: \(error.localizedDescription)")
+                    } else {
+                        print("Profile image URL saved successfully!")
+                    }
+                }
             }
         }
     }
+
 
     private func showAlert(_ message: String) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
@@ -252,4 +276,5 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         present(alert, animated: true)
     }
 }
+
 
