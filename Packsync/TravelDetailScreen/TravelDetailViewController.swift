@@ -29,8 +29,6 @@ class TravelDetailViewController: UIViewController {
         // Add an edit button to the navigation bar
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editTravelPlan))
         
-        detailView.buttonSetAsActivePlan.addTarget(self, action: #selector(setAsActivePlanButtonTapped), for: .touchUpInside)
-        
         // navigate to the packing list screen
         detailView.buttonPackingList.addTarget(self, action: #selector(packingListButtonTapped), for: .touchUpInside)
         
@@ -48,24 +46,14 @@ class TravelDetailViewController: UIViewController {
         }
         let editVC = EditTravelDetailViewController()
         editVC.travel = travel
-        editVC.delegate = self
+        editVC.delegate = self // Now conforms to EditTravelDetailDelegate
         let navController = UINavigationController(rootViewController: editVC)
         present(navController, animated: true, completion: nil)
     }
     
-    @objc func setAsActivePlanButtonTapped() {
-//        let setAsActivePlanVC = InviteFriendViewController()
-//        navigationController?.pushViewController(inviteFriendVC, animated: true)
-    }
-    
     @objc func packingListButtonTapped() {
-        guard let travel = travel else {
-            print("No travel plan available")
-            return
-        }
-        // Create and push the PackingListViewController
         let packingListVC = PackingListViewController()
-        packingListVC.travel = self.travel // Pass the current travel to the packing list
+        packingListVC.travel = self.travel
         navigationController?.pushViewController(packingListVC, animated: true)
     }
     
@@ -75,7 +63,7 @@ class TravelDetailViewController: UIViewController {
     }
     
     @objc func spendingButtonTapped() {
-        let spendingVC = SpendingViewController()
+        let spendingVC = OverviewViewController()
         navigationController?.pushViewController(spendingVC, animated: true)
     }
     
@@ -83,14 +71,10 @@ class TravelDetailViewController: UIViewController {
         let billboardVC = BillboardViewController()
         navigationController?.pushViewController(billboardVC, animated: true)
     }
-    
 }
 
-protocol EditTravelViewControllerDelegate: AnyObject {
-    func didUpdateTravel(_ travel: Travel)
-    func didDeleteTravel(_ travel: Travel)
-}
-extension TravelDetailViewController: EditTravelViewControllerDelegate {
+// Ensure this conforms to EditTravelDetailDelegate
+extension TravelDetailViewController: EditTravelDetailDelegate {
     func didUpdateTravel(_ travel: Travel) {
         self.travel = travel
         detailView.configure(with: travel)
