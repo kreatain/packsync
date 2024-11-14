@@ -16,6 +16,10 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     private let profileView = ProfileView()
     private var isEditingProfile = false
 
+    var handleAuth: AuthStateDidChangeListenerHandle?
+    var currentUser: FirebaseAuth.User?
+
+
     override func loadView() {
         view = profileView
     }
@@ -24,8 +28,41 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         super.viewDidLoad()
         setupActions()
         loadUserProfile()
+        
+        // Add authentication state change listener
+        Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
+            print(11111)
+            self?.handleAuthStateChange(user: user)
+            print(22222)
+        }
     }
 
+    // Handle authentication state changes
+    func handleAuthStateChange(user: FirebaseAuth.User?) {
+        if let user = user {
+            // User is logged in
+            currentUser = user
+            print("[handleAuthStateChange] user is logged in")
+            postLogin()
+        } else {
+            // User is logged out
+            currentUser = nil
+            print("[handleAuthStateChange] user is logged out")
+            postLogout() // clean up
+        }
+    }
+    
+    func postLogin() {
+        //let a = profileView.nameTextField.text ?? ""
+        let b = currentUser?.displayName ?? ""
+        profileView.nameTextField.text = "Name: "+b // TODO append text instead of replace
+    }
+
+    func postLogout() {
+        profileView.nameTextField.text = "<pls login first>"
+    }
+    
+    
     private func setupActions() {
         profileView.editButton.addTarget(self, action: #selector(toggleEditProfile), for: .touchUpInside)
         profileView.configurePhotoButton(target: self, action: #selector(showPhotoOptions))

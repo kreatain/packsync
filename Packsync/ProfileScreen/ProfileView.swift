@@ -40,22 +40,23 @@ class ProfileView: UIView {
         return label
     }()
 
-    let nameTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Name"
-        textField.borderStyle = .roundedRect
-        textField.isUserInteractionEnabled = false
-        textField.translatesAutoresizingMaskIntoConstraints = false
+    let nameTextField: UILabel = {
+        let textField = UILabel()
+        textField.text = "Name: "
+        textField.textColor = .orange
+        textField.isHidden = false
+        textField.textAlignment = .center
+        textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         return textField
     }()
 
-    let emailTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Email"
-        textField.borderStyle = .roundedRect
-        textField.keyboardType = .emailAddress
-        textField.isUserInteractionEnabled = false
-        textField.translatesAutoresizingMaskIntoConstraints = false
+    let emailTextField: UILabel = {
+        let textField = UILabel()
+        textField.text = "Email: "
+        textField.textColor = .red
+        textField.isHidden = false
+        textField.textAlignment = .center
+        textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         return textField
     }()
 
@@ -80,38 +81,55 @@ class ProfileView: UIView {
 
     private func setupView() {
         backgroundColor = .white
-        addSubview(profileImageView)
-        addSubview(buttonTakePhoto)
-        addSubview(editPhotoLabel)
-        addSubview(nameTextField)
-        addSubview(emailTextField)
-        addSubview(editButton)
-
+        [nameTextField, emailTextField].forEach {
+            addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
         NSLayoutConstraint.activate([
-            profileImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            profileImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
-            profileImageView.widthAnchor.constraint(equalToConstant: 100),
-            profileImageView.heightAnchor.constraint(equalToConstant: 100),
-
-            buttonTakePhoto.centerXAnchor.constraint(equalTo: centerXAnchor),
-            buttonTakePhoto.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
-
-            editPhotoLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            editPhotoLabel.topAnchor.constraint(equalTo: buttonTakePhoto.bottomAnchor, constant: 5),
-
-            nameTextField.topAnchor.constraint(equalTo: editPhotoLabel.bottomAnchor, constant: 20),
-            nameTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
-            nameTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
-
-            emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 15),
-            emailTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
-            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
-
-            editButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 25),
-            editButton.leadingAnchor.constraint(equalTo: emailTextField.leadingAnchor),
-            editButton.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor),
-            editButton.heightAnchor.constraint(equalToConstant: 50)
+            nameTextField.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
+            nameTextField.centerXAnchor.constraint(equalTo: centerXAnchor),
+            
+            emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 40),
+            emailTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            emailTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            emailTextField.heightAnchor.constraint(equalToConstant: 50),
+            
         ])
+        
+//
+//        addSubview(profileImageView)
+//        addSubview(buttonTakePhoto)
+//        addSubview(editPhotoLabel)
+//        addSubview(nameTextField)
+//        addSubview(emailTextField)
+//        addSubview(editButton)
+//
+//        NSLayoutConstraint.activate([
+//            profileImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
+//            profileImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
+//            profileImageView.widthAnchor.constraint(equalToConstant: 100),
+//            profileImageView.heightAnchor.constraint(equalToConstant: 100),
+//
+//            buttonTakePhoto.centerXAnchor.constraint(equalTo: centerXAnchor),
+//            buttonTakePhoto.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+//
+//            editPhotoLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+//            editPhotoLabel.topAnchor.constraint(equalTo: buttonTakePhoto.bottomAnchor, constant: 5),
+//
+//            nameTextField.topAnchor.constraint(equalTo: editPhotoLabel.bottomAnchor, constant: 20),
+//            nameTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
+//            nameTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
+//
+//            emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 15),
+//            emailTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
+//            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
+//
+//            editButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 25),
+//            editButton.leadingAnchor.constraint(equalTo: emailTextField.leadingAnchor),
+//            editButton.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor),
+//            editButton.heightAnchor.constraint(equalToConstant: 50)
+//        ])
     }
 
     func configurePhotoButton(target: Any, action: Selector) {
