@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04112FB22CE5705F00371ABD /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04112FB12CE5705F00371ABD /* CategoryCell.swift */; };
 		4CC0792B2CE42AD4009364D8 /* ActivePlanNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */; };
 		4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */; };
 		4CC0792D2CE42AD4009364D8 /* AddPackingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DF2CE42AD4009364D8 /* AddPackingItemView.swift */; };
@@ -17,8 +18,8 @@
 		4CC079322CE42AD4009364D8 /* EditPackingItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E62CE42AD4009364D8 /* EditPackingItemViewController.swift */; };
 		4CC079332CE42AD4009364D8 /* FriendsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E82CE42AD4009364D8 /* FriendsListView.swift */; };
 		4CC079342CE42AD4009364D8 /* FriendsListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E92CE42AD4009364D8 /* FriendsListViewController.swift */; };
-		4CC079352CE42AD4009364D8 /* InviteFriendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EB2CE42AD4009364D8 /* InviteFriendView.swift */; };
-		4CC079362CE42AD4009364D8 /* InviteFriendViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EC2CE42AD4009364D8 /* InviteFriendViewController.swift */; };
+		4CC079352CE42AD4009364D8 /* InviteFriendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EB2CE42AD4009364D8 /* InviteFriendsView.swift */; };
+		4CC079362CE42AD4009364D8 /* InviteFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EC2CE42AD4009364D8 /* InviteFriendsViewController.swift */; };
 		4CC079372CE42AD4009364D8 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EE2CE42AD4009364D8 /* Category.swift */; };
 		4CC079382CE42AD4009364D8 /* GroupExpense.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078EF2CE42AD4009364D8 /* GroupExpense.swift */; };
 		4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078F02CE42AD4009364D8 /* Invitation.swift */; };
@@ -88,6 +89,7 @@
 
 /* Begin PBXFileReference section */
 		010872923AF6786A876453AC /* Pods-PacksyncTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PacksyncTests.release.xcconfig"; path = "Target Support Files/Pods-PacksyncTests/Pods-PacksyncTests.release.xcconfig"; sourceTree = "<group>"; };
+		04112FB12CE5705F00371ABD /* CategoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryCell.swift; sourceTree = "<group>"; };
 		417A1F4FED55E21A08E652A3 /* Pods-Packsync.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync.debug.xcconfig"; path = "Target Support Files/Pods-Packsync/Pods-Packsync.debug.xcconfig"; sourceTree = "<group>"; };
 		4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivePlanNotification.swift; sourceTree = "<group>"; };
 		4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanManager.swift; sourceTree = "<group>"; };
@@ -99,8 +101,8 @@
 		4CC078E62CE42AD4009364D8 /* EditPackingItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPackingItemViewController.swift; sourceTree = "<group>"; };
 		4CC078E82CE42AD4009364D8 /* FriendsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsListView.swift; sourceTree = "<group>"; };
 		4CC078E92CE42AD4009364D8 /* FriendsListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsListViewController.swift; sourceTree = "<group>"; };
-		4CC078EB2CE42AD4009364D8 /* InviteFriendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendView.swift; sourceTree = "<group>"; };
-		4CC078EC2CE42AD4009364D8 /* InviteFriendViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendViewController.swift; sourceTree = "<group>"; };
+		4CC078EB2CE42AD4009364D8 /* InviteFriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendsView.swift; sourceTree = "<group>"; };
+		4CC078EC2CE42AD4009364D8 /* InviteFriendsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendsViewController.swift; sourceTree = "<group>"; };
 		4CC078EE2CE42AD4009364D8 /* Category.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
 		4CC078EF2CE42AD4009364D8 /* GroupExpense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupExpense.swift; sourceTree = "<group>"; };
 		4CC078F02CE42AD4009364D8 /* Invitation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Invitation.swift; sourceTree = "<group>"; };
@@ -160,16 +162,8 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		737AC41B2CCB2C79005F0B42 /* PacksyncTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PacksyncTests;
-			sourceTree = "<group>";
-		};
-		737AC4252CCB2C79005F0B42 /* PacksyncUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = PacksyncUITests;
-			sourceTree = "<group>";
-		};
+		737AC41B2CCB2C79005F0B42 /* PacksyncTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PacksyncTests; sourceTree = "<group>"; };
+		737AC4252CCB2C79005F0B42 /* PacksyncUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PacksyncUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -255,13 +249,13 @@
 			path = FriendsListScreen;
 			sourceTree = "<group>";
 		};
-		4CC078ED2CE42AD4009364D8 /* InviteFriendScreen */ = {
+		4CC078ED2CE42AD4009364D8 /* InviteFriendsScreen */ = {
 			isa = PBXGroup;
 			children = (
-				4CC078EB2CE42AD4009364D8 /* InviteFriendView.swift */,
-				4CC078EC2CE42AD4009364D8 /* InviteFriendViewController.swift */,
+				4CC078EB2CE42AD4009364D8 /* InviteFriendsView.swift */,
+				4CC078EC2CE42AD4009364D8 /* InviteFriendsViewController.swift */,
 			);
-			path = InviteFriendScreen;
+			path = InviteFriendsScreen;
 			sourceTree = "<group>";
 		};
 		4CC078F52CE42AD4009364D8 /* Model */ = {
@@ -335,6 +329,7 @@
 		4CC079092CE42AD4009364D8 /* Overview */ = {
 			isa = PBXGroup;
 			children = (
+				04112FB12CE5705F00371ABD /* CategoryCell.swift */,
 				4CC079082CE42AD4009364D8 /* OverviewViewController.swift */,
 			);
 			path = Overview;
@@ -397,7 +392,7 @@
 				4CC078E42CE42AD4009364D8 /* BillboardScreen */,
 				4CC078E72CE42AD4009364D8 /* EditPackingItemScreen */,
 				4CC078EA2CE42AD4009364D8 /* FriendsListScreen */,
-				4CC078ED2CE42AD4009364D8 /* InviteFriendScreen */,
+				4CC078ED2CE42AD4009364D8 /* InviteFriendsScreen */,
 				4CC078F52CE42AD4009364D8 /* Model */,
 				4CC078F82CE42AD4009364D8 /* PackingListScreen */,
 				4CC078FB2CE42AD4009364D8 /* ProfileScreen */,
@@ -545,6 +540,7 @@
 				};
 			};
 			buildConfigurationList = 737AC3FD2CCB2C78005F0B42 /* Build configuration list for PBXProject "Packsync" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -709,8 +705,8 @@
 				4CC079322CE42AD4009364D8 /* EditPackingItemViewController.swift in Sources */,
 				4CC079332CE42AD4009364D8 /* FriendsListView.swift in Sources */,
 				4CC079342CE42AD4009364D8 /* FriendsListViewController.swift in Sources */,
-				4CC079352CE42AD4009364D8 /* InviteFriendView.swift in Sources */,
-				4CC079362CE42AD4009364D8 /* InviteFriendViewController.swift in Sources */,
+				4CC079352CE42AD4009364D8 /* InviteFriendsView.swift in Sources */,
+				4CC079362CE42AD4009364D8 /* InviteFriendsViewController.swift in Sources */,
 				4CC079372CE42AD4009364D8 /* Category.swift in Sources */,
 				4CC079382CE42AD4009364D8 /* GroupExpense.swift in Sources */,
 				4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */,
@@ -722,6 +718,7 @@
 				4CC0793F2CE42AD4009364D8 /* PackingListViewController.swift in Sources */,
 				4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */,
 				4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */,
+				04112FB22CE5705F00371ABD /* CategoryCell.swift in Sources */,
 				4CC079422CE42AD4009364D8 /* ProgressSpinnerDelegate.swift in Sources */,
 				4CC079432CE42AD4009364D8 /* ProgressSpinnerViewController.swift in Sources */,
 				4CC079442CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift in Sources */,

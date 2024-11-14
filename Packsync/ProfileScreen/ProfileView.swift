@@ -13,7 +13,7 @@ class ProfileView: UIView {
     let profileImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 50
+        imageView.layer.cornerRadius = 60  // Adjust size as desired
         imageView.layer.masksToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -22,8 +22,8 @@ class ProfileView: UIView {
     let buttonTakePhoto: UIButton = {
         let button = UIButton(type: .system)
         button.setImage(UIImage(systemName: "camera.fill"), for: .normal)
-        button.imageView?.contentMode = .scaleAspectFit
-        button.tintColor = .black
+        button.setPreferredSymbolConfiguration(UIImage.SymbolConfiguration(pointSize: 30), forImageIn: .normal)
+        button.tintColor = .darkGray
         button.translatesAutoresizingMaskIntoConstraints = false
         button.isHidden = true  // Initially hidden until edit mode is enabled
         return button
@@ -40,33 +40,24 @@ class ProfileView: UIView {
         return label
     }()
 
-    let nameTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Name"
-        textField.borderStyle = .roundedRect
-        textField.isUserInteractionEnabled = false
+    let nameTextField: UILabel = {
+        let textField = UILabel()
+        textField.text = "Name: "
+        textField.textColor = .black
+        textField.textAlignment = .center
+        textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
     }()
 
-    let emailTextField: UITextField = {
-        let textField = UITextField()
-        textField.placeholder = "Email"
-        textField.borderStyle = .roundedRect
-        textField.keyboardType = .emailAddress
-        textField.isUserInteractionEnabled = false
+    let emailTextField: UILabel = {
+        let textField = UILabel()
+        textField.text = "Email: "
+        textField.textColor = .black
+        textField.textAlignment = .center
+        textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
-    }()
-
-    let editButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Edit Profile", for: .normal)
-        button.backgroundColor = .systemBlue
-        button.tintColor = .white
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
     }()
 
     override init(frame: CGRect) {
@@ -80,37 +71,41 @@ class ProfileView: UIView {
 
     private func setupView() {
         backgroundColor = .white
+
+        // Add all UI components to the view
         addSubview(profileImageView)
         addSubview(buttonTakePhoto)
         addSubview(editPhotoLabel)
         addSubview(nameTextField)
         addSubview(emailTextField)
-        addSubview(editButton)
 
+        // Set up layout constraints
         NSLayoutConstraint.activate([
+            // Profile Image View Constraints
             profileImageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            profileImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 40),
-            profileImageView.widthAnchor.constraint(equalToConstant: 100),
-            profileImageView.heightAnchor.constraint(equalToConstant: 100),
+            profileImageView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20),
+            profileImageView.widthAnchor.constraint(equalToConstant: 120),
+            profileImageView.heightAnchor.constraint(equalToConstant: 120),
 
+            // Take Photo Button Constraints (Positioned below the profile image and above the "Edit Photo" label)
             buttonTakePhoto.centerXAnchor.constraint(equalTo: centerXAnchor),
-            buttonTakePhoto.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 10),
+            buttonTakePhoto.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8),
+            buttonTakePhoto.widthAnchor.constraint(equalToConstant: 40),
+            buttonTakePhoto.heightAnchor.constraint(equalToConstant: 40),
 
+            // Edit Photo Label Constraints
             editPhotoLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             editPhotoLabel.topAnchor.constraint(equalTo: buttonTakePhoto.bottomAnchor, constant: 5),
 
-            nameTextField.topAnchor.constraint(equalTo: editPhotoLabel.bottomAnchor, constant: 20),
+            // Name TextField Constraints
+            nameTextField.topAnchor.constraint(equalTo: editPhotoLabel.bottomAnchor, constant: 15),
             nameTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 32),
             nameTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -32),
 
+            // Email TextField Constraints
             emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 15),
             emailTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
-            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
-
-            editButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 25),
-            editButton.leadingAnchor.constraint(equalTo: emailTextField.leadingAnchor),
-            editButton.trailingAnchor.constraint(equalTo: emailTextField.trailingAnchor),
-            editButton.heightAnchor.constraint(equalToConstant: 50)
+            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor)
         ])
     }
 

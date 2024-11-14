@@ -10,6 +10,7 @@ import UIKit
 class SpendingViewController: UIViewController {
     private let spendingView = SpendingView() // Using SpendingView for layout
     private var travelID: String? // Optional travelID parameter for specific travel plan
+    private let noActivePlanLabel = UILabel() // Label to prompt user to set active plan
 
     private lazy var overviewVC = OverviewViewController()
     private lazy var budgetVC = BudgetViewController()
@@ -38,6 +39,7 @@ class SpendingViewController: UIViewController {
             spendingView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
+        setupNoActivePlanLabel()
         setupTabBarAction()
         loadTravelPlan()
         
@@ -47,6 +49,23 @@ class SpendingViewController: UIViewController {
     
     private func setupTabBarAction() {
         spendingView.tabBar.addTarget(self, action: #selector(tabChanged(_:)), for: .valueChanged)
+    }
+    
+    private func setupNoActivePlanLabel() {
+        noActivePlanLabel.text = "Please select an active travel plan to view spending details."
+        noActivePlanLabel.textAlignment = .center
+        noActivePlanLabel.numberOfLines = 0
+        noActivePlanLabel.textColor = .gray
+        noActivePlanLabel.isHidden = true // Initially hidden
+        noActivePlanLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(noActivePlanLabel)
+        
+        NSLayoutConstraint.activate([
+            noActivePlanLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            noActivePlanLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            noActivePlanLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            noActivePlanLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
     }
     
     // MARK: - Load Travel Plan
@@ -60,11 +79,13 @@ class SpendingViewController: UIViewController {
                     return
                 }
                 self.spendingView.isHidden = false
+                self.noActivePlanLabel.isHidden = true
                 self.renderContentForTravelPlan(travelPlan)
             }
         } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             // Use the active travel plan if no travelID is provided
             spendingView.isHidden = false
+            noActivePlanLabel.isHidden = true
             renderContentForTravelPlan(activePlan)
         } else {
             // Show notice if no active plan and no travelID provided
@@ -76,10 +97,19 @@ class SpendingViewController: UIViewController {
     private func fetchTravelPlanByID(_ travelID: String, completion: @escaping (Travel?) -> Void) {
         // Placeholder for database or API call to fetch the Travel by ID
         // For testing, you can simulate a travel plan
-        let mockPlan = Travel(creatorEmail: "test@example.com", travelTitle: "Mock Trip", travelStartDate: "2024-01-01", travelEndDate: "2024-01-10", countryAndCity: "Mock City")
+        let mockPlan = Travel(
+            id: travelID,
+            creatorId: "mockCreatorId",
+            travelTitle: "Mock Trip",
+            travelStartDate: "2024-01-01",
+            travelEndDate: "2024-01-10",
+            countryAndCity: "Mock City",
+            categoryIds: ["category1", "category2"],
+            expenseIds: ["expense1", "expense2"],
+            participantIds: ["user1", "user2"]
+        )
         completion(mockPlan) // Simulate fetching a travel plan with this ID
     }
-    
     private func renderContentForTravelPlan(_ travelPlan: Travel) {
         // Update UI based on the provided or active travel plan
         add(asChildViewController: overviewVC) // Default tab
@@ -87,9 +117,8 @@ class SpendingViewController: UIViewController {
     }
     
     private func showNoActivePlanNotice() {
-        let alert = UIAlertController(title: "No Active Plan", message: "Please select an active travel plan to view spending details.", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        present(alert, animated: true)
+        // Display the persistent notice for setting an active travel plan
+        noActivePlanLabel.isHidden = false
     }
     
     @objc private func tabChanged(_ sender: UISegmentedControl) {

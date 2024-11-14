@@ -52,6 +52,12 @@ class TravelDetailViewController: UIViewController {
     }
     
     @objc func packingListButtonTapped() {
+
+        guard let travel = travel else {
+            print("No travel plan available")
+            return
+        }
+
         let packingListVC = PackingListViewController()
         packingListVC.travel = self.travel
         navigationController?.pushViewController(packingListVC, animated: true)
@@ -61,7 +67,7 @@ class TravelDetailViewController: UIViewController {
         let inviteFriendVC = InviteFriendViewController()
         navigationController?.pushViewController(inviteFriendVC, animated: true)
     }
-    
+   
     @objc func spendingButtonTapped() {
         let spendingVC = OverviewViewController()
         navigationController?.pushViewController(spendingVC, animated: true)
@@ -71,6 +77,7 @@ class TravelDetailViewController: UIViewController {
         let billboardVC = BillboardViewController()
         navigationController?.pushViewController(billboardVC, animated: true)
     }
+
 }
 
 // Ensure this conforms to EditTravelDetailDelegate

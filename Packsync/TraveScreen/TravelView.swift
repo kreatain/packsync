@@ -2,7 +2,7 @@
 //  TravelView.swift
 //  Packsync
 //
-//  Created by Xi Jia on 11/7/24.
+//  Created by Xi Jia/Jessica Li on 11/7/24.
 //
 
 import UIKit
@@ -72,7 +72,7 @@ class TravelView: UIView {
         segmentedControlView.addSubview(activePlanButton)
 
         otherPlansButton = UIButton(type: .system)
-        otherPlansButton.setTitle("Other Plans", for: .normal)
+        otherPlansButton.setTitle("All Plans", for: .normal)
         otherPlansButton.backgroundColor = .clear
         otherPlansButton.setTitleColor(.systemBlue, for: .normal)
         otherPlansButton.layer.cornerRadius = 8

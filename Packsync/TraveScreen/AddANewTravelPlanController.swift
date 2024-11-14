@@ -1,23 +1,14 @@
-//
-//  AddANewTravelViewController.swift
-//  Packsync
-//
-//  Created by Xi Jia on 11/7/24.
-//
-
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 
 class AddANewTravelViewController: UIViewController {
     
-    var currentUser:FirebaseAuth.User?
-    
+    var currentUser: FirebaseAuth.User?
     let db = Firestore.firestore()
-    
     let addANewTravelPlan = AddANewTravelPlanView()
     
-    override func loadView(){
+    override func loadView() {
         view = addANewTravelPlan
     }
 
@@ -30,14 +21,15 @@ class AddANewTravelViewController: UIViewController {
         currentUser = Auth.auth().currentUser
         
         addANewTravelPlan.buttonAdd.addTarget(self, action: #selector(onAddButtonTapped), for: .touchUpInside)
-    
     }
 
     @objc func onAddButtonTapped() {
-        guard let currentUser = currentUser, let creatorEmail = currentUser.email else {
+        guard let currentUser = currentUser else {
             showAlert(message: "User not logged in")
             return
         }
+        
+        let creatorId = currentUser.uid
         
         guard let travelTitle = addANewTravelPlan.textFieldTravelTitle.text,
               let travelStartDate = addANewTravelPlan.textFieldTravelStartDate.text,
@@ -48,23 +40,27 @@ class AddANewTravelViewController: UIViewController {
             return
         }
 
+        // Create a new Travel instance using the updated model structure
         let travel = Travel(
-            creatorEmail: creatorEmail,
+            id: UUID().uuidString,
+            creatorId: creatorId,
             travelTitle: travelTitle,
             travelStartDate: travelStartDate,
             travelEndDate: travelEndDate,
-            countryAndCity: travelCountryAndCity
+            countryAndCity: travelCountryAndCity,
+            categoryIds: [],
+            expenseIds: [],
+            participantIds: []
         )
         
         saveTravelToFirestore(travel: travel)
     }
 
     func saveTravelToFirestore(travel: Travel) {
-   
         let collectionTravelPlans = db.collection("travelPlans")
         
         do {
-            try collectionTravelPlans.addDocument(from: travel) { error in
+            try collectionTravelPlans.document(travel.id).setData(from: travel) { error in
                 if let error = error {
                     print("Error adding document: \(error.localizedDescription)")
                     self.showAlert(message: "Failed to save travel plan. Please try again.")
@@ -84,5 +80,4 @@ class AddANewTravelViewController: UIViewController {
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
-
 }

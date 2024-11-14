@@ -17,7 +17,7 @@ class BudgetViewController: UIViewController {
     }
     
     private func fetchBudgetCategories() {
-        SpendingFirebaseManager.shared.fetchBudgetCategories(tripId: "tripId") { [weak self] categories in
+        SpendingFirebaseManager.shared.fetchCategories(for: "tripId") { [weak self] categories in
             guard let self = self else { return }
             self.categories = categories
             self.tableView.reloadData()
@@ -34,8 +34,17 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         let category = categories[indexPath.row]
-        cell.textLabel?.text = category.name
-        cell.detailTextLabel?.text = "Budget: \(category.budgetAmount), Spent: \(category.spendingItems.reduce(0) { $0 + $1.amount })"
+        
+        // Fetch spending items by their IDs
+        SpendingFirebaseManager.shared.fetchSpendingItems(for: "tripId", categoryId: category.id) { spendingItems in
+            let totalSpent = spendingItems.reduce(0) { $0 + $1.amount }
+            
+            DispatchQueue.main.async {
+                cell.textLabel?.text = category.name
+                cell.detailTextLabel?.text = "Budget: \(category.budgetAmount), Spent: \(totalSpent)"
+            }
+        }
+        
         return cell
     }
 }

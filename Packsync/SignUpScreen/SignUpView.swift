@@ -2,7 +2,7 @@
 //  SignUpView.swift
 //  Packsync
 //
-//  Created by Xi Jia on 11/8/24.
+//  Created by Xi Jia/Jessica Li on 11/8/24.
 //
 
 

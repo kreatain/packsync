@@ -70,9 +70,9 @@ extension TravelViewController {
         })
         
         //MARK: action buttons, add the actions to the alert controller
-        signInAlert.addAction(signInAction)
         signInAlert.addAction(signUpAction)
-        
+        signInAlert.addAction(signInAction)
+
         // present the alert controller. In the completion closure, we write logic to handle if the user taps outside the alert.
         self.present(signInAlert, animated: true, completion: {() in
             // to hide the alerton tap outside, add a Gesture Recognizer on the superview (the screen which popped this alert) of the alert controller.

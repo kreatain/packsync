@@ -8,17 +8,28 @@
 import Foundation
 
 struct Category: Codable {
+    var id: String // Unique identifier for the category
     var name: String
     var budgetAmount: Double
-    var spendingItems: [SpendingItem]
-    
+    var emoji: String // Emoji for category representation
+    var spendingItemIds: [String] // Array of IDs for spending items associated with the category
+
     init(
+        id: String = UUID().uuidString, // Generate a unique ID if not provided
         name: String,
         budgetAmount: Double,
-        spendingItems: [SpendingItem] = []
+        emoji: String,
+        spendingItemIds: [String] = []
     ) {
+        self.id = id
         self.name = name
         self.budgetAmount = budgetAmount
-        self.spendingItems = spendingItems
+        self.emoji = emoji
+        self.spendingItemIds = spendingItemIds
+    }
+    
+    // This would require a function to calculate total spent by fetching all SpendingItem objects by ID
+    func calculateTotalSpent(using spendingItems: [SpendingItem]) -> Double {
+        return spendingItems.reduce(0) { $0 + $1.amount }
     }
 }
