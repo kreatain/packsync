@@ -23,8 +23,6 @@ class TravelDetailView: UIView {
         super.init(frame: frame)
         self.backgroundColor = .white
         
-        
-        
         setupLabelTravelTitle()
         setupLabelDateRange()
         setupLabelCountryAndCity()
@@ -108,11 +106,9 @@ class TravelDetailView: UIView {
         buttonBillboard.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(buttonBillboard)
     }
-
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            
             labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
             labelTravelTitle.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelTravelTitle.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
@@ -125,6 +121,16 @@ class TravelDetailView: UIView {
             labelCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
+//            buttonPackingList.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
+//            buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+//            buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+//            buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
+//            
+//            buttonInviteFriend.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
+//            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+//            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+//            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
+//            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
             buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
             buttonSetAsActivePlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonSetAsActivePlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
