@@ -40,6 +40,7 @@ class AddANewTravelViewController: UIViewController {
             return
         }
 
+        // Create a new Travel instance using the updated model structure
         let travel = Travel(
             id: UUID().uuidString,
             creatorId: creatorId,
@@ -59,7 +60,7 @@ class AddANewTravelViewController: UIViewController {
         let collectionTravelPlans = db.collection("travelPlans")
         
         do {
-            try collectionTravelPlans.addDocument(from: travel) { error in
+            try collectionTravelPlans.document(travel.id).setData(from: travel) { error in
                 if let error = error {
                     print("Error adding document: \(error.localizedDescription)")
                     self.showAlert(message: "Failed to save travel plan. Please try again.")

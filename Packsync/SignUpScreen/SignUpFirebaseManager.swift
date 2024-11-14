@@ -7,63 +7,79 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseFirestore
 
-extension SignUpViewController{
+extension SignUpViewController {
     
-    func signUpNewAccount(){
+    func signUpNewAccount() {
         
-        //MARK: display the progress indicator...
+        // Show activity indicator
         showActivityIndicator()
         
-        //MARK: create a Firebase user with email and password...
-        // read the text fields to unwrap name, email, and password.
+        // Unwrap name, email, and password from text fields
         if let name = signUpView.nameTextField.text,
            let email = signUpView.emailTextField.text,
-           let password = signUpView.passwordTextField.text{
+           let password = signUpView.passwordTextField.text {
             
-            //Validations....
-            
-            // call Auth.auth().createUser(withEmail:...) to send a request to the Firebase Authentication service to create a user with email and password.
-            Auth.auth().createUser(withEmail: email, password: password, completion: {result, error in
-                // check if the error is nil, meaning if there is no error.
-                if error == nil{
-                    //  If there is no error, we decide that the response was successful, and the user is created.
+            // Call Firebase Auth to create a new user with email and password
+            Auth.auth().createUser(withEmail: email, password: password) { result, error in
+                if let error = error {
+                    // Handle error in user creation
+                    print("Error creating user: \(error.localizedDescription)")
+                    self.hideActivityIndicator()
+                } else if let authResult = result {
+                    // Successful user creation
                     
-                    //MARK: the user creation is successful...
-                    
-                    // Please note we cannot set the profile data in a FirebaseAuth account while creating the account. It can create just an account with the email and password. Then we have to update the profile with the name provided by the user in setNameOfTheUserInFirebaseAuth() method.
+                    // Set display name in FirebaseAuth
                     self.setNameOfTheUserInFirebaseAuth(name: name)
                     
-                }else{
-                    //MARK: there is a error creating the user...
-                    print(error as Any)
+                    // Create a new User model instance
+                    let user = User(
+                        id: authResult.user.uid,
+                        email: email,
+                        password: password, // Avoid storing raw passwords in production; store only a hash or encrypted version
+                        displayName: name,
+                        profilePicURL: nil
+                    )
+                    
+                    // Save user to Firestore
+                    self.saveUserToFirestore(user: user)
                 }
-            })
+            }
         }
     }
     
-    //MARK: We set the name of the user after we create the account...
-    func setNameOfTheUserInFirebaseAuth(name: String){
-        // create a change request for the current FirebaseAuth user.
+    // Set the display name for the FirebaseAuth user profile
+    func setNameOfTheUserInFirebaseAuth(name: String) {
         let changeRequest = Auth.auth().currentUser?.createProfileChangeRequest()
-        //  set the intended name of the user in the change request.
         changeRequest?.displayName = name
-        // commit the changes with a request.
-        changeRequest?.commitChanges(completion: {(error) in
-            // If there is no error, the response returns a nil error. So, here we can certainly say that the profile has been updated.
-            if error == nil{
-                //MARK: the profile update is successful...
-                
-                //MARK: hide the progress indicator...
-                self.hideActivityIndicator()
-                
-                // close the register screen and return to the main screen
-                self.navigationController?.popViewController(animated: true)
-                
-            }else{
-                //MARK: there was an error updating the profile...
-                print("Error occured: \(String(describing: error))")
+        changeRequest?.commitChanges { error in
+            if let error = error {
+                print("Error updating profile: \(error.localizedDescription)")
+            } else {
+                print("User profile updated successfully")
             }
-        })
+            self.hideActivityIndicator()
+        }
+    }
+    
+    // Save the User model to Firestore
+    func saveUserToFirestore(user: User) {
+        let db = Firestore.firestore()
+        do {
+            try db.collection("users").document(user.id).setData(from: user) { error in
+                if let error = error {
+                    print("Error saving user to Firestore: \(error.localizedDescription)")
+                } else {
+                    print("User saved successfully to Firestore")
+                    // Dismiss registration screen and navigate back
+                    self.navigationController?.popViewController(animated: true)
+                }
+                self.hideActivityIndicator()
+            }
+        } catch let error {
+            print("Error encoding user data: \(error.localizedDescription)")
+            self.hideActivityIndicator()
+        }
     }
 }
