@@ -34,7 +34,7 @@ class PackingListView: UIView {
     
     func setupTableViewPackingList() {
         tableViewPackingList = UITableView()
-        tableViewPackingList.register(UITableViewCell.self, forCellReuseIdentifier: "PackingItemCell")
+        tableViewPackingList.register(PackingItemCell.self, forCellReuseIdentifier: "PackingItemCell")
         tableViewPackingList.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tableViewPackingList)
     }
