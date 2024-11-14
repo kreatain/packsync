@@ -28,7 +28,8 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupActions()
-        loadUserProfile()
+        postLogin() // Use FirebaseAuth directly for name and email initially
+        loadUserProfile() // Only to load the profileImageUrl from Firestore
         
         title = "PROFILE DETAIL"
         
@@ -55,17 +56,18 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     }
     
     func postLogin() {
-        let displayName = currentUser?.displayName ?? ""
-        let email = currentUser?.email ?? ""
-        
-        profileView.nameTextField.text = "Name: " + displayName
-        profileView.emailTextField.text = "Email: " + email
+        guard let currentUser = Auth.auth().currentUser else { return }
 
+        // Set name and email directly from FirebaseAuth's current user
+        profileView.nameTextField.text = "Name: \(currentUser.displayName ?? "No Name")"
+        profileView.emailTextField.text = "Email: \(currentUser.email ?? "No Email")"
+
+        // Load additional data (like profile image URL) from Firestore
         loadUserProfile()
     }
 
     func postLogout() {
-        profileView.nameTextField.text = "<pls login first>"
+        profileView.nameTextField.text = "Please Login FIRST!!!"
         profileView.emailTextField.text = ""
         profileView.profileImageView.image = nil  // Clear profile image on logout
     }
@@ -77,7 +79,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     @objc private func toggleEditProfile() {
         isEditingProfile.toggle()
 
-        title = isEditingProfile ? "EDIT PROFILE" : "Profile"
+        title = isEditingProfile ? "EDIT PROFILE" : "PROFILE"
         
         navigationItem.rightBarButtonItem?.title = isEditingProfile ? "Save" : "Edit"
         
@@ -129,15 +131,15 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     private func loadUserProfile() {
         guard let userID = Auth.auth().currentUser?.uid else { return }
         
-        // Access Firestore to retrieve the profile image URL
+        // Access Firestore to retrieve the profile image URL only
         firestore.collection("users").document(userID).getDocument { snapshot, error in
             if let error = error {
                 print("Error loading user profile: \(error.localizedDescription)")
                 return
             }
             guard let data = snapshot?.data() else { return }
-            self.profileView.nameTextField.text = data["displayName"] as? String ?? self.profileView.nameTextField.text
-            self.profileView.emailTextField.text = data["email"] as? String ?? self.profileView.emailTextField.text
+
+            // Check if profileImageUrl exists in Firestore
             if let profileImageUrl = data["profileImageUrl"] as? String {
                 self.loadProfileImage(urlString: profileImageUrl)
             }
@@ -250,3 +252,4 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         present(alert, animated: true)
     }
 }
+

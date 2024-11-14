@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseFirestore
+import FirebaseAuth
 
 class InviteFriendViewController: UIViewController {
     
@@ -23,29 +24,45 @@ class InviteFriendViewController: UIViewController {
         title = "INVITE A FRIEND"
         view.backgroundColor = .white
         
+        // Check if the user is signed in
+        if let currentUser = Auth.auth().currentUser {
+            print("Current user is signed in with UID: \(currentUser.uid)")
+        } else {
+            print("No user is currently signed in.")
+            showAlert("Please log in to invite a friend")
+            // Optionally, navigate to the login screen here
+        }
+        
         // Configure the invite button action
         inviteFriendView.configureInviteAction(target: self, action: #selector(sendInvite))
-        
-    }
-    
-    @objc func addTapped() {
-        // Handle additional actions if needed
     }
 
     @objc private func sendInvite() {
+        // Check if the user is signed in before proceeding
+        guard let currentUser = Auth.auth().currentUser else {
+            print("No user is currently signed in.")
+            showAlert("Please log in to invite a friend")
+            return
+        }
+        
+        print("Current user is signed in with UID: \(currentUser.uid)")
+
         guard let email = inviteFriendView.emailTextField.text, !email.isEmpty else {
             showAlert("Please enter an email address")
             return
         }
         
-        // Here we’ll add code to check if the email exists in the Firestore user collection
-        // and send an invitation if the user exists.
-
+        // Check if the user with the entered email exists in Firestore
         findUserByEmail(email) { [weak self] userId in
             guard let self = self else { return }
             if let userId = userId {
-                self.sendInvitation(to: userId)
-                self.showAlert("Invitation sent to \(email)")
+                self.sendInvitation(to: userId) { success in
+                    if success {
+                        self.inviteFriendView.showConfirmationMessage()
+                    } else {
+                        self.showAlert("Failed to send invitation")
+                    }
+                }
             } else {
                 self.showAlert("No user found with that email")
             }
@@ -53,7 +70,6 @@ class InviteFriendViewController: UIViewController {
     }
     
     private func findUserByEmail(_ email: String, completion: @escaping (String?) -> Void) {
-        // Query Firestore to check if a user with this email exists
         firestore.collection("users")
             .whereField("email", isEqualTo: email)
             .getDocuments { querySnapshot, error in
@@ -63,21 +79,27 @@ class InviteFriendViewController: UIViewController {
                     return
                 }
                 
-                // Assuming we find one user with this email
                 if let document = querySnapshot?.documents.first {
-                    let userId = document.documentID
-                    completion(userId)
+                    completion(document.documentID)
                 } else {
                     completion(nil)
                 }
             }
     }
 
-    private func sendInvitation(to userId: String) {
-        // Access the recipient user's invitations subcollection and add an invitation
+    private func sendInvitation(to userId: String, completion: @escaping (Bool) -> Void) {
+        guard let currentUser = Auth.auth().currentUser else {
+            print("User is not logged in.")
+            completion(false)
+            return
+        }
+        
+        let currentUserId = currentUser.uid
+        let currentUserName = currentUser.displayName ?? "Unknown User"  // Use a default name if displayName is nil
+
         let invitationData: [String: Any] = [
-            "inviterId": "currentUserId",  // Replace with actual current user ID
-            "inviterName": "currentUserName",  // Replace with actual current user name
+            "inviterId": currentUserId,
+            "inviterName": currentUserName,
             "status": "pending",
             "timestamp": Timestamp()
         ]
@@ -88,8 +110,10 @@ class InviteFriendViewController: UIViewController {
             .addDocument(data: invitationData) { error in
                 if let error = error {
                     print("Error sending invitation: \(error)")
+                    completion(false)
                 } else {
                     print("Invitation sent successfully")
+                    completion(true)
                 }
             }
     }

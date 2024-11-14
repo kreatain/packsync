@@ -87,9 +87,9 @@ class ProfileView: UIView {
             profileImageView.widthAnchor.constraint(equalToConstant: 120),
             profileImageView.heightAnchor.constraint(equalToConstant: 120),
 
-            // Take Photo Button Constraints
-            buttonTakePhoto.centerXAnchor.constraint(equalTo: profileImageView.centerXAnchor),
-            buttonTakePhoto.centerYAnchor.constraint(equalTo: profileImageView.centerYAnchor, constant: 40),  // Position below the image for a more natural location
+            // Take Photo Button Constraints (Positioned below the profile image and above the "Edit Photo" label)
+            buttonTakePhoto.centerXAnchor.constraint(equalTo: centerXAnchor),
+            buttonTakePhoto.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8),
             buttonTakePhoto.widthAnchor.constraint(equalToConstant: 40),
             buttonTakePhoto.heightAnchor.constraint(equalToConstant: 40),
 

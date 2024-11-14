@@ -29,6 +29,17 @@ class InviteFriendView: UIView {
         return button
     }()
 
+    let confirmationLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Invitation Sent!!!"
+        label.textColor = .purple
+        label.textAlignment = .center
+        label.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+        label.isHidden = true  // Initially hidden
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+
     // Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -47,26 +58,33 @@ class InviteFriendView: UIView {
         // Add UI elements to the view
         addSubview(emailTextField)
         addSubview(inviteButton)
+        addSubview(confirmationLabel)
 
-        // Set up layout constraints with more spacing from the top
+        // Set up layout constraints
         NSLayoutConstraint.activate([
-            // Email TextField Constraints
             emailTextField.centerXAnchor.constraint(equalTo: centerXAnchor),
-            emailTextField.topAnchor.constraint(equalTo: topAnchor, constant: 150),  // Increased spacing from the top
+            emailTextField.topAnchor.constraint(equalTo: topAnchor, constant: 150),
             emailTextField.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
             emailTextField.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
             emailTextField.heightAnchor.constraint(equalToConstant: 40),
 
-            // Invite Button Constraints
             inviteButton.centerXAnchor.constraint(equalTo: centerXAnchor),
-            inviteButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 30),  // Spacing between text field and button
+            inviteButton.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 30),
             inviteButton.widthAnchor.constraint(equalToConstant: 100),
-            inviteButton.heightAnchor.constraint(equalToConstant: 40)
+            inviteButton.heightAnchor.constraint(equalToConstant: 40),
+
+            confirmationLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            confirmationLabel.topAnchor.constraint(equalTo: inviteButton.bottomAnchor, constant: 20)
         ])
     }
 
     // Configure the button action
     func configureInviteAction(target: Any, action: Selector) {
         inviteButton.addTarget(target, action: action, for: .touchUpInside)
+    }
+
+    // Function to show the confirmation message
+    func showConfirmationMessage() {
+        confirmationLabel.isHidden = false
     }
 }
