@@ -1,3 +1,10 @@
+//
+//  TravelViewController.swift
+//  Packsync
+//
+//  Created by Xi Jia/Jessica Li on 11/7/24.
+//
+
 import UIKit
 import FirebaseFirestore
 import FirebaseAuth
