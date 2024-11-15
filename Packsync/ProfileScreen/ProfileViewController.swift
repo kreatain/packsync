@@ -31,7 +31,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         postLogin() // Use FirebaseAuth directly for name and email initially
         loadUserProfile() // Load profile image from Firestore on login
         
-        title = "PROFILE DETAIL"
+        title = "Profile"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Edit",
