@@ -70,8 +70,10 @@ class InviteFriendViewController: UIViewController {
     }
     
     private func findUserByEmail(_ email: String, completion: @escaping (String?) -> Void) {
+        let searchEmail = "Email: \(email)" // Include prefix in search query
+
         firestore.collection("users")
-            .whereField("email", isEqualTo: email)
+            .whereField("email", isEqualTo: searchEmail)
             .getDocuments { querySnapshot, error in
                 if let error = error {
                     print("Error finding user: \(error)")
@@ -80,12 +82,23 @@ class InviteFriendViewController: UIViewController {
                 }
                 
                 if let document = querySnapshot?.documents.first {
+                    var fetchedEmail = document.data()["email"] as? String ?? ""
+                    
+                    // Remove prefix if it exists
+                    if fetchedEmail.starts(with: "Email: ") {
+                        fetchedEmail = fetchedEmail.replacingOccurrences(of: "Email: ", with: "")
+                    }
+                    
+                    print("Fetched email without prefix: \(fetchedEmail)")
                     completion(document.documentID)
                 } else {
+                    print("No document found for email: \(email)")
                     completion(nil)
                 }
             }
     }
+
+
 
     private func sendInvitation(to userId: String, completion: @escaping (Bool) -> Void) {
         guard let currentUser = Auth.auth().currentUser else {
