@@ -43,7 +43,7 @@ class PackingListView: UIView {
         buttonAddPackingItem = UIButton(type: .system)
         buttonAddPackingItem.setTitle("Add Packing Item", for: .normal)
         buttonAddPackingItem.setTitleColor(.white, for: .normal)
-        buttonAddPackingItem.backgroundColor = .systemRed
+        buttonAddPackingItem.backgroundColor = .systemBlue
         buttonAddPackingItem.layer.cornerRadius = 8
         buttonAddPackingItem.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(buttonAddPackingItem)
@@ -63,7 +63,7 @@ class PackingListView: UIView {
             buttonAddPackingItem.topAnchor.constraint(equalTo: tableViewPackingList.bottomAnchor, constant: 20),
             buttonAddPackingItem.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonAddPackingItem.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            buttonAddPackingItem.heightAnchor.constraint(equalToConstant: 44),
+            buttonAddPackingItem.heightAnchor.constraint(equalToConstant: 45),
             buttonAddPackingItem.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }

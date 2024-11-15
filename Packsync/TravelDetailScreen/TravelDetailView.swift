@@ -39,7 +39,7 @@ class TravelDetailView: UIView {
     func setupButtonSetAsActivePlan() {
         buttonSetAsActivePlan = UIButton(type: .system)
         buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
-        buttonSetAsActivePlan.backgroundColor = .systemGreen
+        buttonSetAsActivePlan.backgroundColor = .systemBlue
         buttonSetAsActivePlan.setTitleColor(.white, for: .normal)
         buttonSetAsActivePlan.layer.cornerRadius = 8
         buttonSetAsActivePlan.translatesAutoresizingMaskIntoConstraints = false
@@ -70,7 +70,7 @@ class TravelDetailView: UIView {
     func setupButtonPackingList() {
         buttonPackingList = UIButton(type: .system)
         buttonPackingList.setTitle("Packing List", for: .normal)
-        buttonPackingList.backgroundColor = .systemGreen
+        buttonPackingList.backgroundColor = .systemBlue
         buttonPackingList.setTitleColor(.white, for: .normal)
         buttonPackingList.layer.cornerRadius = 8
         buttonPackingList.translatesAutoresizingMaskIntoConstraints = false
@@ -80,7 +80,7 @@ class TravelDetailView: UIView {
     func setupButtonInviteFriend() {
         buttonInviteFriend = UIButton(type: .system)
         buttonInviteFriend.setTitle("Invite Friend", for: .normal)
-        buttonInviteFriend.backgroundColor = .systemGreen
+        buttonInviteFriend.backgroundColor = .systemBlue
         buttonInviteFriend.setTitleColor(.white, for: .normal)
         buttonInviteFriend.layer.cornerRadius = 8
         buttonInviteFriend.translatesAutoresizingMaskIntoConstraints = false
@@ -90,7 +90,7 @@ class TravelDetailView: UIView {
     func setupButtonSpending() {
         buttonSpending = UIButton(type: .system)
         buttonSpending.setTitle("Spending", for: .normal)
-        buttonSpending.backgroundColor = .systemGreen
+        buttonSpending.backgroundColor = .systemBlue
         buttonSpending.setTitleColor(.white, for: .normal)
         buttonSpending.layer.cornerRadius = 8
         buttonSpending.translatesAutoresizingMaskIntoConstraints = false
@@ -100,7 +100,7 @@ class TravelDetailView: UIView {
     func setupButtonBillboard() {
         buttonBillboard = UIButton(type: .system)
         buttonBillboard.setTitle("Billboard", for: .normal)
-        buttonBillboard.backgroundColor = .systemGreen
+        buttonBillboard.backgroundColor = .systemBlue
         buttonBillboard.setTitleColor(.white, for: .normal)
         buttonBillboard.layer.cornerRadius = 8
         buttonBillboard.translatesAutoresizingMaskIntoConstraints = false

@@ -75,7 +75,6 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
             }
     }
     
-    
     @objc func checkboxTapped(_ sender: UIButton) {
         let index = sender.tag
         guard index < packingItems.count else {
@@ -86,7 +85,6 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         packingItems[index].isPacked.toggle()
         sender.isSelected = packingItems[index].isPacked
         
-        // Update the item in Firestore
         guard let travel = travel else {
             print("Error: Travel object is nil")
             return
@@ -95,27 +93,51 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         let db = Firestore.firestore()
         let id = packingItems[index].id
         let currentUser = Auth.auth().currentUser
-        let displayName = currentUser?.displayName ?? "Unknown User"
-        let updateData: [String: Any] = [
-            "isPacked": packingItems[index].isPacked,
-            "isPackedBy": packingItems[index].isPacked ? displayName : NSNull()
-        ]
         
-        db.collection("trips").document(travel.id).collection("packingItems").document(id).updateData(updateData) { [weak self] error in
-            if let error = error {
-                print("Error updating document: \(error)")
-                // Revert the change if the update fails
-                DispatchQueue.main.async {
-                    self?.packingItems[index].isPacked.toggle()
-                    sender.isSelected = self?.packingItems[index].isPacked ?? false
-                }
-            } else {
-                print("Document successfully updated")
-                // Update the local packingItems array
-                self?.packingItems[index].isPackedBy = self?.packingItems[index].isPacked == true ? displayName : nil
-                // Refresh the UI
-                DispatchQueue.main.async {
-                    self?.packingListView.tableViewPackingList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+        // Fetch the user's profile data
+        if let userId = currentUser?.uid {
+            db.collection("users").document(userId).getDocument { [weak self] (document, error) in
+                if let document = document, document.exists {
+                    let profilePicURL = document.data()?["profileImageUrl"] as? String
+                    let displayName = document.data()?["displayName"] as? String ?? "Unknown User"
+                    
+                    print("Debug - ProfilePicURL: \(profilePicURL ?? "nil")")
+                    print("Debug - DisplayName: \(displayName)")
+                    
+                    let packedByValue: String
+                    if let profilePicURL = profilePicURL, !profilePicURL.isEmpty {
+                        packedByValue = profilePicURL
+                        print("Debug - Using ProfilePicURL: \(profilePicURL)")
+                    } else {
+                        packedByValue = "Name: \(displayName)"
+                        print("Debug - Using DisplayName: \(displayName)")
+                    }
+                    
+                    let updateData: [String: Any] = [
+                        "isPacked": self?.packingItems[index].isPacked ?? false,
+                        "isPackedBy": (self?.packingItems[index].isPacked ?? false) ? packedByValue : NSNull()
+                    ]
+                    
+                    db.collection("trips").document(travel.id).collection("packingItems").document(id).updateData(updateData) { error in
+                        if let error = error {
+                            print("Error updating document: \(error)")
+                            // Revert the change if the update fails
+                            DispatchQueue.main.async {
+                                self?.packingItems[index].isPacked.toggle()
+                                sender.isSelected = self?.packingItems[index].isPacked ?? false
+                            }
+                        } else {
+                            print("Document successfully updated")
+                            // Update the local packingItems array
+                            self?.packingItems[index].isPackedBy = self?.packingItems[index].isPacked == true ? packedByValue : nil
+                            // Refresh the UI
+                            DispatchQueue.main.async {
+                                self?.packingListView.tableViewPackingList.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+                            }
+                        }
+                    }
+                } else {
+                    print("User document does not exist")
                 }
             }
         }
