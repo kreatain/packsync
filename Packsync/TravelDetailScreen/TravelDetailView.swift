@@ -36,15 +36,20 @@ class TravelDetailView: UIView {
         initConstraints()
     }
     
-    func setupButtonSetAsActivePlan() {
-        buttonSetAsActivePlan = UIButton(type: .system)
-        buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
-        buttonSetAsActivePlan.backgroundColor = .systemBlue
-        buttonSetAsActivePlan.setTitleColor(.white, for: .normal)
-        buttonSetAsActivePlan.layer.cornerRadius = 8
-        buttonSetAsActivePlan.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(buttonSetAsActivePlan)
-    }
+
+    func updateSetAsActivePlanButton(isActive: Bool) {
+          if isActive {
+              buttonSetAsActivePlan.setTitle("Already Set as an Active Plan", for: .normal)
+              buttonSetAsActivePlan.backgroundColor = .systemGray
+//              buttonSetAsActivePlan.isEnabled = true
+          } else {
+              buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
+              buttonSetAsActivePlan.backgroundColor = .systemBlue
+//              buttonSetAsActivePlan.isEnabled = true
+          }
+      }
+    
+
     
     func setupLabelTravelTitle() {
         labelTravelTitle = UILabel()
@@ -65,6 +70,16 @@ class TravelDetailView: UIView {
         labelCountryAndCity.font = UIFont.systemFont(ofSize: 16)
         labelCountryAndCity.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelCountryAndCity)
+    }
+    
+    func setupButtonSetAsActivePlan() {
+        buttonSetAsActivePlan = UIButton(type: .system)
+        buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
+        buttonSetAsActivePlan.backgroundColor = .systemBlue
+        buttonSetAsActivePlan.setTitleColor(.white, for: .normal)
+        buttonSetAsActivePlan.layer.cornerRadius = 8
+        buttonSetAsActivePlan.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(buttonSetAsActivePlan)
     }
     
     func setupButtonPackingList() {
@@ -120,17 +135,7 @@ class TravelDetailView: UIView {
             labelCountryAndCity.topAnchor.constraint(equalTo: labelDateRange.bottomAnchor, constant: 20),
             labelCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            
-//            buttonPackingList.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
-//            buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-//            buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-//            buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
-//            
-//            buttonInviteFriend.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
-//            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-//            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-//            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
-//            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+
             buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
             buttonSetAsActivePlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonSetAsActivePlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
@@ -163,6 +168,9 @@ class TravelDetailView: UIView {
         labelTravelTitle.text = "Travel Title: \(travel.travelTitle)"
         labelDateRange.text = "Travel Date: \(formatDate(travel.travelStartDate)) - \(formatDate(travel.travelEndDate))"
         labelCountryAndCity.text = "Country and City: \(travel.countryAndCity)"
+        let isActivePlan = TravelPlanManager.shared.activeTravelPlan?.id == travel.id
+            buttonSetAsActivePlan.setTitle(isActivePlan ? "Active Plan" : "Set as Active Plan", for: .normal)
+            buttonSetAsActivePlan.isEnabled = !isActivePlan
     }
     
     func formatDate(_ dateString: String) -> String {

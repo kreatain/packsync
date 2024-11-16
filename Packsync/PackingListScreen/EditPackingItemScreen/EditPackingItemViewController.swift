@@ -50,7 +50,7 @@ class EditPackingItemViewController: UIViewController {
         updatedItem.itemNumber = count
         
         let db = Firestore.firestore()
-        db.collection("trips").document(updatedItem.travelId).collection("packingItems").document(updatedItem.id).setData([
+        db.collection("travelPlans").document(updatedItem.travelId).collection("packingItems").document(updatedItem.id).setData([
             "name": updatedItem.name,
             "itemNumber": updatedItem.itemNumber
         ], merge: true) { [weak self] error in
@@ -68,7 +68,7 @@ class EditPackingItemViewController: UIViewController {
         guard let item = packingItem else { return }
         
         let db = Firestore.firestore()
-        db.collection("trips").document(item.travelId).collection("packingItems").document(item.id).delete() { [weak self] error in
+        db.collection("travelPlans").document(item.travelId).collection("packingItems").document(item.id).delete() { [weak self] error in
             if let error = error {
                 print("Error removing document: \(error)")
             } else {

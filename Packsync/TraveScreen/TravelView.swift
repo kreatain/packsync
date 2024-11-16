@@ -2,7 +2,7 @@
 //  TravelView.swift
 //  Packsync
 //
-//  Created by Xi Jia/Jessica Li on 11/7/24.
+//  Created by Xi Jia on 11/7/24.
 //
 
 import UIKit
@@ -25,6 +25,7 @@ class TravelView: UIView {
     var activePlanTitleLabel: UILabel!
     var activePlanDateLabel: UILabel!
     var activePlanLocationLabel: UILabel!
+    var placeholderView: UIView!
 
     weak var delegate: TravelViewDelegate?
 
@@ -56,7 +57,7 @@ class TravelView: UIView {
         labelText.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelText)
     }
-
+    
     func setupSegmentedControl() {
         segmentedControlView = UIView()
         segmentedControlView.backgroundColor = .lightGray

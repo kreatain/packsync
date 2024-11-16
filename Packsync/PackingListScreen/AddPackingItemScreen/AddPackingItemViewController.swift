@@ -58,7 +58,7 @@ class AddPackingItemViewController: UIViewController {
         let db = Firestore.firestore()
         
         do {
-            try db.collection("trips").document(travel.id).collection("packingItems").addDocument(from: item) { error in
+            try db.collection("travelPlans").document(travel.id).collection("packingItems").addDocument(from: item) { error in
                 if let error = error {
                     print("Error adding document: \(error)")
                     self.showAlert(message: "Failed to add item. Please try again.")
