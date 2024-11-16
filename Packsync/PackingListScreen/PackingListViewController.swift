@@ -123,7 +123,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
                         "isPackedBy": (self?.packingItems[index].isPacked ?? false) ? packedByValue : NSNull()
                     ]
                     
-                    db.collection("trips").document(travel.id).collection("packingItems").document(id).updateData(updateData) { error in
+                    db.collection("travelPlans").document(travel.id).collection("packingItems").document(id).updateData(updateData) { error in
                         if let error = error {
                             print("Error updating document: \(error)")
                             // Revert the change if the update fails
