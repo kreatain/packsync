@@ -69,7 +69,12 @@ class TravelDetailViewController: UIViewController {
     }
    
     @objc func spendingButtonTapped() {
-        let spendingVC = OverviewViewController()
+        guard let travel = travel else {
+            print("No travel plan available")
+            return
+        }
+
+        let spendingVC = SpendingViewController(travelID: travel.id) // Pass the travel ID here
         navigationController?.pushViewController(spendingVC, animated: true)
     }
     

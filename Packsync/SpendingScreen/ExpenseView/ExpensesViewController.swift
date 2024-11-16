@@ -13,4 +13,6 @@ class ExpensesViewController: UIViewController {
         view.backgroundColor = .white
         // Additional setup for expenses content
     }
+    
+    
 }

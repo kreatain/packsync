@@ -8,6 +8,10 @@ class AddANewTravelViewController: UIViewController {
     let db = Firestore.firestore()
     let addANewTravelPlan = AddANewTravelPlanView()
     
+    // Currency options and selected currency
+    let currencies = ["USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "CNY (¥)", "INR (₹)"]
+    var selectedCurrency: String?
+    
     override func loadView() {
         view = addANewTravelPlan
     }
@@ -19,6 +23,11 @@ class AddANewTravelViewController: UIViewController {
         
         // Set the current user
         currentUser = Auth.auth().currentUser
+        
+        // Configure the picker
+            addANewTravelPlan.currencyPicker.dataSource = self
+            addANewTravelPlan.currencyPicker.delegate = self
+            addANewTravelPlan.buttonAdd.addTarget(self, action: #selector(onAddButtonTapped), for: .touchUpInside)
         
         addANewTravelPlan.buttonAdd.addTarget(self, action: #selector(onAddButtonTapped), for: .touchUpInside)
     }
@@ -39,6 +48,11 @@ class AddANewTravelViewController: UIViewController {
             showAlert(message: "Please fill in all fields")
             return
         }
+        
+        guard let selectedCurrency = selectedCurrency else {
+            showAlert(message: "Please select a currency.")
+            return
+        }
 
         // Create a new Travel instance using the updated model structure
         let travel = Travel(
@@ -48,6 +62,7 @@ class AddANewTravelViewController: UIViewController {
             travelStartDate: travelStartDate,
             travelEndDate: travelEndDate,
             countryAndCity: travelCountryAndCity,
+            currency: selectedCurrency,
             categoryIds: [],
             expenseIds: [],
             participantIds: []
@@ -55,6 +70,7 @@ class AddANewTravelViewController: UIViewController {
         
         saveTravelToFirestore(travel: travel)
     }
+    
 
     func saveTravelToFirestore(travel: Travel) {
         let collectionTravelPlans = db.collection("travelPlans")
@@ -79,5 +95,23 @@ class AddANewTravelViewController: UIViewController {
         let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
+    }
+}
+
+extension AddANewTravelViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return currencies.count
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return currencies[row]
+    }
+    
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        selectedCurrency = currencies[row]
     }
 }

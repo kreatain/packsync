@@ -16,11 +16,15 @@ class AddANewTravelPlanView: UIView {
     var labelTravelStartDate: UILabel!
     var labelTravelEndDate: UILabel!
     var labelTravelCountryAndCity: UILabel!
+    var labelCurrency: UILabel!
     
     var textFieldTravelTitle: UITextField!
     var textFieldTravelStartDate: UITextField!
     var textFieldTravelEndDate: UITextField!
     var textFieldCountryAndCity: UITextField!
+    
+    var currencyPicker: UIPickerView!
+    
     var buttonAdd: UIButton!
     
     override init(frame: CGRect) {
@@ -33,6 +37,8 @@ class AddANewTravelPlanView: UIView {
         setupLabelTravelStartDate()
         setupLabelTravelEndDate()
         setupLabelCountryAndCity()
+        setupLabelCurrency()
+        setupCurrencyPicker()
         setuptextFieldTravelTitle()
         setuptextFieldTravelStartDate()
         setuptextFieldTravelEndDate()
@@ -54,6 +60,20 @@ class AddANewTravelPlanView: UIView {
         contentView = UIView()
         contentView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.addSubview(contentView)
+    }
+    
+    func setupLabelCurrency() {
+            labelCurrency = UILabel()
+            labelCurrency.text = "Currency"
+            labelCurrency.font = .systemFont(ofSize: 16, weight: .medium)
+            labelCurrency.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview(labelCurrency)
+        }
+    
+    func setupCurrencyPicker() {
+        currencyPicker = UIPickerView()
+        currencyPicker.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(currencyPicker)
     }
     
     func setupLabelTravelTitle() {
@@ -213,7 +233,15 @@ class AddANewTravelPlanView: UIView {
             textFieldCountryAndCity.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             textFieldCountryAndCity.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            buttonAdd.topAnchor.constraint(equalTo: textFieldCountryAndCity.bottomAnchor, constant: 32),
+            labelCurrency.topAnchor.constraint(equalTo: textFieldCountryAndCity.bottomAnchor, constant: 16),
+            labelCurrency.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            
+            currencyPicker.topAnchor.constraint(equalTo: labelCurrency.bottomAnchor, constant: 8),
+            currencyPicker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            currencyPicker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            currencyPicker.heightAnchor.constraint(equalToConstant: 150),
+            
+            buttonAdd.topAnchor.constraint(equalTo: currencyPicker.bottomAnchor, constant: 32),
             buttonAdd.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             buttonAdd.widthAnchor.constraint(equalToConstant: 200),
             buttonAdd.heightAnchor.constraint(equalToConstant: 44),

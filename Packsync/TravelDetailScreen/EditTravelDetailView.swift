@@ -22,6 +22,9 @@ class EditTravelDetailView: UIView {
     var labelCountryAndCity: UILabel!
     var textFieldCountryAndCity: UITextField!
     
+    var labelCurrency: UILabel!
+    var currencyPicker: UIPickerView!
+    
     var buttonSave: UIButton!
     var buttonDelete: UIButton!
     
@@ -37,6 +40,8 @@ class EditTravelDetailView: UIView {
         setupTextFieldTravelEndDate()
         setupLabelCountryAndCity()
         setupTextFieldCountryAndCity()
+        setupLabelCurrency()
+        setupCurrencyPicker()
         setupButtonSave()
         setupButtonDelete()
         setupDoneButtons()
@@ -104,6 +109,20 @@ class EditTravelDetailView: UIView {
         labelCountryAndCity.font = UIFont.boldSystemFont(ofSize: 16)
         labelCountryAndCity.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelCountryAndCity)
+    }
+    
+    func setupLabelCurrency() {
+        labelCurrency = UILabel()
+        labelCurrency.text = "Currency"
+        labelCurrency.font = UIFont.boldSystemFont(ofSize: 16)
+        labelCurrency.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelCurrency)
+    }
+    
+    func setupCurrencyPicker() {
+        currencyPicker = UIPickerView()
+        currencyPicker.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(currencyPicker)
     }
     
     func setupTextFieldCountryAndCity() {
@@ -198,7 +217,19 @@ class EditTravelDetailView: UIView {
             textFieldCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             textFieldCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
-            buttonSave.topAnchor.constraint(equalTo: textFieldCountryAndCity.bottomAnchor, constant: 20),
+            // Add constraints for currency picker label
+            labelCurrency.topAnchor.constraint(equalTo: textFieldCountryAndCity.bottomAnchor, constant: 20),
+            labelCurrency.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelCurrency.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+
+            // Add constraints for currency picker
+            currencyPicker.topAnchor.constraint(equalTo: labelCurrency.bottomAnchor, constant: 8),
+            currencyPicker.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            currencyPicker.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            currencyPicker.heightAnchor.constraint(equalToConstant: 150),
+
+            // Update button constraints
+            buttonSave.topAnchor.constraint(equalTo: currencyPicker.bottomAnchor, constant: 20),
             buttonSave.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonSave.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonSave.heightAnchor.constraint(equalToConstant: 44),

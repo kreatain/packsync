@@ -12,6 +12,7 @@ class TravelDetailView: UIView {
     var labelTravelTitle: UILabel!
     var labelDateRange: UILabel!
     var labelCountryAndCity: UILabel!
+    var labelCurrency: UILabel!
     
     var buttonSetAsActivePlan: UIButton!
     var buttonPackingList: UIButton!
@@ -26,6 +27,7 @@ class TravelDetailView: UIView {
         setupLabelTravelTitle()
         setupLabelDateRange()
         setupLabelCountryAndCity()
+        setupLabelCurrency()
         
         setupButtonSetAsActivePlan()
         setupButtonPackingList()
@@ -65,6 +67,13 @@ class TravelDetailView: UIView {
         labelCountryAndCity.font = UIFont.systemFont(ofSize: 16)
         labelCountryAndCity.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelCountryAndCity)
+    }
+    
+    func setupLabelCurrency() {
+        labelCurrency = UILabel()
+        labelCurrency.font = UIFont.systemFont(ofSize: 16)
+        labelCurrency.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelCurrency)
     }
     
     func setupButtonPackingList() {
@@ -121,17 +130,11 @@ class TravelDetailView: UIView {
             labelCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
-//            buttonPackingList.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
-//            buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-//            buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-//            buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
-//            
-//            buttonInviteFriend.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
-//            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-//            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-//            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
-//            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
-            buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
+            labelCurrency.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
+            labelCurrency.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelCurrency.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+
+            buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCurrency.bottomAnchor, constant: 20),
             buttonSetAsActivePlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonSetAsActivePlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonSetAsActivePlan.heightAnchor.constraint(equalToConstant: 44),
@@ -158,11 +161,13 @@ class TravelDetailView: UIView {
             buttonBillboard.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
+
     
     func configure(with travel: Travel) {
         labelTravelTitle.text = "Travel Title: \(travel.travelTitle)"
         labelDateRange.text = "Travel Date: \(formatDate(travel.travelStartDate)) - \(formatDate(travel.travelEndDate))"
         labelCountryAndCity.text = "Country and City: \(travel.countryAndCity)"
+        labelCurrency.text = "Currency: \(travel.currency)" // Display the currency
     }
     
     func formatDate(_ dateString: String) -> String {

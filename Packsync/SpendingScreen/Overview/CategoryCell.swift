@@ -49,25 +49,35 @@ class CategoryCell: UITableViewCell {
             spendingLabel.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 8),
             spendingLabel.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 4),
             
-            progressBar.leadingAnchor.constraint(equalTo: spendingLabel.trailingAnchor, constant: 16),
+            progressBar.leadingAnchor.constraint(equalTo: categoryLabel.leadingAnchor),
             progressBar.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            progressBar.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            progressBar.topAnchor.constraint(equalTo: spendingLabel.bottomAnchor, constant: 8),
+            progressBar.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -8),
+            progressBar.heightAnchor.constraint(equalToConstant: 4) // Standard height for progress bars
         ])
     }
     
-    func configure(with category: Category, travelId: String, totalBudget: Double) {
+    /// Configures the cell with category data
+    func configure(with category: Category, currencySymbol: String, displayProgressBar: Bool = true) {
         emojiLabel.text = category.emoji
         categoryLabel.text = category.name
-        
-        // Fetch spending items based on `spendingItemIds` and calculate total spent
-        SpendingFirebaseManager.shared.fetchSpendingItems(for: travelId, categoryId: category.id) { spendingItems in
-            let totalSpent = category.calculateTotalSpent(using: spendingItems)
+
+        if displayProgressBar {
+            progressBar.isHidden = false
+            spendingLabel.isHidden = false
             
-            // Update UI elements
-            DispatchQueue.main.async {
-                self.spendingLabel.text = "$\(totalSpent) / $\(category.budgetAmount)"
-                self.progressBar.progress = Float(totalSpent / category.budgetAmount)
+            // Fetch spending items based on the spendingItemIds in the category
+            SpendingFirebaseManager.shared.fetchSpendingItemsByIds(spendingItemIds: category.spendingItemIds) { spendingItems in
+                let totalSpent = category.calculateTotalSpent(using: spendingItems)
+                DispatchQueue.main.async {
+                    self.spendingLabel.text = "\(currencySymbol)\(totalSpent) / \(currencySymbol)\(category.budgetAmount)"
+                    self.progressBar.progress = Float(totalSpent / category.budgetAmount)
+                }
             }
+        } else {
+            progressBar.isHidden = true
+            spendingLabel.isHidden = true
         }
     }
+    
 }

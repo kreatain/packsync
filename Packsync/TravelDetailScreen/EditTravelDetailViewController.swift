@@ -7,6 +7,8 @@ class EditTravelDetailViewController: UIViewController {
     
     let editTravelView = EditTravelDetailView()
     
+    let currencies = ["USD", "EUR", "JPY", "GBP", "AUD", "CAD", "CHF", "CNY", "HKD", "INR"]
+    
     override func loadView() {
         view = editTravelView
     }
@@ -19,6 +21,9 @@ class EditTravelDetailViewController: UIViewController {
         if let travel = travel {
             editTravelView.configure(with: travel)
         }
+        
+        editTravelView.currencyPicker.dataSource = self
+        editTravelView.currencyPicker.delegate = self
         
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelEdit))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(saveEdit))
@@ -41,6 +46,9 @@ class EditTravelDetailViewController: UIViewController {
             return
         }
         
+        let selectedCurrencyRow = editTravelView.currencyPicker.selectedRow(inComponent: 0)
+        let selectedCurrency = currencies[selectedCurrencyRow]
+        
         let updatedTravel = Travel(
             id: travel?.id ?? UUID().uuidString,
             creatorId: creatorId,
@@ -48,6 +56,7 @@ class EditTravelDetailViewController: UIViewController {
             travelStartDate: formatDateForFirestore(updatedStartDate),
             travelEndDate: formatDateForFirestore(updatedEndDate),
             countryAndCity: updatedCountryAndCity,
+            currency: selectedCurrency,
             categoryIds: travel?.categoryIds ?? [],
             expenseIds: travel?.expenseIds ?? [],
             participantIds: travel?.participantIds ?? []
@@ -58,7 +67,8 @@ class EditTravelDetailViewController: UIViewController {
             "travelTitle": updatedTitle,
             "travelStartDate": updatedTravel.travelStartDate,
             "travelEndDate": updatedTravel.travelEndDate,
-            "countryAndCity": updatedCountryAndCity
+            "countryAndCity": updatedCountryAndCity,
+            "currency": selectedCurrency
         ]) { [weak self] error in
             if let error = error {
                 print("Error updating document: \(error)")
@@ -114,4 +124,23 @@ class EditTravelDetailViewController: UIViewController {
 protocol EditTravelDetailDelegate: AnyObject {
     func didUpdateTravel(_ travel: Travel)
     func didDeleteTravel(_ travel: Travel)
+}
+
+extension EditTravelDetailViewController: UIPickerViewDataSource, UIPickerViewDelegate {
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 1 // Single column
+    }
+
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return currencies.count
+    }
+
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return currencies[row] // Assuming `currencies` is a predefined array
+    }
+
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+        // Handle selection if needed
+        print("Selected currency: \(currencies[row])")
+    }
 }

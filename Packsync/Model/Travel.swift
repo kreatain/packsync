@@ -14,6 +14,7 @@ struct Travel: Codable {
     var travelStartDate: String
     var travelEndDate: String
     var countryAndCity: String
+    var currency: String // ISO 4217 currency code (e.g., USD, EUR, JPY)
     var categoryIds: [String] // Array of IDs for budget categories associated with the travel
     var expenseIds: [String] // Array of IDs for group expenses associated with the travel
     var participantIds: [String] // List of user IDs for participants in the travel plan
@@ -25,6 +26,7 @@ struct Travel: Codable {
         travelStartDate: String,
         travelEndDate: String,
         countryAndCity: String,
+        currency: String = "USD", // Default to USD
         categoryIds: [String] = [],
         expenseIds: [String] = [],
         participantIds: [String] = []
@@ -35,6 +37,7 @@ struct Travel: Codable {
         self.travelStartDate = travelStartDate
         self.travelEndDate = travelEndDate
         self.countryAndCity = countryAndCity
+        self.currency = currency
         self.categoryIds = categoryIds
         self.expenseIds = expenseIds
         self.participantIds = participantIds
