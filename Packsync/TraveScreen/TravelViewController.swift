@@ -1,10 +1,3 @@
-//
-//  TravelViewController.swift
-//  Packsync
-//
-//  Created by Xi Jia/Jessica Li on 11/7/24.
-//
-
 import UIKit
 import FirebaseFirestore
 import FirebaseAuth
@@ -48,14 +41,22 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         handleAuth = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             self?.handleAuthStateChange(user: user)
         }
-        
-        // Initialize view to the correct tab based on active plan
-        didTapActivePlanButton()
+        if let activePlan = loadActivePlanLocally() {
+            TravelPlanManager.shared.setActiveTravelPlan(activePlan)
+            updateActivePlanDetailView(with: activePlan)
+        } else {
+            didTapActivePlanButton() // Default to placeholder message if no active plan
+        }
+        DispatchQueue.main.async {
+            self.travelView.activePlanButton.sendActions(for: .touchUpInside)
+        }
     }
+
     
     deinit {
         NotificationCenter.default.removeObserver(self, name: .activeTravelPlanChanged, object: nil)
     }
+ 
     
     // MARK: - Fetch Travel Plans
     func fetchTravelPlans() {
@@ -89,20 +90,28 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     @objc func handleActivePlanChange() {
         if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             updateActivePlanDetailView(with: activePlan)
+            // Hide the placeholder message
+            travelView.labelText.isHidden = true
         } else {
             displayNoActivePlanMessage()
+            // Hide the active plan details view
+            clearActivePlanDetailView()
         }
     }
     
     // MARK: - Display Placeholder for No Active Plan
+    
+   
     private func displayNoActivePlanMessage() {
         travelView.activePlanTitleLabel.text = "No active plan set."
         travelView.activePlanDateLabel.text = "Go to 'Other Plans' to set an active plan."
         travelView.activePlanLocationLabel.text = "Swipe left to set."
         travelView.activePlanDetailView.isHidden = false
-        
+        travelView.tableViewTravelPlans.isHidden = true
+
+            // Force layout update
+        view.layoutIfNeeded()
     }
-    
     // MARK: - Update Active Plan Detail View
     func updateActivePlanDetailView(with activePlan: Travel) {
         travelView.activePlanTitleLabel.text = "Title: \(activePlan.travelTitle)"
@@ -118,8 +127,19 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.activePlanLocationLabel.text = ""
         travelView.activePlanDetailView.isHidden = true
     }
-    
+    private func loadActivePlanLocally() -> Travel? {
+        if let savedData = UserDefaults.standard.data(forKey: "activePlanData") {
+            let decoder = JSONDecoder()
+            if let savedPlan = try? decoder.decode(Travel.self, from: savedData) {
+                print("Active plan loaded from local storage.")
+                return savedPlan
+            }
+        }
+        print("No active plan found in local storage.")
+        return nil
+    }
     // MARK: - TravelViewDelegate Methods
+
     func didTapActivePlanButton() {
         print("Switched to Active Plan tab.")
 
@@ -127,18 +147,17 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.activePlanButton.setTitleColor(.white, for: .normal)
         travelView.otherPlansButton.backgroundColor = .clear
         travelView.otherPlansButton.setTitleColor(.systemBlue, for: .normal)
-        
-        // Hide the list view and show only the active plan or a placeholder
-        travelView.tableViewTravelPlans.isHidden = true
 
         if let activePlan = TravelPlanManager.shared.activeTravelPlan {
-            // Display active plan details
             updateActivePlanDetailView(with: activePlan)
             travelView.activePlanDetailView.isHidden = false
+            travelView.tableViewTravelPlans.isHidden = true
         } else {
-            // Display placeholder message if no active plan is set
             displayNoActivePlanMessage()
+            
         }
+
+        view.layoutIfNeeded()
     }
     
     func didTapOtherPlansButton() {
@@ -158,14 +177,29 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     // MARK: - TravelPlanTableViewCellDelegate Methods
+    
     func setActivePlanButtonTapped(_ travelPlan: Travel) {
         print("Set Active tapped for: \(travelPlan.travelTitle)")
-        
+
+        // Set the active travel plan
         TravelPlanManager.shared.setActiveTravelPlan(travelPlan)
+
+        // Save the active plan data locally
+        saveActivePlanLocally(travelPlan)
+
+        // Notify other parts of the app about the active plan change
+        NotificationCenter.default.post(name: .activeTravelPlanChanged, object: nil)
+
         travelView.tableViewTravelPlans.reloadData()
-        didTapActivePlanButton() // Switch immediately
+        didTapActivePlanButton()
     }
-    
+    private func saveActivePlanLocally(_ travelPlan: Travel) {
+        let encoder = JSONEncoder()
+        if let encodedData = try? encoder.encode(travelPlan) {
+            UserDefaults.standard.set(encodedData, forKey: "activePlanData")
+            print("Active plan saved locally.")
+        }
+    }
     func editTravelPlanTapped(_ travelPlan: Travel) {
         print("Edit tapped for: \(travelPlan.travelTitle)")
     }

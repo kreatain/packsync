@@ -1,4 +1,5 @@
 //
+//
 //  PackingListViewController.swift
 //  Packsync
 //
@@ -13,7 +14,10 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
     
     let packingListView = PackingListView()
     var travel: Travel?
+    private var travelID: String? // Optional travelID parameter for specific travel plan
     var packingItems: [PackingItem] = []
+    private let noActivePlanLabel = UILabel() // Label to prompt user to set active plan
+
     
     override func loadView() {
         view = packingListView
@@ -30,6 +34,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         packingListView.buttonAddPackingItem.addTarget(self, action: #selector(addPackingItemButtonTapped), for: .touchUpInside)
         
         fetchPackingItems()
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,7 +54,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         guard let travel = travel else { return }
 
         let db = Firestore.firestore()
-        db.collection("trips").document(travel.id).collection("packingItems")
+        db.collection("travelPlans").document(travel.id).collection("packingItems")
             .whereField("creatorId", isEqualTo: travel.creatorId)
             .whereField("travelId", isEqualTo: travel.id)
             .addSnapshotListener { [weak self] querySnapshot, error in
@@ -118,7 +123,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
                         "isPackedBy": (self?.packingItems[index].isPacked ?? false) ? packedByValue : NSNull()
                     ]
                     
-                    db.collection("trips").document(travel.id).collection("packingItems").document(id).updateData(updateData) { error in
+                    db.collection("travelPlans").document(travel.id).collection("packingItems").document(id).updateData(updateData) { error in
                         if let error = error {
                             print("Error updating document: \(error)")
                             // Revert the change if the update fails
@@ -196,3 +201,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         }
     }
 }
+
+ 
+
+

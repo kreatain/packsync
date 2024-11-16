@@ -8,10 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		04112FB22CE5705F00371ABD /* CategoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04112FB12CE5705F00371ABD /* CategoryCell.swift */; };
+
 		04112FC02CE7C75B00371ABD /* BudgetAddEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04112FBF2CE7C75B00371ABD /* BudgetAddEditViewController.swift */; };
 		04112FC22CE7CF0800371ABD /* EmojiTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04112FC12CE7CF0800371ABD /* EmojiTextField.swift */; };
 		04112FC82CE857D300371ABD /* BudgetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04112FC72CE857D300371ABD /* BudgetViewController.swift */; };
 		0FC7A453C2D220E35DA085B8 /* Pods_Packsync_PacksyncUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B0E4CF1E1465678B31E857 /* Pods_Packsync_PacksyncUITests.framework */; };
+		365D8E7F2CE808A200453F2E /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8E7E2CE808A200453F2E /* PackingListViewController.swift */; };
+		365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8EB42CE82DC900453F2E /* CreateVoteView.swift */; };
+		365D8EB72CE82DDB00453F2E /* CreateVoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8EB62CE82DDB00453F2E /* CreateVoteViewController.swift */; };
 		36EBDBC32CE6BF5500013D30 /* PacksyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36EBDBC12CE6BF5500013D30 /* PacksyncTests.swift */; };
 		36EBDBC72CE6BF5800013D30 /* PacksyncUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36EBDBC42CE6BF5800013D30 /* PacksyncUITests.swift */; };
 		36EBDBC82CE6BF5800013D30 /* PacksyncUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36EBDBC52CE6BF5800013D30 /* PacksyncUITestsLaunchTests.swift */; };
@@ -21,7 +25,6 @@
 		4C7E69982CE6B6E10056E8CC /* AddPackingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E698B2CE6B6E10056E8CC /* AddPackingItemView.swift */; };
 		4C7E69992CE6B6E10056E8CC /* PackingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E69922CE6B6E10056E8CC /* PackingListView.swift */; };
 		4C7E699A2CE6B6E10056E8CC /* AddPackingItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E698C2CE6B6E10056E8CC /* AddPackingItemViewController.swift */; };
-		4C7E699B2CE6B6E10056E8CC /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E69932CE6B6E10056E8CC /* PackingListViewController.swift */; };
 		4CC0792B2CE42AD4009364D8 /* ActivePlanNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */; };
 		4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */; };
 		4CC0792F2CE42AD4009364D8 /* BillboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E22CE42AD4009364D8 /* BillboardView.swift */; };
@@ -99,6 +102,10 @@
 		04112FC72CE857D300371ABD /* BudgetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewController.swift; sourceTree = "<group>"; };
 		2B72773A39F97A05671505C0 /* Pods-PacksyncTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PacksyncTests.debug.xcconfig"; path = "Target Support Files/Pods-PacksyncTests/Pods-PacksyncTests.debug.xcconfig"; sourceTree = "<group>"; };
 		2ED08F9BF5D23AF0FF973461 /* Pods-Packsync-PacksyncUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync-PacksyncUITests.release.xcconfig"; path = "Target Support Files/Pods-Packsync-PacksyncUITests/Pods-Packsync-PacksyncUITests.release.xcconfig"; sourceTree = "<group>"; };
+		35CD00D9E00339CB6B228F6B /* Pods_PacksyncTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PacksyncTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		365D8E7E2CE808A200453F2E /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
+		365D8EB42CE82DC900453F2E /* CreateVoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoteView.swift; sourceTree = "<group>"; };
+		365D8EB62CE82DDB00453F2E /* CreateVoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoteViewController.swift; sourceTree = "<group>"; };
 		36EBDBC12CE6BF5500013D30 /* PacksyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacksyncTests.swift; sourceTree = "<group>"; };
 		36EBDBC42CE6BF5800013D30 /* PacksyncUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacksyncUITests.swift; sourceTree = "<group>"; };
 		36EBDBC52CE6BF5800013D30 /* PacksyncUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PacksyncUITestsLaunchTests.swift; sourceTree = "<group>"; };
@@ -109,7 +116,6 @@
 		4C7E698F2CE6B6E10056E8CC /* EditPackingItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPackingItemViewController.swift; sourceTree = "<group>"; };
 		4C7E69912CE6B6E10056E8CC /* PackingItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemCell.swift; sourceTree = "<group>"; };
 		4C7E69922CE6B6E10056E8CC /* PackingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListView.swift; sourceTree = "<group>"; };
-		4C7E69932CE6B6E10056E8CC /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
 		4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivePlanNotification.swift; sourceTree = "<group>"; };
 		4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanManager.swift; sourceTree = "<group>"; };
 		4CC078E22CE42AD4009364D8 /* BillboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillboardView.swift; sourceTree = "<group>"; };
@@ -255,7 +261,7 @@
 				4C7E69902CE6B6E10056E8CC /* EditPackingItemScreen */,
 				4C7E69912CE6B6E10056E8CC /* PackingItemCell.swift */,
 				4C7E69922CE6B6E10056E8CC /* PackingListView.swift */,
-				4C7E69932CE6B6E10056E8CC /* PackingListViewController.swift */,
+				365D8E7E2CE808A200453F2E /* PackingListViewController.swift */,
 			);
 			path = PackingListScreen;
 			sourceTree = "<group>";
@@ -274,6 +280,8 @@
 			children = (
 				4CC078E22CE42AD4009364D8 /* BillboardView.swift */,
 				4CC078E32CE42AD4009364D8 /* BillboardViewController.swift */,
+				365D8EB42CE82DC900453F2E /* CreateVoteView.swift */,
+				365D8EB62CE82DDB00453F2E /* CreateVoteViewController.swift */,
 			);
 			path = BillboardScreen;
 			sourceTree = "<group>";
@@ -744,12 +752,15 @@
 				4CC079382CE42AD4009364D8 /* GroupExpense.swift in Sources */,
 				4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */,
 				4CC0793A2CE42AD4009364D8 /* PackingItem.swift in Sources */,
+				365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */,
+				365D8EB72CE82DDB00453F2E /* CreateVoteViewController.swift in Sources */,
 				4CC0793B2CE42AD4009364D8 /* SpendingItem.swift in Sources */,
 				4CC0793C2CE42AD4009364D8 /* Travel.swift in Sources */,
 				4CC0793D2CE42AD4009364D8 /* User.swift in Sources */,
 				4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */,
 				4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */,
 				04112FB22CE5705F00371ABD /* CategoryCell.swift in Sources */,
+				365D8E7F2CE808A200453F2E /* PackingListViewController.swift in Sources */,
 				4CC079422CE42AD4009364D8 /* ProgressSpinnerDelegate.swift in Sources */,
 				4CC079432CE42AD4009364D8 /* ProgressSpinnerViewController.swift in Sources */,
 				4CC079442CE42AD4009364D8 /* RegisterProgressIndicatorManager.swift in Sources */,
@@ -782,7 +793,6 @@
 				04112FC22CE7CF0800371ABD /* EmojiTextField.swift in Sources */,
 				4C7E69992CE6B6E10056E8CC /* PackingListView.swift in Sources */,
 				4C7E699A2CE6B6E10056E8CC /* AddPackingItemViewController.swift in Sources */,
-				4C7E699B2CE6B6E10056E8CC /* PackingListViewController.swift in Sources */,
 				4CC0795C2CE42AD4009364D8 /* AppDelegate.swift in Sources */,
 				4CC0795D2CE42AD4009364D8 /* Configs.swift in Sources */,
 				4CC0795E2CE42AD4009364D8 /* SceneDelegate.swift in Sources */,
