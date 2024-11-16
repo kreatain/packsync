@@ -1,10 +1,3 @@
-//
-//  TravelDetailView.swift
-//  Packsync
-//
-//  Created by Xi Jia on 11/8/24.
-//
-
 import UIKit
 
 class TravelDetailView: UIView {
@@ -38,20 +31,19 @@ class TravelDetailView: UIView {
         initConstraints()
     }
     
-
-    func updateSetAsActivePlanButton(isActive: Bool) {
-          if isActive {
-              buttonSetAsActivePlan.setTitle("Already Set as an Active Plan", for: .normal)
-              buttonSetAsActivePlan.backgroundColor = .systemGray
-//              buttonSetAsActivePlan.isEnabled = true
-          } else {
-              buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
-              buttonSetAsActivePlan.backgroundColor = .systemBlue
-//              buttonSetAsActivePlan.isEnabled = true
-          }
-      }
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
-
+    func updateSetAsActivePlanButton(isActive: Bool) {
+        if isActive {
+            buttonSetAsActivePlan.setTitle("Already Set as an Active Plan", for: .normal)
+            buttonSetAsActivePlan.backgroundColor = .systemGray
+        } else {
+            buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
+            buttonSetAsActivePlan.backgroundColor = .systemBlue
+        }
+    }
     
     func setupLabelTravelTitle() {
         labelTravelTitle = UILabel()
@@ -74,13 +66,13 @@ class TravelDetailView: UIView {
         self.addSubview(labelCountryAndCity)
     }
     
-
     func setupLabelCurrency() {
         labelCurrency = UILabel()
         labelCurrency.font = UIFont.systemFont(ofSize: 16)
         labelCurrency.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelCurrency)
-
+    }
+    
     func setupButtonSetAsActivePlan() {
         buttonSetAsActivePlan = UIButton(type: .system)
         buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
@@ -148,7 +140,7 @@ class TravelDetailView: UIView {
             labelCurrency.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
             labelCurrency.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCurrency.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-
+            
             buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCurrency.bottomAnchor, constant: 20),
             buttonSetAsActivePlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonSetAsActivePlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
@@ -176,14 +168,13 @@ class TravelDetailView: UIView {
             buttonBillboard.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
-
     
     func configure(with travel: Travel) {
         labelTravelTitle.text = "Travel Title: \(travel.travelTitle)"
         labelDateRange.text = "Travel Date: \(formatDate(travel.travelStartDate)) - \(formatDate(travel.travelEndDate))"
         labelCountryAndCity.text = "Country and City: \(travel.countryAndCity)"
         labelCurrency.text = "Currency: \(travel.currency)" // Display the currency
-
+        
         let isActivePlan = TravelPlanManager.shared.activeTravelPlan?.id == travel.id
         buttonSetAsActivePlan.setTitle(isActivePlan ? "Active Plan" : "Set as Active Plan", for: .normal)
         buttonSetAsActivePlan.isEnabled = !isActivePlan
@@ -201,10 +192,5 @@ class TravelDetailView: UIView {
         }
         
         return dateString // Return original string if parsing fails
-    }
-    
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
