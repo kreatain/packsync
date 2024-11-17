@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import FirebaseFirestore
+import FirebaseAuth
 
 class CreateVoteViewController: UIViewController {
 
@@ -38,25 +40,69 @@ class CreateVoteViewController: UIViewController {
 
     // Action for the "Publish" button
     @objc private func publishTapped() {
+        // Get the vote title and choices
         let title = createVoteView.titleTextField.text ?? ""
         let choices = createVoteView.choiceTextFields.compactMap { $0.text }.filter { !$0.isEmpty }
 
-        // Validate the title and choices
+        // Validate the vote title
         guard !title.isEmpty else {
             showAlert(message: "Vote title cannot be empty.")
             return
         }
 
+        // Validate that there are at least two choices
         guard choices.count >= 2 else {
             showAlert(message: "At least two choices are required.")
             return
         }
 
-        print("Publishing vote with title: \(title) and choices: \(choices)")
-        // Handle data transfer here (to be implemented later)
+        // Prepare the vote data
+        guard let travelId = TravelPlanManager.shared.activeTravelPlan?.id else {
+            print("No active travel plan found.")
+            return
+        }
 
-        // Return to the previous screen
+        guard let authorId = Auth.auth().currentUser?.uid else {
+            print("User is not authenticated.")
+            return
+        }
+
+        // Create a unique ID for the vote
+        let billboardId = UUID().uuidString
+
+        // Initialize the votes dictionary with 0 counts for each choice
+        let votes = Dictionary(uniqueKeysWithValues: choices.map { ($0, 0) })
+
+        // Create the Billboard object for the vote
+        let vote = Billboard(
+            id: billboardId,
+            travelId: travelId,
+            type: "vote",
+            title: title,
+            choices: choices,
+            votes: votes,
+            createdAt: Date(),
+            authorId: authorId
+        )
+
+        // Send the vote data to Firestore
+        addVoteToFirestore(vote)
+
+        // Navigate back to the previous screen
         navigationController?.popViewController(animated: true)
+    }
+
+    // Helper method to send vote to Firestore
+    private func addVoteToFirestore(_ vote: Billboard) {
+        let db = Firestore.firestore()
+        let documentId = vote.id ?? UUID().uuidString
+
+        do {
+            try db.collection("billboards").document(documentId).setData(from: vote)
+            print("Vote added successfully!")
+        } catch let error {
+            print("Error adding vote: \(error.localizedDescription)")
+        }
     }
 
     // Helper method to show an alert

@@ -42,19 +42,18 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         billboardView.plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         billboardView.sendButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
     }
-
     private func setupRealTimeListener() {
         guard let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id else {
             print("No active travel plan found.")
             return
         }
 
-        print("Setting up real-time listener for travelId: \(activeTravelId)")
-
         let db = Firestore.firestore()
+
+        // Listen for changes to both "notice" and "vote" types
         listener = db.collection("billboards")
             .whereField("travelId", isEqualTo: activeTravelId)
-            .whereField("type", isEqualTo: "notice")
+            .whereField("type", in: ["notice", "vote"]) // Fetch both "notice" and "vote"
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { [weak self] (querySnapshot, error) in
                 if let error = error {
@@ -69,19 +68,20 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
 
                 print("Real-time listener triggered. Documents count: \(documents.count)")
 
-                // Parse the notices
+                // Parse the notices and votes
                 self?.notices = documents.compactMap { document in
                     try? document.data(as: Billboard.self)
                 }
 
-                // Fetch user display names and reload the table view
+                // Reload the table view on the main thread
                 DispatchQueue.main.async {
                     self?.fetchUserNames()
                     self?.billboardView.tableView.reloadData()
-                    print("Table view reloaded after real-time update.")
                 }
             }
     }
+    
+    
     private func fetchUserNames() {
         let db = Firestore.firestore()
         let authorIds = Set(notices.map { $0.authorId })
@@ -163,23 +163,27 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         let createVoteVC = CreateVoteViewController()
         navigationController?.pushViewController(createVoteVC, animated: true)
     }
-
+    
     @objc private func sendButtonTapped() {
+        // Check if the input message is empty
         guard let message = billboardView.inputTextField.text, !message.isEmpty else {
-            print("Message is empty.")
+            print("Message is empty. Ignoring send action.")
             return
         }
 
+        // Get the active travel plan ID
         guard let travelId = TravelPlanManager.shared.activeTravelPlan?.id else {
             print("No active travel plan found.")
             return
         }
 
+        // Get the current user's ID
         guard let authorId = Auth.auth().currentUser?.uid else {
             print("User is not authenticated.")
             return
         }
 
+        // Create a new Billboard object for the notice
         let billboardId = UUID().uuidString
         let notice = Billboard(
             id: billboardId,
@@ -190,7 +194,10 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
             authorId: authorId
         )
 
+        // Send the notice to Firestore
         addNoticeToFirestore(notice)
+
+        // Clear the input field after sending
         billboardView.inputTextField.text = ""
     }
     
@@ -215,32 +222,65 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return notices.count
     }
-
     
-    
-
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "BillboardCell", for: indexPath) as? BillboardCell else {
             return UITableViewCell()
         }
 
-        let notice = notices[indexPath.row]
-        let authorName = userNames[notice.authorId] ?? "Unknown"
-
-        // Format date text
+        guard indexPath.row < notices.count else {
+            print("Index out of range. Row: \(indexPath.row), Count: \(notices.count)")
+            return UITableViewCell()
+        }
+        let item = notices[indexPath.row]
+        let authorName = userNames[item.authorId] ?? "Unknown"
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
-        let dateText = dateFormatter.string(from: notice.createdAt)
+        let dateText = dateFormatter.string(from: item.createdAt)
+        let authorText = "\(authorName)  \(dateText)"
 
-        // Create author and date text: "[Author Name] [Date]"
-        let authorAndDateText = "\(authorName) \(dateText)"
-
-        // Configure the cell
-        cell.configure(noticeTitle: "Notice", authorAndDate: authorAndDateText, content: notice.content ?? "No content available")
+        if item.type == "notice" {
+            // Ensure content is passed correctly
+            let content = item.content ?? "No content available."
+            print("Configuring notice with content: \(content)") // Debug print
+            cell.configureNotice(title: "Notice", authorText: authorText, content: content)
+        } else if item.type == "vote" {
+            let choices = item.choices ?? []
+            let votes = item.votes ?? [:]
+            cell.configureVote(
+                title: item.title ?? "No title",
+                authorText: authorText,
+                choices: choices,
+                votes: votes,
+                voteId: item.id ?? "", // Pass the voteId here
+                choiceSelectedHandler: { selectedChoice in
+                    self.handleChoiceSelection(billboardId: item.id ?? "", selectedChoice: selectedChoice)
+                }
+            )
+        }
 
         return cell
     }
+    
+    private func handleChoiceSelection(billboardId: String, selectedChoice: String) {
+        let db = Firestore.firestore()
+        let documentRef = db.collection("billboards").document(billboardId)
+
+        // Increment the vote count for the selected choice
+        documentRef.updateData([
+            "votes.\(selectedChoice)": FieldValue.increment(Int64(1))
+        ]) { [weak self] error in
+            if let error = error {
+                print("Error updating vote: \(error.localizedDescription)")
+            } else {
+                print("Vote for '\(selectedChoice)' updated successfully!")
+                self?.fetchNotices() // Refresh the table view after vote update
+            }
+        }
+    }
+    
+
     // MARK: - UITableViewDelegate
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
