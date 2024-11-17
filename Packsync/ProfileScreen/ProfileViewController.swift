@@ -59,8 +59,8 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         guard let currentUser = Auth.auth().currentUser else { return }
 
         // Set name and email directly from FirebaseAuth's current user
-        profileView.nameTextField.text = "Name: \(currentUser.displayName ?? "No Name")"
-        profileView.emailTextField.text = "Email: \(currentUser.email ?? "No Email")"
+        profileView.nameTextField.text = " \(currentUser.displayName ?? "No Name")"
+        profileView.emailTextField.text = " \(currentUser.email ?? "No Email")"
 
         // Load profile image URL from Firestore
         loadUserProfile()
@@ -276,6 +276,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         present(alert, animated: true)
     }
 }
+
 
 
 

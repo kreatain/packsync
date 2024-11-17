@@ -38,65 +38,81 @@ class InviteFriendViewController: UIViewController {
     }
 
     @objc private func sendInvite() {
-        // Check if the user is signed in before proceeding
+        // Ensure the user is signed in before proceeding
         guard let currentUser = Auth.auth().currentUser else {
-            print("No user is currently signed in.")
+            print("❌ No user is currently signed in.")
             showAlert("Please log in to invite a friend")
             return
         }
-        
-        print("Current user is signed in with UID: \(currentUser.uid)")
 
-        guard let email = inviteFriendView.emailTextField.text, !email.isEmpty else {
+        print("ℹ️ Current user is signed in with UID: \(currentUser.uid)")
+
+        // Check if the email field is not empty
+        guard let email = inviteFriendView.emailTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines), !email.isEmpty else {
             showAlert("Please enter an email address")
             return
         }
-        
-        // Check if the user with the entered email exists in Firestore
+
+        // Debugging: log the email being processed
+        print("🔥 Attempting to send invite to email: \(email)")
+
+        // Check if the user is trying to invite themselves
+        guard email.lowercased() != currentUser.email?.lowercased() else {
+            showAlert("You cannot invite yourself")
+            return
+        }
+
+        // Find the user by their email
         findUserByEmail(email) { [weak self] userId in
             guard let self = self else { return }
+
             if let userId = userId {
+                print("✅ Found user ID for email \(email): \(userId)")
                 self.sendInvitation(to: userId) { success in
                     if success {
+                        print("✅ Invitation successfully sent to \(email)")
                         self.inviteFriendView.showConfirmationMessage()
                     } else {
+                        print("❌ Failed to send invitation to \(email)")
                         self.showAlert("Failed to send invitation")
                     }
                 }
             } else {
+                print("❌ No user found with email \(email)")
                 self.showAlert("No user found with that email")
             }
         }
     }
+
     
     private func findUserByEmail(_ email: String, completion: @escaping (String?) -> Void) {
-        let searchEmail = "Email: \(email)" // Include prefix in search query
+        // Normalize email (trim spaces and lowercase it)
+        let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        print("🔥 Searching for email: \(normalizedEmail)") // Debugging log
 
         firestore.collection("users")
-            .whereField("email", isEqualTo: searchEmail)
+            .whereField("email", isEqualTo: normalizedEmail) // Ensure the field name matches Firestore
             .getDocuments { querySnapshot, error in
                 if let error = error {
-                    print("Error finding user: \(error)")
+                    print("❌ Error finding user: \(error.localizedDescription)") // Log any error
+                    completion(nil) // Return nil on error
+                    return
+                }
+
+                // Check if we got any documents
+                guard let document = querySnapshot?.documents.first else {
+                    print("❌ No document found for email: \(normalizedEmail)") // Log no result
                     completion(nil)
                     return
                 }
-                
-                if let document = querySnapshot?.documents.first {
-                    var fetchedEmail = document.data()["email"] as? String ?? ""
-                    
-                    // Remove prefix if it exists
-                    if fetchedEmail.starts(with: "Email: ") {
-                        fetchedEmail = fetchedEmail.replacingOccurrences(of: "Email: ", with: "")
-                    }
-                    
-                    print("Fetched email without prefix: \(fetchedEmail)")
-                    completion(document.documentID)
-                } else {
-                    print("No document found for email: \(email)")
-                    completion(nil)
-                }
+
+                // Debugging output: print the found document data
+                print("✅ User found: \(document.data())")
+                completion(document.documentID) // Return the document ID
             }
     }
+
 
 
 

@@ -66,6 +66,12 @@ class ProfileView: UIView {
         return textField
     }()
 
+    let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
+    }()
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -84,6 +90,7 @@ class ProfileView: UIView {
         addSubview(editPhotoLabel)
         addSubview(nameTextField)
         addSubview(emailTextField)
+        addSubview(tableView)
 
         // Set up layout constraints
         NSLayoutConstraint.activate([
@@ -93,7 +100,7 @@ class ProfileView: UIView {
             profileImageView.widthAnchor.constraint(equalToConstant: 120),
             profileImageView.heightAnchor.constraint(equalToConstant: 120),
 
-            // Take Photo Button Constraints (Positioned below the profile image and above the "Edit Photo" label)
+            // Take Photo Button Constraints
             buttonTakePhoto.centerXAnchor.constraint(equalTo: centerXAnchor),
             buttonTakePhoto.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8),
             buttonTakePhoto.widthAnchor.constraint(equalToConstant: 40),
@@ -111,7 +118,13 @@ class ProfileView: UIView {
             // Email TextField Constraints
             emailTextField.topAnchor.constraint(equalTo: nameTextField.bottomAnchor, constant: 15),
             emailTextField.leadingAnchor.constraint(equalTo: nameTextField.leadingAnchor),
-            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor)
+            emailTextField.trailingAnchor.constraint(equalTo: nameTextField.trailingAnchor),
+
+            // TableView Constraints
+            tableView.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 20),
+            tableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            tableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            tableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 
@@ -125,5 +138,3 @@ class ProfileView: UIView {
         editPhotoLabel.isHidden = !enabled
     }
 }
-
-
