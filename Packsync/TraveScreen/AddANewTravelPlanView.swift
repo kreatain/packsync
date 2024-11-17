@@ -126,7 +126,7 @@ class AddANewTravelPlanView: UIView {
         
         // Create date picker
         let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .dateAndTime
+        datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .wheels
         datePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
         
@@ -152,7 +152,7 @@ class AddANewTravelPlanView: UIView {
         
         // Create date picker
         let datePicker = UIDatePicker()
-        datePicker.datePickerMode = .dateAndTime
+        datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .wheels
         datePicker.addTarget(self, action: #selector(endDateChanged), for: .valueChanged)
         
@@ -267,7 +267,7 @@ class AddANewTravelPlanView: UIView {
 
     func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd, yyyy HH:mm"
+        formatter.dateFormat = "MMM dd, yyyy"
         return formatter.string(from: date)
     }
     
