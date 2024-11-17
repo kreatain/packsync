@@ -1,6 +1,8 @@
 import UIKit
 import FirebaseFirestore
 import FirebaseAuth
+import PhotosUI
+import FirebaseStorage
 
 class BillboardViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UITextFieldDelegate {
 
@@ -42,6 +44,7 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         billboardView.plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         billboardView.sendButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
     }
+    
     private func setupRealTimeListener() {
         guard let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id else {
             print("No active travel plan found.")
@@ -50,10 +53,10 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
 
         let db = Firestore.firestore()
 
-        // Listen for changes to both "notice" and "vote" types
+        // Listen for changes to "notice", "vote", and "photo" types
         listener = db.collection("billboards")
             .whereField("travelId", isEqualTo: activeTravelId)
-            .whereField("type", in: ["notice", "vote"]) // Fetch both "notice" and "vote"
+            .whereField("type", in: ["notice", "vote", "photo"]) // Include "photo" type
             .order(by: "createdAt", descending: true)
             .addSnapshotListener { [weak self] (querySnapshot, error) in
                 if let error = error {
@@ -68,7 +71,7 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
 
                 print("Real-time listener triggered. Documents count: \(documents.count)")
 
-                // Parse the notices and votes
+                // Parse the notices, votes, and photos
                 self?.notices = documents.compactMap { document in
                     try? document.data(as: Billboard.self)
                 }
@@ -155,10 +158,7 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         
         present(alert, animated: true)
     }
-    private func uploadPhoto() {
-        
-    }
-    
+
     private func navigateToCreateVote() {
         let createVoteVC = CreateVoteViewController()
         navigationController?.pushViewController(createVoteVC, animated: true)
@@ -240,10 +240,9 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         let dateText = dateFormatter.string(from: item.createdAt)
         let authorText = "\(authorName)  \(dateText)"
 
+        
         if item.type == "notice" {
-            // Ensure content is passed correctly
             let content = item.content ?? "No content available."
-            print("Configuring notice with content: \(content)") // Debug print
             cell.configureNotice(title: "Notice", authorText: authorText, content: content)
         } else if item.type == "vote" {
             let choices = item.choices ?? []
@@ -253,11 +252,16 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
                 authorText: authorText,
                 choices: choices,
                 votes: votes,
-                voteId: item.id ?? "", // Pass the voteId here
+                voteId: item.id ?? "",
                 choiceSelectedHandler: { selectedChoice in
                     self.handleChoiceSelection(billboardId: item.id ?? "", selectedChoice: selectedChoice)
                 }
             )
+        } else if item.type == "photo" {
+            if let photoUrl = item.photoUrl {
+                cell.configurePhoto(title: "Photo", authorText: authorText, photoUrl: photoUrl)
+                cell.layoutIfNeeded()
+            }
         }
 
         return cell
@@ -289,4 +293,74 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     
+}
+
+
+extension BillboardViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+    private func uploadPhoto() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        present(imagePicker, animated: true)
+    }
+
+    // Image picker delegate method
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+
+        guard let selectedImage = info[.originalImage] as? UIImage else {
+            print("No image selected.")
+            return
+        }
+
+        // Upload image to Firebase Storage
+        uploadImageToFirebase(image: selectedImage)
+    }
+
+    private func uploadImageToFirebase(image: UIImage) {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
+        let storageRef = Storage.storage().reference().child("billboard_photos/\(UUID().uuidString).jpg")
+
+        storageRef.putData(imageData, metadata: nil) { [weak self] (metadata, error) in
+            if let error = error {
+                print("Error uploading image: \(error.localizedDescription)")
+                return
+            }
+
+            storageRef.downloadURL { (url, error) in
+                if let error = error {
+                    print("Error getting download URL: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let downloadURL = url?.absoluteString else { return }
+                print("Image uploaded successfully. URL: \(downloadURL)")
+                self?.addPhotoNoticeToFirestore(photoUrl: downloadURL)
+            }
+        }
+    }
+
+    private func addPhotoNoticeToFirestore(photoUrl: String) {
+        guard let travelId = TravelPlanManager.shared.activeTravelPlan?.id else {
+            print("No active travel plan found.")
+            return
+        }
+        guard let authorId = Auth.auth().currentUser?.uid else {
+            print("User is not authenticated.")
+            return
+        }
+
+        let billboardId = UUID().uuidString
+        let notice = Billboard(
+            id: billboardId,
+            travelId: travelId,
+            type: "photo",
+            content: nil,
+            photoUrl: photoUrl, createdAt: Date(),
+            authorId: authorId
+        )
+
+        addNoticeToFirestore(notice)
+    }
 }

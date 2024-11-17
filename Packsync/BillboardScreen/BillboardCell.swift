@@ -10,6 +10,8 @@ class BillboardCell: UITableViewCell {
     private let contentLabel = UILabel()
     private let stackView = UIStackView()
     private let voteTitleLabel = UILabel()
+    private let photoImageView = UIImageView()
+    private var photoImageHeightConstraint: NSLayoutConstraint?
 
     // Flag to indicate if voting has been completed
   
@@ -39,7 +41,6 @@ class BillboardCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
     private func setupUI() {
         containerView.layer.borderWidth = 1
         containerView.layer.borderColor = UIColor.lightGray.cgColor
@@ -52,6 +53,7 @@ class BillboardCell: UITableViewCell {
         containerView.addSubview(voteTitleLabel)
         containerView.addSubview(contentLabel)
         containerView.addSubview(stackView)
+        containerView.addSubview(photoImageView)
 
         // Configure headerStackView
         headerStackView.axis = .horizontal
@@ -85,8 +87,16 @@ class BillboardCell: UITableViewCell {
         stackView.axis = .vertical
         stackView.spacing = 10
         stackView.translatesAutoresizingMaskIntoConstraints = false
+
+        // Configure photoImageView
+        photoImageView.contentMode = .scaleAspectFill
+        photoImageView.clipsToBounds = true
+        photoImageView.translatesAutoresizingMaskIntoConstraints = false
     }
+    
     private func setupConstraints() {
+        photoImageHeightConstraint = photoImageView.heightAnchor.constraint(equalToConstant: 0)
+        
         NSLayoutConstraint.activate([
             // Container View Constraints
             containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
@@ -115,6 +125,12 @@ class BillboardCell: UITableViewCell {
             stackView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
             stackView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
             stackView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8),
+            
+            photoImageView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: 8),
+            photoImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 8),
+            photoImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -8),
+            photoImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -8),
+            
         ])
     }
     
@@ -126,6 +142,8 @@ class BillboardCell: UITableViewCell {
         contentLabel.isHidden = false
         voteTitleLabel.isHidden = true
         stackView.isHidden = true
+        photoImageView.isHidden = true
+        
         self.invalidateIntrinsicContentSize()
         self.layoutIfNeeded()
     }
@@ -141,7 +159,10 @@ class BillboardCell: UITableViewCell {
         voteTitleLabel.isHidden = false
         stackView.isHidden = false
         contentLabel.isHidden = true
+        photoImageView.isHidden = true
+        
 
+       
         // 配置 voteTitleLabel
         voteTitleLabel.text = title
         voteTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
@@ -262,12 +283,15 @@ class BillboardCell: UITableViewCell {
         contentLabel.isHidden = true
         voteTitleLabel.isHidden = true
         stackView.isHidden = true
-
+        photoImageView.isHidden = true
+        photoImageHeightConstraint?.constant = 0
         // 清空文本内容
         contentLabel.text = nil
         voteTitleLabel.text = nil
         titleLabel.text = nil
         authorLabel.text = nil
+        photoImageView.image = nil
+        photoImageHeightConstraint?.isActive = false
 
         // 移除 stackView 中的所有子视图
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
@@ -279,5 +303,47 @@ class BillboardCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         resetCell()
+    }
+    
+    func configurePhoto(title: String, authorText: String, photoUrl: String) {
+        resetCell()
+        titleLabel.text = title
+        authorLabel.text = authorText
+        contentLabel.isHidden = true
+        voteTitleLabel.isHidden = true
+        stackView.isHidden = true
+        photoImageView.isHidden = false
+        photoImageHeightConstraint?.isActive = true
+
+        photoImageHeightConstraint?.constant = 200
+        self.setNeedsUpdateConstraints()
+        self.updateConstraintsIfNeeded()
+        self.layoutIfNeeded()
+        loadImage(from: photoUrl)
+
+        photoImageView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(photoTapped))
+        photoImageView.addGestureRecognizer(tapGesture)
+    }
+    
+    @objc private func photoTapped() {
+        guard let image = photoImageView.image else { return }
+        let fullScreenVC = PhotoFullScreenViewController()
+        fullScreenVC.photoImage = image
+        UIApplication.shared.keyWindow?.rootViewController?.present(fullScreenVC, animated: true)
+    }
+
+    private func loadImage(from url: String) {
+        guard let imageURL = URL(string: url) else { return }
+
+        DispatchQueue.global().async {
+            if let data = try? Data(contentsOf: imageURL), let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    self.photoImageView.image = image
+                }
+            } else {
+                print("Failed to load image from URL: \(url)")
+            }
+        }
     }
 }
