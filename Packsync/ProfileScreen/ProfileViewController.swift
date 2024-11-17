@@ -12,14 +12,14 @@ import FirebaseStorage
 import PhotosUI
 import FirebaseFirestore
 
-class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
+class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, PHPickerViewControllerDelegate, UITableViewDelegate, UITableViewDataSource {
 
     private let profileView = ProfileView()
     private var isEditingProfile = false
 
-    var handleAuth: AuthStateDidChangeListenerHandle?
-    var currentUser: FirebaseAuth.User?
-    private let firestore = Firestore.firestore()  // Firestore instance for accessing Firestore
+    private var currentUser: FirebaseAuth.User? // Declare currentUser explicitly
+    private var invitations: [Invitation] = [] // Holds the list of invitations
+    private let firestore = Firestore.firestore() // Firestore instance
 
     override func loadView() {
         view = profileView
@@ -28,23 +28,34 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupActions()
-        postLogin() // Use FirebaseAuth directly for name and email initially
-        loadUserProfile() // Load profile image from Firestore on login
-        
+        setupTableView()
+        postLogin()
+        loadUserProfile()
+        fetchInvitations()
+
         title = "Profile"
-        
+
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             title: "Edit",
             style: .plain,
             target: self,
             action: #selector(toggleEditProfile)
         )
-        
+
         Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             self?.handleAuthStateChange(user: user)
         }
+        
+        profileView.tableView.register(InvitationCell.self, forCellReuseIdentifier: "InvitationCell")
+
     }
 
+    // MARK: - Setup Actions
+    private func setupActions() {
+        profileView.configurePhotoButton(target: self, action: #selector(showPhotoOptions))
+    }
+
+    // MARK: - Authentication Handling
     func handleAuthStateChange(user: FirebaseAuth.User?) {
         if let user = user {
             currentUser = user
@@ -54,35 +65,26 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
             postLogout()
         }
     }
-    
+
     func postLogin() {
         guard let currentUser = Auth.auth().currentUser else { return }
-
-        // Set name and email directly from FirebaseAuth's current user
         profileView.nameTextField.text = " \(currentUser.displayName ?? "No Name")"
         profileView.emailTextField.text = " \(currentUser.email ?? "No Email")"
-
-        // Load profile image URL from Firestore
         loadUserProfile()
     }
 
     func postLogout() {
         profileView.nameTextField.text = "Please Login FIRST!!!"
         profileView.emailTextField.text = ""
-        profileView.profileImageView.image = nil  // Clear profile image on logout
+        profileView.profileImageView.image = nil
     }
 
-    private func setupActions() {
-        profileView.configurePhotoButton(target: self, action: #selector(showPhotoOptions))
-    }
-
+    // MARK: - Profile Editing
     @objc private func toggleEditProfile() {
         isEditingProfile.toggle()
-
         title = isEditingProfile ? "EDIT PROFILE" : "PROFILE"
-        
         navigationItem.rightBarButtonItem?.title = isEditingProfile ? "Save" : "Edit"
-        
+
         if isEditingProfile {
             navigationItem.leftBarButtonItem = UIBarButtonItem(
                 title: "Cancel",
@@ -95,7 +97,6 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         }
 
         toggleEditing(isEditingProfile)
-        
         if !isEditingProfile {
             saveProfileChanges()
         }
@@ -103,67 +104,44 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
 
     @objc private func cancelEditing() {
         isEditingProfile = false
-        
         navigationItem.rightBarButtonItem?.title = "Edit"
         navigationItem.leftBarButtonItem = nil
-        
         toggleEditing(false)
-        
         loadUserProfile()
     }
 
     private func toggleEditing(_ enable: Bool) {
         profileView.nameTextField.isUserInteractionEnabled = enable
         profileView.emailTextField.isUserInteractionEnabled = enable
-        
         profileView.togglePhotoEditing(enabled: enable)
-        
-        if enable {
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(showPhotoOptions))
-            profileView.profileImageView.addGestureRecognizer(tapGesture)
-            profileView.profileImageView.isUserInteractionEnabled = true
-        } else {
-            profileView.profileImageView.gestureRecognizers?.forEach { profileView.profileImageView.removeGestureRecognizer($0) }
-            profileView.profileImageView.isUserInteractionEnabled = false
-        }
     }
 
-    private func loadUserProfile() {
-        guard let userID = Auth.auth().currentUser?.uid else {
-            print("User ID not found.")
-            return
-        }
-        
-        let userRef = firestore.collection("users").document(userID)
-        userRef.getDocument { document, error in
-            if let error = error {
-                print("Failed to load user profile: \(error.localizedDescription)")
-                return
-            }
-            
-            if let document = document, let data = document.data() {
-                if let profileImageUrl = data["profileImageUrl"] as? String {
-                    print("Retrieved profile image URL: \(profileImageUrl)") // Debug log
-                    self.loadProfileImage(urlString: profileImageUrl)
-                } else {
-                    print("No profileImageUrl found in Firestore document.")
-                    // Optionally, you can set a default image here
-                    self.profileView.profileImageView.image = UIImage(named: "defaultProfileImage")
-                }
-            } else {
-                print("Document data not found for user ID: \(userID)")
-            }
-        }
-    }
-
-
+    // MARK: - Profile Management
     private func saveProfileChanges() {
         guard let userID = Auth.auth().currentUser?.uid,
               let name = profileView.nameTextField.text,
               let email = profileView.emailTextField.text else { return }
 
-        let ref = firestore.collection("users").document(userID)
-        ref.setData(["displayName": name, "email": email], merge: true)
+        firestore.collection("users").document(userID)
+            .setData(["displayName": name, "email": email], merge: true)
+    }
+
+    private func loadUserProfile() {
+        guard let userID = Auth.auth().currentUser?.uid else { return }
+        firestore.collection("users").document(userID).getDocument { document, error in
+            if let error = error {
+                print("Failed to load user profile: \(error.localizedDescription)")
+                return
+            }
+
+            if let document = document, let data = document.data() {
+                if let profileImageUrl = data["profileImageUrl"] as? String {
+                    self.loadProfileImage(urlString: profileImageUrl)
+                } else {
+                    self.profileView.profileImageView.image = UIImage(named: "defaultProfileImage")
+                }
+            }
+        }
     }
 
     private func loadProfileImage(urlString: String) {
@@ -172,25 +150,113 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
             guard let data = data, let image = UIImage(data: data) else { return }
             DispatchQueue.main.async {
                 self.profileView.profileImageView.image = image
-                self.profileView.buttonTakePhoto.setImage(nil, for: .normal)
             }
         }.resume()
     }
 
+    // MARK: - Invitation Handling
+    private func setupTableView() {
+        profileView.tableView.delegate = self
+        profileView.tableView.dataSource = self
+        profileView.tableView.register(UITableViewCell.self, forCellReuseIdentifier: "InvitationCell")
+    }
+
+    private func fetchInvitations() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        firestore.collection("users")
+            .document(userId)
+            .collection("invitations")
+            .whereField("status", isEqualTo: "pending")
+            .getDocuments { [weak self] snapshot, error in
+                if let error = error {
+                    print("Error fetching invitations: \(error.localizedDescription)")
+                    return
+                }
+
+                self?.invitations = snapshot?.documents.compactMap { document in
+                    let data = document.data()
+                    return Invitation(
+                        id: document.documentID,
+                        inviterId: data["inviterId"] as? String ?? "",
+                        inviterName: data["inviterName"] as? String ?? "",
+                        receiverId: userId,
+                        travelId: data["travelId"] as? String ?? "",
+                        travelTitle: data["travelTitle"] as? String ?? "",
+                        isAccepted: false
+                    )
+                } ?? []
+
+                DispatchQueue.main.async {
+                    self?.profileView.tableView.reloadData()
+                }
+            }
+    }
+
+    // MARK: - Invitation Handling
+
+    // Add the methods here
+    @objc private func handleAcceptButton(_ sender: UIButton) {
+        let index = sender.tag
+        guard index < invitations.count else { return }
+        let invitation = invitations[index]
+        updateInvitationStatus(invitation, to: "accepted")
+    }
+
+    @objc private func handleRejectButton(_ sender: UIButton) {
+        let index = sender.tag
+        guard index < invitations.count else { return }
+        let invitation = invitations[index]
+        updateInvitationStatus(invitation, to: "rejected")
+    }
+
+    // Existing method
+    private func updateInvitationStatus(_ invitation: Invitation, to status: String) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        firestore.collection("users")
+            .document(userId)
+            .collection("invitations")
+            .document(invitation.id)
+            .updateData(["status": status]) { error in
+                if let error = error {
+                    print("Failed to update invitation status: \(error.localizedDescription)")
+                } else {
+                    print("Invitation status updated to \(status)")
+                    self.fetchInvitations() // Refresh invitations
+                }
+            }
+    }
+
+
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return invitations.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "InvitationCell", for: indexPath) as? InvitationCell else {
+            return UITableViewCell()
+        }
+
+        let invitation = invitations[indexPath.row]
+        cell.invitationLabel.text = "Trip Alert! \(invitation.inviterName) invited you. Ready to go?"
+        cell.acceptButton.tag = indexPath.row
+        cell.rejectButton.tag = indexPath.row
+
+        cell.acceptButton.addTarget(self, action: #selector(handleAcceptButton(_:)), for: .touchUpInside)
+        cell.rejectButton.addTarget(self, action: #selector(handleRejectButton(_:)), for: .touchUpInside)
+
+        return cell
+    }
+
+
+
+
+    // MARK: - Photo Actions
     @objc private func showPhotoOptions() {
         let actionSheet = UIAlertController(title: "Select Photo", message: "Choose a source", preferredStyle: .actionSheet)
-        
-        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in
-            self.pickUsingCamera()
-        }))
-        
-        actionSheet.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in
-            self.pickPhotoFromGallery()
-        }))
-        
+        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { _ in self.pickUsingCamera() }))
+        actionSheet.addAction(UIAlertAction(title: "Gallery", style: .default, handler: { _ in self.pickPhotoFromGallery() }))
         actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        
-        present(actionSheet, animated: true, completion: nil)
+        present(actionSheet, animated: true)
     }
 
     private func pickUsingCamera() {
@@ -199,7 +265,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
             picker.delegate = self
             picker.sourceType = .camera
             picker.allowsEditing = true
-            present(picker, animated: true, completion: nil)
+            present(picker, animated: true)
         } else {
             showAlert("Camera not available")
         }
@@ -229,54 +295,38 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         }
     }
 
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let selectedImage = info[.editedImage] as? UIImage {
             profileView.profileImageView.image = selectedImage
             uploadProfileImage(selectedImage)
             profileView.buttonTakePhoto.setImage(nil, for: .normal)
         }
-        picker.dismiss(animated: true, completion: nil)
+        picker.dismiss(animated: true)
     }
 
     private func uploadProfileImage(_ image: UIImage) {
         guard let userID = Auth.auth().currentUser?.uid,
               let imageData = image.jpegData(compressionQuality: 0.75) else { return }
-        
         let storageRef = Storage.storage().reference().child("profile_images").child("\(userID).jpg")
         storageRef.putData(imageData, metadata: nil) { _, error in
             if let error = error {
                 print("Failed to upload image: \(error.localizedDescription)")
                 return
             }
-            
-            // Retrieve download URL after upload
             storageRef.downloadURL { url, error in
-                guard let profileImageUrl = url?.absoluteString else {
-                    print("Failed to retrieve download URL: \(error?.localizedDescription ?? "No error")")
-                    return
-                }
-                
-                // Save the image URL to Firestore
-                let userRef = Firestore.firestore().collection("users").document(userID)
-                userRef.setData(["profileImageUrl": profileImageUrl], merge: true) { error in
-                    if let error = error {
-                        print("Failed to save image URL to Firestore: \(error.localizedDescription)")
-                    } else {
-                        print("Profile image URL saved successfully!")
-                    }
-                }
+                guard let profileImageUrl = url?.absoluteString else { return }
+                self.firestore.collection("users").document(userID).setData(
+                    ["profileImageUrl": profileImageUrl], merge: true
+                )
             }
         }
     }
 
-
     private func showAlert(_ message: String) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
 }
-
-
 
 

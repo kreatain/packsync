@@ -56,9 +56,9 @@ class ProfileView: UIView {
     let emailTextField: UILabel = {
         let textField = UILabel()
         textField.text = "Email: "
-        textField.textColor = .black
+        textField.textColor = .darkGray
         textField.textAlignment = .center
-        textField.font = UIFont.systemFont(ofSize: 28, weight: .bold)
+        textField.font = UIFont.systemFont(ofSize: 28, weight: .medium)
         textField.adjustsFontSizeToFitWidth = true  // Adjusts font size when text is too long
         textField.minimumScaleFactor = 0.5  // Minimum scale factor for font size adjustment
         textField.lineBreakMode = .byTruncatingTail  // Truncate text with ellipsis if it's too long
@@ -68,7 +68,9 @@ class ProfileView: UIView {
 
     let tableView: UITableView = {
         let tableView = UITableView()
+        tableView.backgroundColor = .clear // Change from .lightGray to .clear
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.separatorStyle = .none // Optional: Remove cell separators
         return tableView
     }()
 
@@ -124,7 +126,7 @@ class ProfileView: UIView {
             tableView.topAnchor.constraint(equalTo: emailTextField.bottomAnchor, constant: 20),
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            tableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor),
         ])
     }
 
@@ -138,3 +140,4 @@ class ProfileView: UIView {
         editPhotoLabel.isHidden = !enabled
     }
 }
+

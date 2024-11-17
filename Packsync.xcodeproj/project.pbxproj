@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,6 +24,7 @@
 		4C7E69982CE6B6E10056E8CC /* AddPackingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E698B2CE6B6E10056E8CC /* AddPackingItemView.swift */; };
 		4C7E69992CE6B6E10056E8CC /* PackingListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E69922CE6B6E10056E8CC /* PackingListView.swift */; };
 		4C7E699A2CE6B6E10056E8CC /* AddPackingItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C7E698C2CE6B6E10056E8CC /* AddPackingItemViewController.swift */; };
+		4C8783982CE9B91F00B4F5C0 /* InvitationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C8783972CE9B91F00B4F5C0 /* InvitationCell.swift */; };
 		4CC0792B2CE42AD4009364D8 /* ActivePlanNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */; };
 		4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */; };
 		4CC0792F2CE42AD4009364D8 /* BillboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC078E22CE42AD4009364D8 /* BillboardView.swift */; };
@@ -115,6 +116,7 @@
 		4C7E698F2CE6B6E10056E8CC /* EditPackingItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditPackingItemViewController.swift; sourceTree = "<group>"; };
 		4C7E69912CE6B6E10056E8CC /* PackingItemCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemCell.swift; sourceTree = "<group>"; };
 		4C7E69922CE6B6E10056E8CC /* PackingListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListView.swift; sourceTree = "<group>"; };
+		4C8783972CE9B91F00B4F5C0 /* InvitationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationCell.swift; sourceTree = "<group>"; };
 		4CC078DC2CE42AD4009364D8 /* ActivePlanNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivePlanNotification.swift; sourceTree = "<group>"; };
 		4CC078DD2CE42AD4009364D8 /* TravelPlanManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanManager.swift; sourceTree = "<group>"; };
 		4CC078E22CE42AD4009364D8 /* BillboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillboardView.swift; sourceTree = "<group>"; };
@@ -180,17 +182,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		04112FC32CE8254200371ABD /* Notifications */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
-			explicitFileTypes = {
-			};
-			explicitFolders = (
-			);
-			path = Notifications;
-			sourceTree = "<group>";
-		};
+		04112FC32CE8254200371ABD /* Notifications */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Notifications; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -327,6 +319,7 @@
 			children = (
 				4CC078F92CE42AD4009364D8 /* ProfileView.swift */,
 				4CC078FA2CE42AD4009364D8 /* ProfileViewController.swift */,
+				4C8783972CE9B91F00B4F5C0 /* InvitationCell.swift */,
 			);
 			path = ProfileScreen;
 			sourceTree = "<group>";
@@ -761,6 +754,7 @@
 				4CC0793B2CE42AD4009364D8 /* SpendingItem.swift in Sources */,
 				4CC0793C2CE42AD4009364D8 /* Travel.swift in Sources */,
 				4CC0793D2CE42AD4009364D8 /* User.swift in Sources */,
+				4C8783982CE9B91F00B4F5C0 /* InvitationCell.swift in Sources */,
 				4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */,
 				4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */,
 				04112FB22CE5705F00371ABD /* CategoryCell.swift in Sources */,

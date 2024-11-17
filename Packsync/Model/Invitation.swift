@@ -5,13 +5,6 @@
 //  Created by Xu Yang/Jessica Li on 11/11/24.
 //
 
-//
-//  Invitation.swift
-//  Packsync
-//
-//  Created by Xu Yang on 11/11/24.
-//
-
 import Foundation
 
 struct Invitation: Codable {
@@ -29,7 +22,7 @@ struct Invitation: Codable {
         inviterName: String,
         receiverId: String,
         travelId: String,
-        travelTitle: String = "Unknown Trip", // Default value if travel title is unavailable
+        travelTitle: String, // No default value, must be provided
         isAccepted: Bool = false
     ) {
         self.id = id
@@ -37,7 +30,7 @@ struct Invitation: Codable {
         self.inviterName = inviterName
         self.receiverId = receiverId
         self.travelId = travelId
-        self.travelTitle = travelTitle
+        self.travelTitle = travelTitle // This value must be passed explicitly
         self.isAccepted = isAccepted
     }
 }
