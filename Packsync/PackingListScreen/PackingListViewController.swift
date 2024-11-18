@@ -14,10 +14,8 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
     
     let packingListView = PackingListView()
     var travel: Travel?
-    private var travelID: String? // Optional travelID parameter for specific travel plan
     var packingItems: [PackingItem] = []
-    private let noActivePlanLabel = UILabel() // Label to prompt user to set active plan
-
+    
     
     override func loadView() {
         view = packingListView
@@ -36,6 +34,7 @@ class PackingListViewController: UIViewController, UITableViewDelegate, UITableV
         fetchPackingItems()
         
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

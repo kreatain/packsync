@@ -155,7 +155,7 @@ class EditTravelDetailView: UIView {
     
     func setupStartDatePicker() {
         startDatePicker = UIDatePicker()
-        startDatePicker.datePickerMode = .dateAndTime
+        startDatePicker.datePickerMode = .date
         startDatePicker.preferredDatePickerStyle = .wheels
         startDatePicker.addTarget(self, action: #selector(startDateChanged), for: .valueChanged)
         textFieldTravelStartDate.inputView = startDatePicker
@@ -163,7 +163,7 @@ class EditTravelDetailView: UIView {
 
     func setupEndDatePicker() {
         endDatePicker = UIDatePicker()
-        endDatePicker.datePickerMode = .dateAndTime
+        endDatePicker.datePickerMode = .date
         endDatePicker.preferredDatePickerStyle = .wheels
         endDatePicker.addTarget(self, action: #selector(endDateChanged), for: .valueChanged)
         textFieldTravelEndDate.inputView = endDatePicker
@@ -179,7 +179,7 @@ class EditTravelDetailView: UIView {
 
     func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd, yyyy HH:mm"
+        formatter.dateFormat = "MMM dd, yyyy"
         return formatter.string(from: date)
     }
     
@@ -246,7 +246,7 @@ class EditTravelDetailView: UIView {
         textFieldTravelTitle.text = travel.travelTitle
         
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MMM dd, yyyy HH:mm"
+        dateFormatter.dateFormat = "MMM dd, yyyy"
         
         if let startDate = dateFormatter.date(from: travel.travelStartDate) {
             startDatePicker.date = startDate
@@ -263,7 +263,7 @@ class EditTravelDetailView: UIView {
     
     func formatDate(_ dateString: String) -> String {
         let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "MMM dd, yyyy HH:mm"
+        inputFormatter.dateFormat = "MMM dd, yyyy"
 
         let outputFormatter = DateFormatter()
         outputFormatter.dateFormat = "yyyy-MM-dd"
