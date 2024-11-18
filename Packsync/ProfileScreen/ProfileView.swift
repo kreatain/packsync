@@ -12,7 +12,6 @@ class ProfileView: UIView {
     var buttonEditProfilePic: UIButton!
     var labelNameText: UILabel!
     var labelName: UILabel!
-    var buttonEditName: UIButton! // Edit button for display name
     var labelEmailText: UILabel!
     var labelEmail: UILabel!
     var tableViewInvitations: UITableView!
@@ -57,12 +56,6 @@ class ProfileView: UIView {
         labelName.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelName)
 
-        // Edit button for display name
-        buttonEditName = UIButton(type: .system)
-        buttonEditName.setTitle("Edit", for: .normal)
-        buttonEditName.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(buttonEditName)
-
         labelEmailText = UILabel()
         labelEmailText.text = "Email:"
         labelEmailText.font = .systemFont(ofSize: 18)
@@ -100,10 +93,6 @@ class ProfileView: UIView {
             labelName.topAnchor.constraint(equalTo: buttonEditProfilePic.bottomAnchor, constant: 20),
             labelName.leadingAnchor.constraint(equalTo: labelNameText.trailingAnchor, constant: 5),
 
-            // Positioning edit button next to display name and aligning it to the end of the line.
-            buttonEditName.centerYAnchor.constraint(equalTo: labelName.centerYAnchor),
-            buttonEditName.leadingAnchor.constraint(equalTo: labelName.trailingAnchor, constant: 30),
-            buttonEditName.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor, constant: -20), // Ensure it stays within bounds
 
             labelEmailText.topAnchor.constraint(equalTo: labelName.bottomAnchor, constant: 10),
             labelEmailText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),

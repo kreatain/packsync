@@ -30,9 +30,6 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         
         // Add target for edit button to upload image or take a photo
         profileView.buttonEditProfilePic.addTarget(self, action: #selector(editProfilePictureTapped), for: .touchUpInside)
-        
-        // Add target for edit name button
-        profileView.buttonEditName.addTarget(self, action:#selector(editDisplayNameTapped), for:.touchUpInside)
 
         fetchCurrentUser()
         fetchInvitations()
@@ -170,52 +167,6 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                 UIImage(named:"default_profile_pic") // Placeholder image
         }
     }
-    
-    @objc func editDisplayNameTapped() {
-             let alertController = UIAlertController(title:"Edit Display Name", message:"Enter your new display name:", preferredStyle:.alert)
-
-             alertController.addTextField { textField in
-                 textField.placeholder = "New Display Name"
-                 textField.text = self.currentUser?.displayName // Pre-fill with current name
-             }
-
-             alertController.addAction(UIAlertAction(title:"Cancel", style:.cancel))
-
-             alertController.addAction(UIAlertAction(title:"Save", style:.default) { [weak self] _ in
-                 guard let self = self,
-                       let newDisplayName =
-                       alertController.textFields?.first?.text,
-                       !newDisplayName.isEmpty else {
-                     self?.showAlert(title:"Error", message:"Please enter a valid display name.")
-                     return
-                 }
-                 self.updateDisplayName(newDisplayName)
-             })
-
-             present(alertController, animated:true)
-         }
-
-         func updateDisplayName(_ newDisplayName:String) {
-             guard let userId =
-                 Auth.auth().currentUser?.uid else { return }
-             
-             // Update Firestore with new display name.
-             db.collection("users").document(userId).updateData([
-                 "displayName": newDisplayName
-             ]) { error in
-                 if let error =
-                     error {
-                     print("Error updating display name: \(error)")
-                     self.showAlert(title:"Error", message:"Failed to update display name. Please try again.")
-                 } else {
-                     print("Successfully updated display name.")
-                     self.currentUser?.displayName =
-                         newDisplayName // Update local user object.
-                     self.profileView.labelName.text =
-                         newDisplayName // Update UI immediately.
-                 }
-             }
-         }
 
 
     func fetchInvitations() {
