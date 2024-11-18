@@ -65,7 +65,7 @@ class AddANewTravelViewController: UIViewController {
             currency: selectedCurrency,
             categoryIds: [],
             expenseIds: [],
-            participantIds: []
+            participantIds: [creatorId]
         )
         
         saveTravelToFirestore(travel: travel)
