@@ -11,7 +11,6 @@ struct SpendingItem: Codable {
     var id: String // Unique identifier for the spending item
     var amount: Double
     var description: String
-    var payerEmail: String
     var date: String
     var receiptURL: String? // Optional: URL to receipt image if uploaded
     var addedByUserId: String // User ID of the person who added the spending item
@@ -21,7 +20,6 @@ struct SpendingItem: Codable {
         id: String = UUID().uuidString, // Generate a unique ID if not provided
         amount: Double,
         description: String,
-        payerEmail: String,
         date: String,
         addedByUserId: String,
         spentByUserId: String? = nil, // Defaults to addedByUserId if not provided
@@ -30,7 +28,6 @@ struct SpendingItem: Codable {
         self.id = id
         self.amount = amount
         self.description = description
-        self.payerEmail = payerEmail
         self.date = date
         self.addedByUserId = addedByUserId
         self.spentByUserId = spentByUserId ?? addedByUserId // Set spentByUserId to addedByUserId if nil

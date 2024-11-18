@@ -244,7 +244,13 @@ class SpendingViewController: UIViewController {
         // Pass resolved data to child view controllers
         overviewVC.setTravelPlan(travelPlan, categories: categories, spendingItems: spendingItems, participants: participants, currencySymbol: travelPlan.currency)
         budgetVC.setTravelPlan(travelPlan, categories: categories, currencySymbol: travelPlan.currency)
-        //expensesVC.setTravelPlan(travelPlan, expenses: expenses)
+        expensesVC.setTravelPlan(
+            travelPlan,
+            categories: categories,
+            spendingItems: spendingItems,
+            participants: participants,
+            currencySymbol: travelPlan.currency
+        )
         //splitVC.setTravelPlan(travelPlan, participants: participants)
 
         // Restore the active tab

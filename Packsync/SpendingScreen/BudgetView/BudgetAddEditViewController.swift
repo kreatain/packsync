@@ -9,11 +9,13 @@ class BudgetAddEditViewController: UIViewController {
     private var category: Category?
     private var travelId: String
     private var totalBudget: Double
+    private var currencySymbol: String = "$" // Default currency symbol
     
-    init(category: Category? = nil, travelId: String, totalBudget: Double) {
+    init(category: Category? = nil, travelId: String, totalBudget: Double,  currencySymbol: String = "$") {
         self.category = category
         self.travelId = travelId
         self.totalBudget = totalBudget
+        self.currencySymbol = currencySymbol
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -41,7 +43,7 @@ class BudgetAddEditViewController: UIViewController {
         textFieldName.borderStyle = .roundedRect
         textFieldName.translatesAutoresizingMaskIntoConstraints = false
         
-        textFieldBudget.placeholder = "Budget Amount"
+        textFieldBudget.placeholder = "\(currencySymbol) Budget Amount"
         textFieldBudget.keyboardType = .decimalPad
         textFieldBudget.borderStyle = .roundedRect
         textFieldBudget.translatesAutoresizingMaskIntoConstraints = false
