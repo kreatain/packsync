@@ -58,6 +58,7 @@ class EditTravelDetailViewController: UIViewController {
         
         let updatedTravel = Travel(
             id: travel?.id ?? UUID().uuidString,
+            creatorName: travel!.creatorName,
             creatorId: creatorId,
             travelTitle: updatedTitle,
             travelStartDate: formatDateForFirestore(updatedStartDate),

@@ -1,3 +1,10 @@
+//
+//  TravelViewController.swift
+//  Packsync
+//
+//  Created by Xi Jia on 11/7/24.
+//
+
 import UIKit
 import FirebaseFirestore
 import FirebaseAuth
@@ -50,6 +57,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         DispatchQueue.main.async {
             self.travelView.activePlanButton.sendActions(for: .touchUpInside)
         }
+       
     }
 
     
@@ -57,34 +65,34 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         NotificationCenter.default.removeObserver(self, name: .activeTravelPlanChanged, object: nil)
     }
  
-    
     // MARK: - Fetch Travel Plans
-    func fetchTravelPlans() {
-        guard let creatorId = currentUser?.uid else {
-            print("User is not signed in.")
-            return
-        }
-        
-        // Reset travelPlanList to avoid residual data
-        travelPlanList = []
-        database.collection("travelPlans")
-            .whereField("creatorId", isEqualTo: creatorId)
-            .addSnapshotListener { [weak self] (querySnapshot, error) in
-                if let error = error {
-                    print("Error fetching travel plans: \(error)")
-                    return
-                }
-                
-                self?.travelPlanList = querySnapshot?.documents.compactMap { document in
-                    try? document.data(as: Travel.self)
-                } ?? []
-                
-                DispatchQueue.main.async {
-                    print("Reloading travel plans table with \(self?.travelPlanList.count ?? 0) plans.")
-                    self?.travelView.tableViewTravelPlans.reloadData()
-                }
+        func fetchTravelPlans() {
+            guard let userId = Auth.auth().currentUser?.uid else {
+                print("User is not signed in.")
+                return
             }
-    }
+            
+            print("Current User ID: \(userId)") // For debugging
+
+            // Reset travelPlanList to avoid residual data
+            travelPlanList = []
+            
+            database.collection("travelPlans")
+                .whereField("participantIds", arrayContains: userId) // Query where participantIds includes current user ID
+                .addSnapshotListener { [weak self] (querySnapshot, error) in
+                    if let error = error {
+                        print("Error fetching travel plans: \(error)")
+                        return
+                    }
+                    
+                    self?.travelPlanList = querySnapshot?.documents.compactMap { document in try? document.data(as: Travel.self) } ?? []
+                    
+                    DispatchQueue.main.async {
+                        print("Reloading travel plans table with \(self?.travelPlanList.count ?? 0) plans.")
+                        self?.travelView.tableViewTravelPlans.reloadData()
+                    }
+                }
+        }
     
     // MARK: - Handle Active Plan Change
     @objc func handleActivePlanChange() {

@@ -10,6 +10,7 @@ import Foundation
 
 struct Travel: Codable {
     var id: String // Unique identifier for the travel plan
+    var creatorName: String
     var creatorId: String // ID of the user who created the travel plan
     var travelTitle: String
     var travelStartDate: String
@@ -23,6 +24,7 @@ struct Travel: Codable {
 
     init(
         id: String = UUID().uuidString, // Generate a unique ID if not provided
+        creatorName: String,
         creatorId: String,
         travelTitle: String,
         travelStartDate: String,
@@ -35,6 +37,7 @@ struct Travel: Codable {
         billboardIds: [String] = []
     ) {
         self.id = id
+        self.creatorName = creatorName
         self.creatorId = creatorId
         self.travelTitle = travelTitle
         self.travelStartDate = travelStartDate

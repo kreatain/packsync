@@ -66,7 +66,6 @@
 		4CC079562CE42AD4009364D8 /* AddANewTravelPlanView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079182CE42AD4009364D8 /* AddANewTravelPlanView.swift */; };
 		4CC079572CE42AD4009364D8 /* LeftBarButttonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC079192CE42AD4009364D8 /* LeftBarButttonManager.swift */; };
 		4CC079582CE42AD4009364D8 /* TravelPlanTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791A2CE42AD4009364D8 /* TravelPlanTableViewCell.swift */; };
-		4CC079592CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791B2CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift */; };
 		4CC0795A2CE42AD4009364D8 /* TravelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791C2CE42AD4009364D8 /* TravelView.swift */; };
 		4CC0795B2CE42AD4009364D8 /* TravelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791D2CE42AD4009364D8 /* TravelViewController.swift */; };
 		4CC0795C2CE42AD4009364D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC0791F2CE42AD4009364D8 /* AppDelegate.swift */; };
@@ -162,7 +161,6 @@
 		4CC079182CE42AD4009364D8 /* AddANewTravelPlanView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddANewTravelPlanView.swift; sourceTree = "<group>"; };
 		4CC079192CE42AD4009364D8 /* LeftBarButttonManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftBarButttonManager.swift; sourceTree = "<group>"; };
 		4CC0791A2CE42AD4009364D8 /* TravelPlanTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanTableViewCell.swift; sourceTree = "<group>"; };
-		4CC0791B2CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelPlanTableViewCellManager.swift; sourceTree = "<group>"; };
 		4CC0791C2CE42AD4009364D8 /* TravelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelView.swift; sourceTree = "<group>"; };
 		4CC0791D2CE42AD4009364D8 /* TravelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TravelViewController.swift; sourceTree = "<group>"; };
 		4CC0791F2CE42AD4009364D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -424,7 +422,6 @@
 				4CC079182CE42AD4009364D8 /* AddANewTravelPlanView.swift */,
 				4CC079192CE42AD4009364D8 /* LeftBarButttonManager.swift */,
 				4CC0791A2CE42AD4009364D8 /* TravelPlanTableViewCell.swift */,
-				4CC0791B2CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift */,
 				4CC0791C2CE42AD4009364D8 /* TravelView.swift */,
 				4CC0791D2CE42AD4009364D8 /* TravelViewController.swift */,
 			);
@@ -797,7 +794,6 @@
 				4CC079562CE42AD4009364D8 /* AddANewTravelPlanView.swift in Sources */,
 				4CC079572CE42AD4009364D8 /* LeftBarButttonManager.swift in Sources */,
 				4CC079582CE42AD4009364D8 /* TravelPlanTableViewCell.swift in Sources */,
-				4CC079592CE42AD4009364D8 /* TravelPlanTableViewCellManager.swift in Sources */,
 				4CC0795A2CE42AD4009364D8 /* TravelView.swift in Sources */,
 				4CC0795B2CE42AD4009364D8 /* TravelViewController.swift in Sources */,
 				4C7E69952CE6B6E10056E8CC /* PackingItemCell.swift in Sources */,

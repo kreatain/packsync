@@ -1,3 +1,10 @@
+//
+//  AddANewTravelViewController.swift
+//  Packsync
+//
+//  Created by Xi Jia on 11/7/24.
+//
+
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
@@ -39,6 +46,8 @@ class AddANewTravelViewController: UIViewController {
         }
         
         let creatorId = currentUser.uid
+        let creatorName = currentUser.displayName!
+        
         
         guard let travelTitle = addANewTravelPlan.textFieldTravelTitle.text,
               let travelStartDate = addANewTravelPlan.textFieldTravelStartDate.text,
@@ -57,6 +66,7 @@ class AddANewTravelViewController: UIViewController {
         // Create a new Travel instance using the updated model structure
         let travel = Travel(
             id: UUID().uuidString,
+            creatorName: creatorName,
             creatorId: creatorId,
             travelTitle: travelTitle,
             travelStartDate: travelStartDate,

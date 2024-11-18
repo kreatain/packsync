@@ -122,7 +122,7 @@ class TravelDetailViewController: UIViewController {
             print("No travel plan available for inviteFriendButtonTapped")
             return
         }
-        let inviteFriendVC = InviteFriendViewController(travelID: t.id)
+        let inviteFriendVC = InviteFriendViewController(travelID: t.id, travelTitle: t.travelTitle)
         navigationController?.pushViewController(inviteFriendVC, animated: true)
     }
     

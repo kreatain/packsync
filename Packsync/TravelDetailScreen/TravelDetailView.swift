@@ -1,3 +1,10 @@
+//
+//  TravelDetailView.swift
+//  Packsync
+//
+//  Created by Xi Jia on 11/8/24.
+//
+
 import UIKit
 
 class TravelDetailView: UIView {
@@ -6,28 +13,26 @@ class TravelDetailView: UIView {
     var labelDateRange: UILabel!
     var labelCountryAndCity: UILabel!
     var labelCurrency: UILabel!
-    
+    var labelCreatorName: UILabel! // New label for creator's name
     var buttonSetAsActivePlan: UIButton!
     var buttonPackingList: UIButton!
     var buttonInviteFriend: UIButton!
     var buttonSpending: UIButton!
     var buttonBillboard: UIButton!
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .white
-        
         setupLabelTravelTitle()
         setupLabelDateRange()
         setupLabelCountryAndCity()
         setupLabelCurrency()
-        
+        setupLabelCreatorName() // Initialize the creator's name label
         setupButtonSetAsActivePlan()
         setupButtonPackingList()
         setupButtonInviteFriend()
         setupButtonBillboard()
         setupButtonSpending()
-        
         initConstraints()
     }
     
@@ -123,6 +128,14 @@ class TravelDetailView: UIView {
         self.addSubview(buttonBillboard)
     }
     
+    func setupLabelCreatorName() {
+           labelCreatorName = UILabel()
+           labelCreatorName.font = UIFont.systemFont(ofSize: 16)
+           labelCreatorName.translatesAutoresizingMaskIntoConstraints = false
+           self.addSubview(labelCreatorName)
+       }
+
+    
     func initConstraints() {
         NSLayoutConstraint.activate([
             labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
@@ -132,11 +145,16 @@ class TravelDetailView: UIView {
             labelDateRange.topAnchor.constraint(equalTo: labelTravelTitle.bottomAnchor, constant: 20),
             labelDateRange.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelDateRange.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            
-            labelCountryAndCity.topAnchor.constraint(equalTo: labelDateRange.bottomAnchor, constant: 20),
+
+            // Constraints for creator's name
+            labelCreatorName.topAnchor.constraint(equalTo: labelDateRange.bottomAnchor, constant: 20),
+            labelCreatorName.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelCreatorName.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+
+            labelCountryAndCity.topAnchor.constraint(equalTo: labelCreatorName.bottomAnchor, constant: 20),
             labelCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            
+
             labelCurrency.topAnchor.constraint(equalTo: labelCountryAndCity.bottomAnchor, constant: 20),
             labelCurrency.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCurrency.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
@@ -173,6 +191,8 @@ class TravelDetailView: UIView {
         labelTravelTitle.text = "Travel Title: \(travel.travelTitle)"
         labelDateRange.text = "Travel Date: \(formatDate(travel.travelStartDate)) - \(formatDate(travel.travelEndDate))"
         labelCountryAndCity.text = "Country and City: \(travel.countryAndCity)"
+        // Set the creator's name (assuming you have a way to fetch it)
+        labelCreatorName.text = "Created by \(travel.creatorName)"
         labelCurrency.text = "Currency: \(travel.currency)" // Display the currency
         
         let isActivePlan = TravelPlanManager.shared.activeTravelPlan?.id == travel.id
