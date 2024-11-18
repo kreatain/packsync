@@ -74,7 +74,7 @@ class ExpensesViewController: UIViewController {
     @objc private func addExpenseButtonTapped() {
         guard let travelPlan = travelPlan else { return }
         
-        let addEditExpenseVC = AddEditExpenseViewController(categories: categories, participants: participants, travelId: travelPlan.id)
+        let addEditExpenseVC = AddEditExpenseViewController(categories: categories, participants: participants, travelId: travelPlan.id, currencySymbol: currencySymbol)
         let navController = UINavigationController(rootViewController: addEditExpenseVC)
         present(navController, animated: true, completion: nil)
     }

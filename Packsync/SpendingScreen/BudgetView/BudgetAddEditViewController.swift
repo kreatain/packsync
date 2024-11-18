@@ -9,7 +9,7 @@ class BudgetAddEditViewController: UIViewController {
     private var category: Category?
     private var travelId: String
     private var totalBudget: Double
-    private var currencySymbol: String = "$" // Default currency symbol
+    private var currencySymbol: String // Default currency symbol
     
     init(category: Category? = nil, travelId: String, totalBudget: Double,  currencySymbol: String = "$") {
         self.category = category

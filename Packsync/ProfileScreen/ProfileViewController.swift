@@ -238,11 +238,9 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
             return UITableViewCell()
         }
 
-        
-        
-        
         let invitation = invitations[indexPath.row]
-        cell.invitationLabel.text = "Trip Alert! \(invitation.inviterName) invited you. Ready to go?"
+        let inviterName = invitation.inviterName ?? "Someone" // Provide a default value if inviterName is nil
+        cell.invitationLabel.text = "Trip Alert! \(inviterName) invited you. Ready to go?"
         cell.acceptButton.tag = indexPath.row
         cell.rejectButton.tag = indexPath.row
 

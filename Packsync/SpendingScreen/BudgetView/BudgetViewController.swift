@@ -107,7 +107,7 @@ class BudgetViewController: UIViewController {
             print("Error: travelPlan is nil.")
             return
         }
-        let addEditVC = BudgetAddEditViewController(travelId: travelPlan.id, totalBudget: totalBudget)
+        let addEditVC = BudgetAddEditViewController(travelId: travelPlan.id, totalBudget: totalBudget, currencySymbol: currencySymbol)
         navigationController?.pushViewController(addEditVC, animated: true)
         
         // Notify that travel data has changed
@@ -211,7 +211,12 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
             guard let self = self else { return }
             let category = self.categories[indexPath.row]
             guard let travelPlan = self.travelPlan else { return }
-            let addEditVC = BudgetAddEditViewController(category: category, travelId: travelPlan.id, totalBudget: self.totalBudget)
+            let addEditVC = BudgetAddEditViewController(
+                category: category,
+                travelId: travelPlan.id,
+                totalBudget: self.totalBudget,
+                currencySymbol: self.currencySymbol
+            )
             self.navigationController?.pushViewController(addEditVC, animated: true)
             completionHandler(true)
         }
