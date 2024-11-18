@@ -10,10 +10,20 @@ import FirebaseFirestore
 import FirebaseAuth
 
 class InviteFriendViewController: UIViewController {
-    
+    private var travelID: String?
     let inviteFriendView = InviteFriendView()
     let firestore = Firestore.firestore()  // Firestore instance
 
+    init(travelID: String? = nil) {
+        self.travelID = travelID
+        super.init(nibName: nil, bundle: nil)
+        print("[InviteFriendViewController] Initialized with travelID: \(String(describing: travelID))")
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    
     override func loadView() {
         view = inviteFriendView
     }
@@ -65,13 +75,11 @@ class InviteFriendViewController: UIViewController {
         // Find the user by their email
         findUserByEmail(email) { [weak self] userId in
             guard let self = self else { return }
-
             if let userId = userId {
                 print("✅ Found user ID for email \(email): \(userId)")
                 self.sendInvitation(to: userId) { success in
                     if success {
                         print("✅ Invitation successfully sent to \(email)")
-                        self.inviteFriendView.showConfirmationMessage()
                     } else {
                         print("❌ Failed to send invitation to \(email)")
                         self.showAlert("Failed to send invitation")
@@ -84,7 +92,7 @@ class InviteFriendViewController: UIViewController {
         }
     }
 
-    
+    // findUserByEmail retrieves user's record from DB's users table by email
     private func findUserByEmail(_ email: String, completion: @escaping (String?) -> Void) {
         // Normalize email (trim spaces and lowercase it)
         let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
@@ -99,7 +107,7 @@ class InviteFriendViewController: UIViewController {
                     completion(nil) // Return nil on error
                     return
                 }
-
+                
                 // Check if we got any documents
                 guard let document = querySnapshot?.documents.first else {
                     print("❌ No document found for email: \(normalizedEmail)") // Log no result
@@ -113,40 +121,49 @@ class InviteFriendViewController: UIViewController {
             }
     }
 
-
-
-
-    private func sendInvitation(to userId: String, completion: @escaping (Bool) -> Void) {
+    // sendInvitation sends an invitation. Return true if succeeded
+    private func sendInvitation(to userId: String, completion: @escaping (Bool) -> Void) -> Bool {
         guard let currentUser = Auth.auth().currentUser else {
             print("User is not logged in.")
             completion(false)
-            return
+            return false
         }
         
         let currentUserId = currentUser.uid
         let currentUserName = currentUser.displayName ?? "Unknown User"  // Use a default name if displayName is nil
-
-        let invitationData: [String: Any] = [
-            "inviterId": currentUserId,
-            "inviterName": currentUserName,
-            "status": "pending",
-            "timestamp": Timestamp()
-        ]
         
-        firestore.collection("users")
-            .document(userId)
-            .collection("invitations")
-            .addDocument(data: invitationData) { error in
-                if let error = error {
-                    print("Error sending invitation: \(error)")
-                    completion(false)
-                } else {
-                    print("Invitation sent successfully")
-                    completion(true)
-                }
-            }
+        let travelId = self.travelID ?? "<UNKNOWN TRAVEL ID>"
+        let invitationData = Invitation(
+            id: UUID().uuidString,
+            inviterId: currentUser.uid,
+            receiverId: userId,
+            travelId: travelId,
+            isAccepted: 0,
+            timestamp: Date(),
+            inviterName: currentUser.displayName ?? "" // WARNING: if user ever changed name, this value might be outdated
+        )
+        let ok = addInvitationToDB(invitationData)
+        if ok {
+            self.inviteFriendView.showConfirmationMessage()
+        }
+        return ok
     }
 
+    // addInvitationToDB inserts a record into `invitations`. Return true if succeeded.
+    private func addInvitationToDB(_ record: Invitation) -> Bool {
+        let db = Firestore.firestore()
+        let documentId = record.id
+
+        do {
+            try db.collection("invitations").document(documentId).setData(from: record)
+            print("Invitation added successfully!")
+            return true
+        } catch let error {
+            print("Error adding invitation: \(error.localizedDescription)")
+            return false
+        }
+    }
+    
     private func showAlert(_ message: String) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

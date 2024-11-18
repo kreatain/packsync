@@ -10,27 +10,28 @@ import Foundation
 struct Invitation: Codable {
     var id: String // Unique identifier for the invitation
     var inviterId: String // ID of the user who sent the invitation
-    var inviterName: String // Name of the user who sent the invitation
     var receiverId: String // ID of the user who received the invitation
     var travelId: String // ID of the travel plan the invitation is associated with
-    var travelTitle: String // Title of the travel plan (new field)
-    var isAccepted: Bool // Indicates whether the invitation has been accepted
+    var isAccepted: Int // 0: pending, 1: accept, 2: reject
+    var timestamp: Date?
+    
+    var inviterName: String? // for the sake of querying
 
     init(
         id: String = UUID().uuidString,
         inviterId: String,
-        inviterName: String,
         receiverId: String,
-        travelId: String,
-        travelTitle: String, // No default value, must be provided
-        isAccepted: Bool = false
+        travelId: String, // No default value, must be provided
+        isAccepted: Int = 0,
+        timestamp: Date? = Date(),
+        inviterName: String?
     ) {
         self.id = id
         self.inviterId = inviterId
-        self.inviterName = inviterName
         self.receiverId = receiverId
         self.travelId = travelId
-        self.travelTitle = travelTitle // This value must be passed explicitly
         self.isAccepted = isAccepted
+        self.timestamp = timestamp
+        self.inviterName = inviterName
     }
 }

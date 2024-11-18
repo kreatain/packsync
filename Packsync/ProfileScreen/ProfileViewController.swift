@@ -31,6 +31,7 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         setupTableView()
         postLogin()
         loadUserProfile()
+        print("?????????aaaaaaa")
         fetchInvitations()
 
         title = "Profile"
@@ -163,26 +164,30 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
 
     private func fetchInvitations() {
         guard let userId = Auth.auth().currentUser?.uid else { return }
-        firestore.collection("users")
-            .document(userId)
-            .collection("invitations")
-            .whereField("status", isEqualTo: "pending")
+        
+        currentUser = Auth.auth().currentUser
+        if currentUser?.uid == "" {
+            return
+        }
+
+        firestore.collection("invitations")
+            .whereField("isAccepted", isEqualTo: 0)
+            .whereField("receiverId", isEqualTo: currentUser?.uid)
             .getDocuments { [weak self] snapshot, error in
                 if let error = error {
                     print("Error fetching invitations: \(error.localizedDescription)")
                     return
                 }
-
                 self?.invitations = snapshot?.documents.compactMap { document in
                     let data = document.data()
                     return Invitation(
                         id: document.documentID,
                         inviterId: data["inviterId"] as? String ?? "",
-                        inviterName: data["inviterName"] as? String ?? "",
-                        receiverId: userId,
+                        receiverId: data["inviterName"] as? String ?? "",
                         travelId: data["travelId"] as? String ?? "",
-                        travelTitle: data["travelTitle"] as? String ?? "",
-                        isAccepted: false
+                        isAccepted: data["isAccepted"] as? Int ?? 0,
+                        timestamp: data["timestamp"] as? Date,
+                        inviterName: data["inviterName"] as? String ?? ""
                     )
                 } ?? []
 
@@ -199,24 +204,21 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
         let index = sender.tag
         guard index < invitations.count else { return }
         let invitation = invitations[index]
-        updateInvitationStatus(invitation, to: "accepted")
+        updateInvitationStatus(invitation, to: 1)
     }
 
     @objc private func handleRejectButton(_ sender: UIButton) {
         let index = sender.tag
         guard index < invitations.count else { return }
         let invitation = invitations[index]
-        updateInvitationStatus(invitation, to: "rejected")
+        updateInvitationStatus(invitation, to: 2)
     }
 
     // Existing method
-    private func updateInvitationStatus(_ invitation: Invitation, to status: String) {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        firestore.collection("users")
-            .document(userId)
-            .collection("invitations")
+    private func updateInvitationStatus(_ invitation: Invitation, to status: Int) {
+        firestore.collection("invitations")
             .document(invitation.id)
-            .updateData(["status": status]) { error in
+            .updateData(["isAccepted": status]) { error in
                 if let error = error {
                     print("Failed to update invitation status: \(error.localizedDescription)")
                 } else {
@@ -236,6 +238,9 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
             return UITableViewCell()
         }
 
+        
+        
+        
         let invitation = invitations[indexPath.row]
         cell.invitationLabel.text = "Trip Alert! \(invitation.inviterName) invited you. Ready to go?"
         cell.acceptButton.tag = indexPath.row
