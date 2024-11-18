@@ -83,7 +83,8 @@ class ProfileViewController: UIViewController, UIImagePickerControllerDelegate, 
     // MARK: - Profile Editing
     @objc private func toggleEditProfile() {
         isEditingProfile.toggle()
-        title = isEditingProfile ? "EDIT PROFILE" : "PROFILE"
+        // title = isEditingProfile ? "EDIT PROFILE" : "PROFILE"
+    
         navigationItem.rightBarButtonItem?.title = isEditingProfile ? "Save" : "Edit"
 
         if isEditingProfile {

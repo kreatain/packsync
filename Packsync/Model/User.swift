@@ -13,8 +13,8 @@ struct User: Codable {
     let password: String
     var displayName: String?
     var travelIds: [String] = [] // List of travel IDs associated with the user
-    var pendingInvites: [String] = [] // List of pending invite IDs
-    var profilePicURL: String? // Optional URL to profile picture
+    // var pendingInvites: [String] = [] // List of pending invite IDs
+    var profilePicURL: String? // URL to profile picture
 
     init(
         id: String = UUID().uuidString, // Generate a unique ID if not provided
@@ -22,7 +22,7 @@ struct User: Codable {
         password: String,
         displayName: String? = nil,
         travelIds: [String] = [],
-        pendingInvites: [String] = [],
+        // pendingInvites: [String] = [],
         profilePicURL: String? = nil
     ) {
         self.id = id
@@ -30,7 +30,7 @@ struct User: Codable {
         self.password = password
         self.displayName = displayName
         self.travelIds = travelIds
-        self.pendingInvites = pendingInvites
+        //self.pendingInvites = pendingInvites
         self.profilePicURL = profilePicURL
     }
 }
