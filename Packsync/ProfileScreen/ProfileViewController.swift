@@ -123,6 +123,7 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 
     func updateUserProfilePicture(_ url: String?) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
+
         
         // Update Firestore with new profile picture URL
         db.collection("users").document(userId).updateData([
@@ -136,15 +137,21 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             }
         }
     }
-
+    
     func fetchCurrentUser() {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-        
-        db.collection("users").document(userId).getDocument { [weak self] (document, error) in
-            if let document = document, document.exists {
-                self?.currentUser = try? document.data(as: User.self)
-                self?.updateUI()
+        if let userId = Auth.auth().currentUser?.uid {
+            db.collection("users").document(userId).getDocument { [weak self] (document, error) in
+                if let document = document, document.exists {
+                    self?.currentUser = try? document.data(as: User.self)
+                    self?.updateUI()
+                    self?.profileView.isHidden = false // Show profile view when user is signed in
+                } else {
+                    print("Document does not exist or error occurred: \(String(describing: error))")
+                    self?.profileView.isHidden = true // Hide profile view if no document found
+                }
             }
+        } else {
+            profileView.isHidden = true // Hide profile view when no user is signed in
         }
     }
 
@@ -155,16 +162,14 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
         // Load profile picture if available
         if let profilePicURL = currentUser?.profilePicURL, let url = URL(string: profilePicURL) {
             DispatchQueue.global().async {
-                if let data = try? Data(contentsOf:url) {
+                if let data = try? Data(contentsOf: url) {
                     DispatchQueue.main.async { [weak self] in
-                        self?.profileView.imageViewProfilePic.image =
-                            UIImage(data:data)
+                        self?.profileView.imageViewProfilePic.image = UIImage(data: data)
                     }
                 }
             }
         } else {
-            profileView.imageViewProfilePic.image =
-                UIImage(named:"default_profile_pic") // Placeholder image
+            profileView.imageViewProfilePic.image = UIImage(named: "default_profile_pic") // Placeholder image
         }
     }
 

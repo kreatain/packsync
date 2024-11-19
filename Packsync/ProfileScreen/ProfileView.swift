@@ -94,13 +94,13 @@ class ProfileView: UIView {
             labelName.leadingAnchor.constraint(equalTo: labelNameText.trailingAnchor, constant: 5),
 
 
-            labelEmailText.topAnchor.constraint(equalTo: labelName.bottomAnchor, constant: 10),
+            labelEmailText.topAnchor.constraint(equalTo: labelName.bottomAnchor, constant: 20),
             labelEmailText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
 
-            labelEmail.topAnchor.constraint(equalTo: labelName.bottomAnchor, constant: 10),
+            labelEmail.topAnchor.constraint(equalTo: labelName.bottomAnchor, constant: 20),
             labelEmail.leadingAnchor.constraint(equalTo: labelEmailText.trailingAnchor, constant: 5),
 
-            tableViewInvitations.topAnchor.constraint(equalTo: labelEmail.bottomAnchor, constant: 20),
+            tableViewInvitations.topAnchor.constraint(equalTo: labelEmail.bottomAnchor, constant: 30),
             tableViewInvitations.leadingAnchor.constraint(equalTo: self.leadingAnchor),
             tableViewInvitations.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             tableViewInvitations.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor)
