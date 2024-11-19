@@ -11,6 +11,6 @@ extension Notification.Name {
     /// Notification when travel data changes (e.g., categories, spending items, participants, etc.)
     static let travelDataChanged = Notification.Name("travelDataChanged")
     
-    /// Add more notifications as needed
-    // static let someOtherNotification = Notification.Name("someOtherNotification")
+    /// Notification when a specific category's data changes (e.g., spending items updated)
+    static let categoryDataChanged = Notification.Name("categoryDataChanged")
 }

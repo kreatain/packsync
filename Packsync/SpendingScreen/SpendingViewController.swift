@@ -242,8 +242,20 @@ class SpendingViewController: UIViewController {
         noActivePlanLabel.isHidden = true
 
         // Pass resolved data to child view controllers
-        overviewVC.setTravelPlan(travelPlan, categories: categories, spendingItems: spendingItems, participants: participants, currencySymbol: travelPlan.currency)
-        budgetVC.setTravelPlan(travelPlan, categories: categories, currencySymbol: travelPlan.currency)
+        overviewVC.setTravelPlan(
+            travelPlan,
+            categories: categories,
+            spendingItems: spendingItems,
+            participants: participants,
+            currencySymbol: travelPlan.currency
+        )
+        budgetVC.setTravelPlan(
+            travelPlan,
+            categories: categories,
+            spendingItems: spendingItems, // Add spending items here
+            participants: participants,
+            currencySymbol: travelPlan.currency
+        )
         expensesVC.setTravelPlan(
             travelPlan,
             categories: categories,

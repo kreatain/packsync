@@ -12,13 +12,13 @@
 					<key>EndingColumnNumber</key>
 					<string>0</string>
 					<key>EndingLineNumber</key>
-					<string>107</string>
+					<string>240</string>
 					<key>StartingColumnNumber</key>
 					<string>0</string>
 					<key>StartingLineNumber</key>
-					<string>107</string>
+					<string>240</string>
 					<key>Timestamp</key>
-					<string>753428891.986986</string>
+					<string>753671337.09706</string>
 				</dict>
 				<key>rebasable-url</key>
 				<dict>
@@ -38,14 +38,11 @@
 				<key>focused</key>
 				<string></string>
 				<key>leading</key>
-				<string>            pieChartView.data = nil
-            return
+				<string>    
+}
 </string>
 				<key>trailing</key>
-				<string>        }
-        
-        let totalBudget = categories.reduce(0) { $0 + $1.budgetAmount }
-</string>
+				<string></string>
 			</dict>
 			<key>title</key>
 			<string>Error: Extra argument 'travelId' in call</string>

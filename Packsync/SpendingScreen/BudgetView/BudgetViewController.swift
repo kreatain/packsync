@@ -3,6 +3,8 @@ import UIKit
 class BudgetViewController: UIViewController {
     
     private var categories: [Category] = []
+    private var spendingItems: [SpendingItem] = []
+    private var participants: [User] = []
     private var travelPlan: Travel?
     private var totalBudget: Double = 0
     private var currencySymbol: String = "$" // Default to USD
@@ -87,19 +89,44 @@ class BudgetViewController: UIViewController {
         tableView.reloadData()
     }
     
-    func setTravelPlan(_ travelPlan: Travel, categories: [Category], currencySymbol: String) {
-        self.travelPlan = travelPlan
-        self.categories = categories
-        self.currencySymbol = currencySymbol
+    func setTravelPlan(
+            _ travelPlan: Travel,
+            categories: [Category],
+            spendingItems: [SpendingItem],
+            participants: [User],
+            currencySymbol: String
+        ) {
+            self.travelPlan = travelPlan
+            self.categories = categories
+            self.spendingItems = spendingItems 
+            self.participants = participants
+            self.currencySymbol = currencySymbol
 
-        print("[BudgetViewController] Travel plan updated: \(travelPlan.travelTitle). Categories count: \(categories.count). Currency: \(currencySymbol).")
-    
+        print("[BudgetViewController] Travel plan updated: \(travelPlan.travelTitle). Categories count: \(categories.count). Participants count: \(participants.count). Currency: \(currencySymbol).")
+        
         tableView.reloadData() // Refresh the table
+            
+        // Update the active BudgetDetailViewController if it exists
+            if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
+                // Find the category corresponding to the currently active detail view
+                if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
+                    let filteredSpendingItems = spendingItems.filter { $0.categoryId == activeCategory.id }
+                    detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems)
+                } else {
+                    print("[BudgetViewController] No matching category found for active BudgetDetailViewController.")
+                }
+            }
+    }
+    
+    func updateBudgetDetailViewController(with category: Category, spendingItems: [SpendingItem]) {
+        if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
+            detailVC.updateCategory(category, spendingItems: spendingItems)
+        }
     }
     
     private func calculateSummary() {
            totalBudget = categories.reduce(0) { $0 + $1.budgetAmount }
-           summaryLabel.text = "Total Budget: \(currencySymbol)\(totalBudget)"
+           summaryLabel.text = "Total Budget: \(currencySymbol)  \(totalBudget)"
        }
     
     @objc private func addCategoryTapped() {
@@ -124,19 +151,22 @@ class BudgetViewController: UIViewController {
 
         print("[BudgetViewController] Handling travel data change notification.")
 
-        // Fetch the latest travel plan to synchronize category IDs
         SpendingFirebaseManager.shared.fetchTravel(for: travelId) { [weak self] travelPlan in
             guard let self = self, let travelPlan = travelPlan else { return }
             DispatchQueue.main.async {
-                // Update the local travelPlan and category IDs
                 self.travelPlan = travelPlan
 
-                // Fetch updated categories
                 SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { categories in
                     DispatchQueue.main.async {
                         self.categories = categories
                         self.calculateSummary()
                         self.tableView.reloadData()
+
+                        // Dynamically update BudgetDetailViewController
+                        if let selectedCategory = self.categories.first(where: { $0.id == self.categories.first?.id }) {
+                            let filteredSpendingItems = self.spendingItems.filter { $0.categoryId == selectedCategory.id }
+                            self.updateBudgetDetailViewController(with: selectedCategory, spendingItems: filteredSpendingItems)
+                        }
                     }
                 }
             }
@@ -204,6 +234,27 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
         print("Category for row \(indexPath.row): \(category.name)")
         cell.configure(with: category, currencySymbol: currencySymbol, displayProgressBar: true)
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let category = categories[indexPath.row]
+        guard let travelPlan = travelPlan else { return }
+
+        let filteredSpendingItems = spendingItems.filter { $0.categoryId == category.id }
+
+        if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
+            detailVC.updateCategory(category, spendingItems: filteredSpendingItems)
+            navigationController?.popToViewController(detailVC, animated: true)
+        } else {
+            let detailVC = BudgetDetailViewController(
+                category: category,
+                spendingItems: filteredSpendingItems,
+                participants: participants,
+                currencySymbol: currencySymbol,
+                travelId: travelPlan.id
+            )
+            navigationController?.pushViewController(detailVC, animated: true)
+        }
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {

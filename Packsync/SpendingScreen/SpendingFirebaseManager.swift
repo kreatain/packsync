@@ -182,51 +182,26 @@ class SpendingFirebaseManager {
     func fetchSpendingItemsByCategoryIds(categoryIds: [String], completion: @escaping ([SpendingItem]) -> Void) {
         print("Starting fetchSpendingItemsByCategoryIds for category IDs: \(categoryIds)")
 
+        // Early exit if categoryIds is empty
+        guard !categoryIds.isEmpty else {
+            print("fetchSpendingItemsByCategoryIds: No category IDs provided.")
+            completion([])
+            return
+        }
+
         let spendingItemsRef = db.collection("spendingItems")
         let dispatchGroup = DispatchGroup()
         var spendingItems: [SpendingItem] = []
 
         for categoryId in categoryIds {
             dispatchGroup.enter()
-            print("Fetching category with ID: \(categoryId)")
-            
-            // Fetch the category document to retrieve the spending item IDs
-            db.collection("categories").document(categoryId).getDocument { categorySnapshot, error in
+            spendingItemsRef.whereField("categoryId", isEqualTo: categoryId).getDocuments { snapshot, error in
                 if let error = error {
-                    print("Error fetching category \(categoryId): \(error.localizedDescription)")
-                    dispatchGroup.leave()
-                    return
+                    print("Error fetching spending items for category ID \(categoryId): \(error.localizedDescription)")
+                } else if let documents = snapshot?.documents {
+                    let items = documents.compactMap { try? $0.data(as: SpendingItem.self) }
+                    spendingItems.append(contentsOf: items)
                 }
-                
-                guard let categoryData = categorySnapshot?.data(),
-                      let spendingItemIds = categoryData["spendingItemIds"] as? [String] else {
-                    print("Category \(categoryId) does not have spendingItemIds or failed to decode.")
-                    dispatchGroup.leave()
-                    return
-                }
-                
-                print("Fetched \(spendingItemIds.count) spending item IDs for category \(categoryId).")
-
-                // Fetch each spending item by ID
-                for spendingItemId in spendingItemIds {
-                    dispatchGroup.enter()
-                    spendingItemsRef.document(spendingItemId).getDocument { document, error in
-                        if let error = error {
-                            print("Error fetching spending item \(spendingItemId): \(error.localizedDescription)")
-                            dispatchGroup.leave()
-                            return
-                        }
-
-                        if let document = document, let spendingItem = try? document.data(as: SpendingItem.self) {
-                            spendingItems.append(spendingItem)
-                            print("Fetched spending item with ID: \(spendingItemId), Amount: \(spendingItem.amount)")
-                        } else {
-                            print("Spending item \(spendingItemId) not found or failed to decode.")
-                        }
-                        dispatchGroup.leave()
-                    }
-                }
-
                 dispatchGroup.leave()
             }
         }
@@ -243,13 +218,14 @@ class SpendingFirebaseManager {
         let spendingItemsRef = db.collection("spendingItems")
         let categoryRef = db.collection("categories").document(categoryId)
         
-        // Generate a new document ID for the spending item
+        // Generate a new spending item with a unique ID
         var spendingItemToAdd = spendingItem
-        let newSpendingItemRef = spendingItemsRef.document()
+        let newSpendingItemRef = spendingItemsRef.document() // Generate a new document ID
         spendingItemToAdd.id = newSpendingItemRef.documentID // Assign the generated ID
+        spendingItemToAdd.categoryId = categoryId // Ensure categoryId is assigned
 
         do {
-            // Add the spending item to the spendingItems table
+            // Add the spending item to the spendingItems collection
             try newSpendingItemRef.setData(from: spendingItemToAdd) { error in
                 if let error = error {
                     print("Error adding spending item: \(error.localizedDescription)")
@@ -259,13 +235,13 @@ class SpendingFirebaseManager {
 
                 // Update the category to include the new spending item ID
                 categoryRef.updateData([
-                    "spendingItemIds": FieldValue.arrayUnion([spendingItemToAdd.id])
+                    "spendingItemIds": FieldValue.arrayUnion([spendingItemToAdd.id]) // Add the ID to the array
                 ]) { error in
                     if let error = error {
                         print("Error updating category with new spending item ID: \(error.localizedDescription)")
                         completion(false)
                     } else {
-                        print("Spending item added successfully and linked to category.")
+                        print("Spending item added successfully and linked to category ID: \(categoryId)")
                         completion(true)
                     }
                 }

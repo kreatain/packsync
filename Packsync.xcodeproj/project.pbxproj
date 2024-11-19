@@ -13,6 +13,9 @@
 		04112FC82CE857D300371ABD /* BudgetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04112FC72CE857D300371ABD /* BudgetViewController.swift */; };
 		0430CA8E2CEA92240076BBA1 /* ExpenseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA8D2CEA92240076BBA1 /* ExpenseCell.swift */; };
 		0430CA902CEA92590076BBA1 /* AddEditExpenseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA8F2CEA92590076BBA1 /* AddEditExpenseViewController.swift */; };
+		0430CA962CEBED770076BBA1 /* ExpenseDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA952CEBED770076BBA1 /* ExpenseDetailsViewController.swift */; };
+		0430CA982CEBED900076BBA1 /* FullscreenImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA972CEBED900076BBA1 /* FullscreenImageViewController.swift */; };
+		0430CA9A2CEBF1AC0076BBA1 /* BudgetDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */; };
 		3627BA582CEA976F00D56011 /* PackinListActiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3627BA572CEA976F00D56011 /* PackinListActiveViewController.swift */; };
 		365D8E7F2CE808A200453F2E /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8E7E2CE808A200453F2E /* PackingListViewController.swift */; };
 		365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8EB42CE82DC900453F2E /* CreateVoteView.swift */; };
@@ -107,6 +110,9 @@
 		04112FC72CE857D300371ABD /* BudgetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetViewController.swift; sourceTree = "<group>"; };
 		0430CA8D2CEA92240076BBA1 /* ExpenseCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseCell.swift; sourceTree = "<group>"; };
 		0430CA8F2CEA92590076BBA1 /* AddEditExpenseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEditExpenseViewController.swift; sourceTree = "<group>"; };
+		0430CA952CEBED770076BBA1 /* ExpenseDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseDetailsViewController.swift; sourceTree = "<group>"; };
+		0430CA972CEBED900076BBA1 /* FullscreenImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenImageViewController.swift; sourceTree = "<group>"; };
+		0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailViewController.swift; sourceTree = "<group>"; };
 		20612AFFA4052AB7EDDC2562 /* Pods-Packsync-PacksyncUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync-PacksyncUITests.release.xcconfig"; path = "Target Support Files/Pods-Packsync-PacksyncUITests/Pods-Packsync-PacksyncUITests.release.xcconfig"; sourceTree = "<group>"; };
 		3627BA572CEA976F00D56011 /* PackinListActiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackinListActiveViewController.swift; sourceTree = "<group>"; };
 		365D8E7E2CE808A200453F2E /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
@@ -355,6 +361,7 @@
 		4CC079052CE42AD4009364D8 /* BudgetView */ = {
 			isa = PBXGroup;
 			children = (
+				0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */,
 				04112FC12CE7CF0800371ABD /* EmojiTextField.swift */,
 				04112FBF2CE7C75B00371ABD /* BudgetAddEditViewController.swift */,
 				04112FC72CE857D300371ABD /* BudgetViewController.swift */,
@@ -365,6 +372,8 @@
 		4CC079072CE42AD4009364D8 /* ExpenseView */ = {
 			isa = PBXGroup;
 			children = (
+				0430CA972CEBED900076BBA1 /* FullscreenImageViewController.swift */,
+				0430CA952CEBED770076BBA1 /* ExpenseDetailsViewController.swift */,
 				0430CA8F2CEA92590076BBA1 /* AddEditExpenseViewController.swift */,
 				0430CA8D2CEA92240076BBA1 /* ExpenseCell.swift */,
 				4CC079062CE42AD4009364D8 /* ExpensesViewController.swift */,
@@ -752,6 +761,7 @@
 				0430CA8E2CEA92240076BBA1 /* ExpenseCell.swift in Sources */,
 				4CC079302CE42AD4009364D8 /* BillboardViewController.swift in Sources */,
 				4CC079332CE42AD4009364D8 /* FriendsListView.swift in Sources */,
+				0430CA962CEBED770076BBA1 /* ExpenseDetailsViewController.swift in Sources */,
 				4CC079342CE42AD4009364D8 /* FriendsListViewController.swift in Sources */,
 				4CC079352CE42AD4009364D8 /* InviteFriendsView.swift in Sources */,
 				4CC079362CE42AD4009364D8 /* InviteFriendsViewController.swift in Sources */,
@@ -766,6 +776,7 @@
 				4CC0793C2CE42AD4009364D8 /* Travel.swift in Sources */,
 				4CC0793D2CE42AD4009364D8 /* User.swift in Sources */,
 				4C8783982CE9B91F00B4F5C0 /* InvitationCell.swift in Sources */,
+				0430CA982CEBED900076BBA1 /* FullscreenImageViewController.swift in Sources */,
 				4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */,
 				4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */,
 				04112FB22CE5705F00371ABD /* CategoryCell.swift in Sources */,
@@ -782,6 +793,7 @@
 				4CC0794A2CE42AD4009364D8 /* OverviewViewController.swift in Sources */,
 				4CC0794B2CE42AD4009364D8 /* SplitViewController.swift in Sources */,
 				4CC0794C2CE42AD4009364D8 /* SpendingFirebaseManager.swift in Sources */,
+				0430CA9A2CEBF1AC0076BBA1 /* BudgetDetailViewController.swift in Sources */,
 				4CC0794E2CE42AD4009364D8 /* SpendingView.swift in Sources */,
 				4CC0794F2CE42AD4009364D8 /* SpendingViewController.swift in Sources */,
 				4CC079502CE42AD4009364D8 /* EditTravelDetailView.swift in Sources */,
