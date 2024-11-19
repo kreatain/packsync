@@ -17,6 +17,8 @@
 		0430CA982CEBED900076BBA1 /* FullscreenImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA972CEBED900076BBA1 /* FullscreenImageViewController.swift */; };
 		0430CA9A2CEBF1AC0076BBA1 /* BudgetDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */; };
 		3627BA582CEA976F00D56011 /* PackinListActiveViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3627BA572CEA976F00D56011 /* PackinListActiveViewController.swift */; };
+		3633E3712CED045200F14439 /* PackingItemDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */; };
+		3633E3742CED085600F14439 /* PackingItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3633E3732CED085600F14439 /* PackingItemDetailView.swift */; };
 		365D8E7F2CE808A200453F2E /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8E7E2CE808A200453F2E /* PackingListViewController.swift */; };
 		365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8EB42CE82DC900453F2E /* CreateVoteView.swift */; };
 		365D8EB72CE82DDB00453F2E /* CreateVoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8EB62CE82DDB00453F2E /* CreateVoteViewController.swift */; };
@@ -115,6 +117,8 @@
 		0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailViewController.swift; sourceTree = "<group>"; };
 		20612AFFA4052AB7EDDC2562 /* Pods-Packsync-PacksyncUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync-PacksyncUITests.release.xcconfig"; path = "Target Support Files/Pods-Packsync-PacksyncUITests/Pods-Packsync-PacksyncUITests.release.xcconfig"; sourceTree = "<group>"; };
 		3627BA572CEA976F00D56011 /* PackinListActiveViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackinListActiveViewController.swift; sourceTree = "<group>"; };
+		3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemDetailViewController.swift; sourceTree = "<group>"; };
+		3633E3732CED085600F14439 /* PackingItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemDetailView.swift; sourceTree = "<group>"; };
 		365D8E7E2CE808A200453F2E /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
 		365D8EB42CE82DC900453F2E /* CreateVoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoteView.swift; sourceTree = "<group>"; };
 		365D8EB62CE82DDB00453F2E /* CreateVoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoteViewController.swift; sourceTree = "<group>"; };
@@ -225,6 +229,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3633E3722CED045700F14439 /* PackingItem */ = {
+			isa = PBXGroup;
+			children = (
+				3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */,
+				3633E3732CED085600F14439 /* PackingItemDetailView.swift */,
+			);
+			path = PackingItem;
+			sourceTree = "<group>";
+		};
 		36EBDBC22CE6BF5500013D30 /* PacksyncTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -265,10 +278,11 @@
 			children = (
 				4C7E698D2CE6B6E10056E8CC /* AddPackingItemScreen */,
 				4C7E69902CE6B6E10056E8CC /* EditPackingItemScreen */,
-				4C7E69912CE6B6E10056E8CC /* PackingItemCell.swift */,
 				4C7E69922CE6B6E10056E8CC /* PackingListView.swift */,
+				4C7E69912CE6B6E10056E8CC /* PackingItemCell.swift */,
 				365D8E7E2CE808A200453F2E /* PackingListViewController.swift */,
 				3627BA572CEA976F00D56011 /* PackinListActiveViewController.swift */,
+				3633E3722CED045700F14439 /* PackingItem */,
 			);
 			path = PackingListScreen;
 			sourceTree = "<group>";
@@ -755,6 +769,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4CC0792B2CE42AD4009364D8 /* ActivePlanNotification.swift in Sources */,
+				3633E3712CED045200F14439 /* PackingItemDetailViewController.swift in Sources */,
 				4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */,
 				4CC0792F2CE42AD4009364D8 /* BillboardView.swift in Sources */,
 				04112FC82CE857D300371ABD /* BudgetViewController.swift in Sources */,
@@ -769,6 +784,7 @@
 				4CC079382CE42AD4009364D8 /* GroupExpense.swift in Sources */,
 				4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */,
 				3627BA582CEA976F00D56011 /* PackinListActiveViewController.swift in Sources */,
+				3633E3742CED085600F14439 /* PackingItemDetailView.swift in Sources */,
 				4CC0793A2CE42AD4009364D8 /* PackingItem.swift in Sources */,
 				365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */,
 				365D8EB72CE82DDB00453F2E /* CreateVoteViewController.swift in Sources */,

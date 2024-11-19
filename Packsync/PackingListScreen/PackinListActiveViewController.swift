@@ -13,6 +13,7 @@ class PackinListActiveViewController: UIViewController, EditPackingItemViewContr
     
     private var packingListView: PackingListView?
     private let noActiveplanLabel = UILabel()
+    var travel: Travel?
     private var packingItems: [PackingItem] = []
     private var listener: ListenerRegistration?
     
@@ -97,10 +98,9 @@ class PackinListActiveViewController: UIViewController, EditPackingItemViewContr
         let navController = UINavigationController(rootViewController: addPackingItemVC)
         present(navController, animated: true, completion: nil)
     }
-    
+
     private func fetchPackingItems(for travelId: String) {
         guard let travel = TravelPlanManager.shared.activeTravelPlan else { return }
-
         let db = Firestore.firestore()
         listener?.remove() // Remove any existing listener
         
@@ -109,17 +109,15 @@ class PackinListActiveViewController: UIViewController, EditPackingItemViewContr
             .whereField("travelId", isEqualTo: travel.id)
             .addSnapshotListener { [weak self] querySnapshot, error in
                 guard let self = self else { return }
-                
                 if let error = error {
                     print("Error fetching documents: \(error.localizedDescription)")
                     return
                 }
-                
                 guard let documents = querySnapshot?.documents else {
                     print("No documents found")
                     return
                 }
-               
+                
                 self.packingItems = documents.compactMap { queryDocumentSnapshot in
                     let data = queryDocumentSnapshot.data()
                     let id = queryDocumentSnapshot.documentID
@@ -127,8 +125,20 @@ class PackinListActiveViewController: UIViewController, EditPackingItemViewContr
                     let itemNumber = data["itemNumber"] as? String ?? ""
                     let isPacked = data["isPacked"] as? Bool ?? false
                     let isPackedBy = data["isPackedBy"] as? String
-
+                    
                     return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber)
+                }
+                
+                // Sort packing items by first letter of first word and move packed items to the bottom
+                self.packingItems.sort {
+                    let firstLetter1 = $0.name.prefix(1).uppercased()
+                    let firstLetter2 = $1.name.prefix(1).uppercased()
+                    
+                    if $0.isPacked == $1.isPacked {
+                        return firstLetter1 < firstLetter2
+                    } else {
+                        return !$0.isPacked // Move packed items to the bottom
+                    }
                 }
                 
                 DispatchQueue.main.async {
@@ -163,16 +173,13 @@ class PackinListActiveViewController: UIViewController, EditPackingItemViewContr
                     let profilePicURL = document.data()?["profileImageUrl"] as? String
                     let displayName = document.data()?["displayName"] as? String ?? "Unknown User"
                     
-                    print("Debug - ProfilePicURL: \(profilePicURL ?? "nil")")
-                    print("Debug - DisplayName: \(displayName)")
-                    
                     let packedByValue: String
                     if let profilePicURL = profilePicURL, !profilePicURL.isEmpty {
                         packedByValue = profilePicURL
-                        print("Debug - Using ProfilePicURL: \(profilePicURL)")
+
                     } else {
-                        packedByValue = "Name: \(displayName)"
-                        print("Debug - Using DisplayName: \(displayName)")
+                        packedByValue = "\(displayName)"
+                       
                     }
                     
                     let updateData: [String: Any] = [
@@ -227,13 +234,11 @@ extension PackinListActiveViewController: UITableViewDelegate, UITableViewDataSo
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
                     
-                    let selectedItem = packingItems[indexPath.row]
-                    let editVC = EditPackingItemViewController()
-                    editVC.packingItem = selectedItem
-                    editVC.delegate = self
-                    
-                    let navController = UINavigationController(rootViewController: editVC)
-                    present(navController, animated: true, completion: nil)
+        let item = packingItems[indexPath.row]
+        let detailVC = PackingItemDetailViewController()
+        detailVC.packingItem = item
+        detailVC.travel = self.travel
+        navigationController?.pushViewController(detailVC, animated: true)
                 
     }
     
@@ -265,6 +270,11 @@ extension PackinListActiveViewController: PackingListViewControllerDelegate {
         }
     }
 }
+
+
+
+
+
 
 
 

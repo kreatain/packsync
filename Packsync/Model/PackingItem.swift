@@ -14,6 +14,7 @@ struct PackingItem: Codable {
     var isPacked: Bool
     var isPackedBy: String?
     var itemNumber: String // Quantity or count of the item
+    var photoURL: String?
     
     init(
         id: String = UUID().uuidString,
@@ -22,7 +23,8 @@ struct PackingItem: Codable {
         name: String,
         isPacked: Bool = false,
         isPackedBy: String? = nil, 
-        itemNumber: String
+        itemNumber: String,
+        photoURL: String? = nil
     ) {
         self.id = id
         self.creatorId = creatorId
@@ -31,5 +33,6 @@ struct PackingItem: Codable {
         self.isPacked = isPacked
         self.isPackedBy = isPackedBy
         self.itemNumber = itemNumber
+        self.photoURL = photoURL
     }
 }
