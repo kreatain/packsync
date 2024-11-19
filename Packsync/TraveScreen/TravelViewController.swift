@@ -86,13 +86,54 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                     
                     self?.travelPlanList = querySnapshot?.documents.compactMap { document in try? document.data(as: Travel.self) } ?? []
-                    
+                    // Fetch participant display names after fetching travel plans
+                    self?.fetchParticipantDisplayNames(for: self?.travelPlanList ?? [])
+    
                     DispatchQueue.main.async {
                         print("Reloading travel plans table with \(self?.travelPlanList.count ?? 0) plans.")
                         self?.travelView.tableViewTravelPlans.reloadData()
                     }
                 }
         }
+    
+    // MARK: - Fetch Participant Display Names
+       func fetchParticipantDisplayNames(for travelPlans: [Travel]) {
+           var participantIds = Set<String>()
+           
+           // Collect all unique participant IDs from travel plans
+           for plan in travelPlans {
+               participantIds.formUnion(plan.participantIds)
+           }
+
+           // Fetch display names for each participant ID
+           var participantNamesDict = [String: String]()
+           
+           let group = DispatchGroup()
+           
+           for id in participantIds {
+               group.enter()
+               database.collection("users").document(id).getDocument { (document, error) in
+                   if let document = document, document.exists,
+                      let displayName = document.data()?["displayName"] as? String {
+                       participantNamesDict[id] = displayName
+                   }
+                   group.leave()
+               }
+           }
+
+           group.notify(queue: .main) {
+               // Update travel plans with fetched names
+               for i in 0..<travelPlans.count {
+                   let plan = travelPlans[i]
+                   let names = plan.participantIds.compactMap { participantNamesDict[$0] }
+                   self.travelPlanList[i].participantIds = names // Update to use display names instead of IDs
+               }
+               
+               DispatchQueue.main.async {
+                   self.travelView.tableViewTravelPlans.reloadData()
+               }
+           }
+       }
     
     // MARK: - Handle Active Plan Change
     @objc func handleActivePlanChange() {
@@ -121,11 +162,16 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         view.layoutIfNeeded()
     }
     // MARK: - Update Active Plan Detail View
+
     func updateActivePlanDetailView(with activePlan: Travel) {
         travelView.activePlanTitleLabel.text = "Title: \(activePlan.travelTitle)"
         travelView.activePlanDateLabel.text = "Date: \(activePlan.travelStartDate) - \(activePlan.travelEndDate)"
         travelView.activePlanLocationLabel.text = "Location: \(activePlan.countryAndCity)"
-        travelView.activePlanDetailView.isHidden = false
+        
+        // Display participant names instead of IDs
+               travelView.activePlanParticipantIdsLabel.text = "Participants: \(activePlan.participantIds.joined(separator: ", "))"
+        
+        travelView.activePlanDetailView.isHidden = false // Ensure it's visible
     }
     
     // MARK: - Clear Active Plan Detail View

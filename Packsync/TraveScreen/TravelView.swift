@@ -25,6 +25,7 @@ class TravelView: UIView {
     var activePlanTitleLabel: UILabel!
     var activePlanDateLabel: UILabel!
     var activePlanLocationLabel: UILabel!
+    var activePlanParticipantIdsLabel: UILabel!
     var placeholderView: UIView!
 
     weak var delegate: TravelViewDelegate?
@@ -125,6 +126,12 @@ class TravelView: UIView {
         activePlanLocationLabel.textAlignment = .center
         activePlanLocationLabel.translatesAutoresizingMaskIntoConstraints = false
         activePlanDetailView.addSubview(activePlanLocationLabel)
+        
+        activePlanParticipantIdsLabel = UILabel()
+        activePlanParticipantIdsLabel.font = .systemFont(ofSize: 14)
+        activePlanParticipantIdsLabel.textAlignment = .center
+        activePlanParticipantIdsLabel.translatesAutoresizingMaskIntoConstraints = false
+        activePlanDetailView.addSubview(activePlanParticipantIdsLabel)
     }
     // MARK: - Button Actions
 
@@ -174,7 +181,11 @@ class TravelView: UIView {
             activePlanLocationLabel.topAnchor.constraint(equalTo: activePlanDateLabel.bottomAnchor, constant: 8),
             activePlanLocationLabel.leadingAnchor.constraint(equalTo: activePlanDetailView.leadingAnchor),
             activePlanLocationLabel.trailingAnchor.constraint(equalTo: activePlanDetailView.trailingAnchor),
-            activePlanLocationLabel.bottomAnchor.constraint(equalTo: activePlanDetailView.bottomAnchor, constant: -16),
+            
+            activePlanParticipantIdsLabel.topAnchor.constraint(equalTo: activePlanLocationLabel.bottomAnchor, constant: 8),
+            activePlanParticipantIdsLabel.leadingAnchor.constraint(equalTo: activePlanDetailView.leadingAnchor),
+            activePlanParticipantIdsLabel.trailingAnchor.constraint(equalTo: activePlanDetailView.trailingAnchor),
+            activePlanParticipantIdsLabel.bottomAnchor.constraint(equalTo: activePlanDetailView.bottomAnchor, constant: -16),
 
             tableViewTravelPlans.topAnchor.constraint(equalTo: segmentedControlView.bottomAnchor, constant: 16),
             tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),
