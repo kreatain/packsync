@@ -14,7 +14,6 @@ class TravelDetailView: UIView {
     var labelCountryAndCity: UILabel!
     var labelCurrency: UILabel!
     var labelCreatorName: UILabel! // New label for creator's name
-    var buttonSetAsActivePlan: UIButton!
     var buttonPackingList: UIButton!
     var buttonInviteFriend: UIButton!
     var buttonSpending: UIButton!
@@ -28,7 +27,6 @@ class TravelDetailView: UIView {
         setupLabelCountryAndCity()
         setupLabelCurrency()
         setupLabelCreatorName() // Initialize the creator's name label
-        setupButtonSetAsActivePlan()
         setupButtonPackingList()
         setupButtonInviteFriend()
         setupButtonBillboard()
@@ -38,16 +36,6 @@ class TravelDetailView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-    
-    func updateSetAsActivePlanButton(isActive: Bool) {
-        if isActive {
-            buttonSetAsActivePlan.setTitle("Already Set as an Active Plan", for: .normal)
-            buttonSetAsActivePlan.backgroundColor = .systemGray
-        } else {
-            buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
-            buttonSetAsActivePlan.backgroundColor = .systemBlue
-        }
     }
     
     func setupLabelTravelTitle() {
@@ -76,16 +64,6 @@ class TravelDetailView: UIView {
         labelCurrency.font = UIFont.systemFont(ofSize: 16)
         labelCurrency.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(labelCurrency)
-    }
-    
-    func setupButtonSetAsActivePlan() {
-        buttonSetAsActivePlan = UIButton(type: .system)
-        buttonSetAsActivePlan.setTitle("Set as Active Plan", for: .normal)
-        buttonSetAsActivePlan.backgroundColor = .systemBlue
-        buttonSetAsActivePlan.setTitleColor(.white, for: .normal)
-        buttonSetAsActivePlan.layer.cornerRadius = 8
-        buttonSetAsActivePlan.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(buttonSetAsActivePlan)
     }
     
     func setupButtonPackingList() {
@@ -159,12 +137,7 @@ class TravelDetailView: UIView {
             labelCurrency.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCurrency.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
-            buttonSetAsActivePlan.topAnchor.constraint(equalTo: labelCurrency.bottomAnchor, constant: 20),
-            buttonSetAsActivePlan.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            buttonSetAsActivePlan.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            buttonSetAsActivePlan.heightAnchor.constraint(equalToConstant: 44),
-            
-            buttonPackingList.topAnchor.constraint(equalTo: buttonSetAsActivePlan.bottomAnchor, constant: 20),
+            buttonPackingList.topAnchor.constraint(equalTo: labelCurrency.bottomAnchor, constant: 20),
             buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
@@ -195,9 +168,6 @@ class TravelDetailView: UIView {
         labelCreatorName.text = "Created by \(travel.creatorName)"
         labelCurrency.text = "Currency: \(travel.currency)" // Display the currency
         
-        let isActivePlan = TravelPlanManager.shared.activeTravelPlan?.id == travel.id
-        buttonSetAsActivePlan.setTitle(isActivePlan ? "Active Plan" : "Set as Active Plan", for: .normal)
-        buttonSetAsActivePlan.isEnabled = !isActivePlan
     }
     
     func formatDate(_ dateString: String) -> String {
