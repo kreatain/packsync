@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Create view controllers for each screen
         let travelsVC = TravelViewController()
-        let packingVC = PackinListViewController()
+        let packingVC = PackingListViewController()
         let spendingVC = SpendingViewController()
         let billboardVC = BillboardViewController()
         let profileVC = ProfileViewController()
@@ -60,7 +60,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if let navController = viewController as? UINavigationController,
-           let packingVC = navController.topViewController as? PackinListViewController {
+           let packingVC = navController.topViewController as? PackingListViewController {
             packingVC.updateUI()
         }
         return true

@@ -23,7 +23,7 @@
 		0430CAA42CED498D0076BBA1 /* SettledBalancesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA32CED498D0076BBA1 /* SettledBalancesViewController.swift */; };
 		0430CAA62CED52C60076BBA1 /* ParticipantSelectorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA52CED52C60076BBA1 /* ParticipantSelectorCell.swift */; };
 		0430CAA82CED64780076BBA1 /* ParticipantSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA72CED64780076BBA1 /* ParticipantSelectorViewController.swift */; };
-		3627BA582CEA976F00D56011 /* PackinListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3627BA572CEA976F00D56011 /* PackinListViewController.swift */; };
+		3627BA582CEA976F00D56011 /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3627BA572CEA976F00D56011 /* PackingListViewController.swift */; };
 		3633E3712CED045200F14439 /* PackingItemDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */; };
 		3633E3742CED085600F14439 /* PackingItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3633E3732CED085600F14439 /* PackingItemDetailView.swift */; };
 		365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 365D8EB42CE82DC900453F2E /* CreateVoteView.swift */; };
@@ -128,7 +128,7 @@
 		0430CAA52CED52C60076BBA1 /* ParticipantSelectorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantSelectorCell.swift; sourceTree = "<group>"; };
 		0430CAA72CED64780076BBA1 /* ParticipantSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantSelectorViewController.swift; sourceTree = "<group>"; };
 		20612AFFA4052AB7EDDC2562 /* Pods-Packsync-PacksyncUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync-PacksyncUITests.release.xcconfig"; path = "Target Support Files/Pods-Packsync-PacksyncUITests/Pods-Packsync-PacksyncUITests.release.xcconfig"; sourceTree = "<group>"; };
-		3627BA572CEA976F00D56011 /* PackinListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackinListViewController.swift; sourceTree = "<group>"; };
+		3627BA572CEA976F00D56011 /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
 		3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemDetailViewController.swift; sourceTree = "<group>"; };
 		3633E3732CED085600F14439 /* PackingItemDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemDetailView.swift; sourceTree = "<group>"; };
 		365D8EB42CE82DC900453F2E /* CreateVoteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateVoteView.swift; sourceTree = "<group>"; };
@@ -287,11 +287,11 @@
 			isa = PBXGroup;
 			children = (
 				4C7E698D2CE6B6E10056E8CC /* AddPackingItemScreen */,
+				3633E3722CED045700F14439 /* PackingItem */,
 				4C7E69902CE6B6E10056E8CC /* EditPackingItemScreen */,
 				4C7E69922CE6B6E10056E8CC /* PackingListView.swift */,
 				4C7E69912CE6B6E10056E8CC /* PackingItemCell.swift */,
-				3627BA572CEA976F00D56011 /* PackinListViewController.swift */,
-				3633E3722CED045700F14439 /* PackingItem */,
+				3627BA572CEA976F00D56011 /* PackingListViewController.swift */,
 			);
 			path = PackingListScreen;
 			sourceTree = "<group>";
@@ -799,7 +799,7 @@
 				4CC079362CE42AD4009364D8 /* InviteFriendsViewController.swift in Sources */,
 				4CC079372CE42AD4009364D8 /* Category.swift in Sources */,
 				4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */,
-				3627BA582CEA976F00D56011 /* PackinListViewController.swift in Sources */,
+				3627BA582CEA976F00D56011 /* PackingListViewController.swift in Sources */,
 				3633E3742CED085600F14439 /* PackingItemDetailView.swift in Sources */,
 				4CC0793A2CE42AD4009364D8 /* PackingItem.swift in Sources */,
 				365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */,

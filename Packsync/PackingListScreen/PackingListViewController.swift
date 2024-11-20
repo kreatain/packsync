@@ -5,12 +5,11 @@
 //  Created by Xi Jia on 11/17/24.
 //
 
-
 import UIKit
 import FirebaseFirestore
 import FirebaseAuth
 
-class PackinListViewController: UIViewController, EditPackingItemViewControllerDelegate {
+class PackingListViewController: UIViewController, EditPackingItemViewControllerDelegate {
     private var packingListView: PackingListView?
     private let noActiveplanLabel = UILabel()
     var travel: Travel?
@@ -49,10 +48,7 @@ class PackinListViewController: UIViewController, EditPackingItemViewControllerD
     }
 
     func updateUI() {
-        if let specificTravel = self.travel {
-            showPackingListView(for: specificTravel)
-            fetchPackingItems(for: specificTravel.id)
-        } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
+        if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             self.travel = activePlan
             showPackingListView(for: activePlan)
             fetchPackingItems(for: activePlan.id)
@@ -60,15 +56,6 @@ class PackinListViewController: UIViewController, EditPackingItemViewControllerD
             showNoActivePlanLabel()
         }
     }
-    
-    private func showNoTravelPlanLabel() {
-           packingListView?.isHidden = true
-           noActiveplanLabel.isHidden = false
-           noActiveplanLabel.text = "No travel plan selected. Please go back and select a travel plan."
-           packingItems.removeAll()
-           listener?.remove()
-       }
-
 
     private func showPackingListView(for travelPlan: Travel) {
         noActiveplanLabel.isHidden = true
@@ -94,20 +81,19 @@ class PackinListViewController: UIViewController, EditPackingItemViewControllerD
     }
 
     @objc private func addPackingItemTapped() {
-        guard let travel = self.travel else {
-            print("Error: No travel plan")
+        guard let activePlan = TravelPlanManager.shared.activeTravelPlan else {
+            print("Error: No active travel plan")
             return
         }
         let addPackingItemVC = AddPackingItemViewController()
-        addPackingItemVC.travel = travel
+        addPackingItemVC.travel = activePlan
         addPackingItemVC.delegate = self
         let navController = UINavigationController(rootViewController: addPackingItemVC)
         present(navController, animated: true, completion: nil)
     }
 
     private func fetchPackingItems(for travelId: String) {
-//        guard let travel = TravelPlanManager.shared.activeTravelPlan else { return }
-        guard let travel = self.travel else { return }
+        guard let travel = TravelPlanManager.shared.activeTravelPlan else { return }
         let db = Firestore.firestore()
         listener?.remove()
         listener = db.collection("travelPlans").document(travel.id).collection("packingItems")
@@ -155,7 +141,7 @@ class PackinListViewController: UIViewController, EditPackingItemViewControllerD
         }
         packingItems[index].isPacked.toggle()
         sender.isSelected = packingItems[index].isPacked
-        guard let travel = self.travel else {
+        guard let travel = TravelPlanManager.shared.activeTravelPlan else {
             print("Error: Travel object is nil")
             return
         }
@@ -201,7 +187,7 @@ class PackinListViewController: UIViewController, EditPackingItemViewControllerD
 }
 
 // MARK: - UITableViewDelegate, UITableViewDataSource
-extension PackinListViewController: UITableViewDelegate, UITableViewDataSource {
+extension PackingListViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return packingItems.count
     }
@@ -226,6 +212,7 @@ extension PackinListViewController: UITableViewDelegate, UITableViewDataSource {
         print("travelTitle: \(travel?.travelTitle)")
         navigationController?.pushViewController(detailVC, animated: true)
     }
+
     func didUpdatePackingItem(_ item: PackingItem) {
         if let index = packingItems.firstIndex(where: { $0.id == item.id }) {
             packingItems[index] = item
@@ -246,7 +233,7 @@ extension PackinListViewController: UITableViewDelegate, UITableViewDataSource {
 }
 
 // MARK: - PackingListViewControllerDelegate
-extension PackinListViewController: PackingListViewControllerDelegate {
+extension PackingListViewController: PackingListViewControllerDelegate {
     func didAddPackingItem(_ item: PackingItem) {
         DispatchQueue.main.async {
             self.packingListView?.tableViewPackingList.reloadData()
