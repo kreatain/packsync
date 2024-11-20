@@ -58,8 +58,11 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         setupUI()
         configureWithExpense()
         
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(debugTap))
-           view.addGestureRecognizer(tapRecognizer)
+        // Show alert only if there are no categories and no fixed category
+            if categories.isEmpty && fixedCategory == nil {
+                showAlertAndGoBack()
+                return // Stop further execution to prevent crashes due to empty categories
+            }
     }
     
     @objc private func debugTap(_ recognizer: UITapGestureRecognizer) {
@@ -552,7 +555,20 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
-
+    
+    private func showAlertAndGoBack() {
+        let alert = UIAlertController(
+            title: "No Categories Found",
+            message: "Please create a category first to proceed.",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            // Dismiss the modal after the alert is acknowledged
+            self.dismiss(animated: true)
+        })
+        present(alert, animated: true)
+    }
+    
     // MARK: - UIPickerView DataSource & Delegate
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1

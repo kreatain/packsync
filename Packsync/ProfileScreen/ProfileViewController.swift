@@ -324,6 +324,7 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                       print("Transaction failed while adding participant ID to travel plan \(error)")
                   } else {
                       print("Successfully accepted invitation and added participant.")
+                      NotificationCenter.default.post(name: .travelDataChanged, object: nil, userInfo: ["travelId": invitation.travelId])
                   }
               }
               

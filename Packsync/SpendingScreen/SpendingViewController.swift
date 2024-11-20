@@ -26,6 +26,7 @@ class SpendingViewController: UIViewController {
     private lazy var splitVC = SplitViewController()
     
     private let travelTitleLabel = UILabel() // Label to show the travel plan's name on top of the tab bar
+    
 
     // Initializer to accept travelID parameter
     init(travelID: String? = nil) {

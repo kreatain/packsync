@@ -11,6 +11,9 @@ import UIKit
 class BudgetDetailViewController: UIViewController {
     private let tableView = UITableView()
     private let addExpenseButton = UIButton(type: .system)
+    
+    private let totalBudgetLabel = UILabel()
+    private let totalExpensesLabel = UILabel()
 
     private var category: Category
     private var categories: [Category] 
@@ -52,6 +55,7 @@ class BudgetDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        updateLabels()
     
     }
     
@@ -63,6 +67,18 @@ class BudgetDetailViewController: UIViewController {
     private func setupUI() {
         view.backgroundColor = .white
         title = "\(category.name)"
+        
+        // Setup Total Budget Label
+        totalBudgetLabel.font = .boldSystemFont(ofSize: 18)
+        totalBudgetLabel.textAlignment = .left
+        totalBudgetLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(totalBudgetLabel)
+        
+        // Setup Total Expenses Label
+        totalExpensesLabel.font = .boldSystemFont(ofSize: 18)
+        totalExpensesLabel.textAlignment = .left
+        totalExpensesLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(totalExpensesLabel)
 
         // TableView Setup
         tableView.register(ExpenseCell.self, forCellReuseIdentifier: "ExpenseCell")
@@ -88,8 +104,15 @@ class BudgetDetailViewController: UIViewController {
 
         // Constraints
             NSLayoutConstraint.activate([
-                // TableView Constraints
-                tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                totalBudgetLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+                totalBudgetLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                totalBudgetLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+                totalExpensesLabel.topAnchor.constraint(equalTo: totalBudgetLabel.bottomAnchor, constant: 5),
+                totalExpensesLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+                totalExpensesLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+
+                tableView.topAnchor.constraint(equalTo: totalExpensesLabel.bottomAnchor, constant: 10),
                 tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 tableView.bottomAnchor.constraint(equalTo: addExpenseButton.topAnchor, constant: -10),
@@ -138,6 +161,17 @@ class BudgetDetailViewController: UIViewController {
     func getCategoryId() -> String {
         return category.id
     }
+    
+    private func updateLabels() {
+            // Compute totals
+            let totalBudget = category.budgetAmount
+            let totalExpenses = spendingItems.reduce(0) { $0 + $1.amount }
+            let percentage = totalBudget > 0 ? (totalExpenses / totalBudget * 100) : 0
+
+            // Update labels
+            totalBudgetLabel.text = "Total Budget: \(currencySymbol) \(totalBudget)"
+            totalExpensesLabel.text = "Total Expenses: \(currencySymbol) \(totalExpenses) (\(String(format: "%.0f", percentage))%)"
+        }
     
     private func filterSpendingItemsByCategory() {
         loadingIndicator.startAnimating() // Show the spinner
