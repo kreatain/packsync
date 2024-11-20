@@ -16,7 +16,19 @@ class AddANewTravelViewController: UIViewController {
     let addANewTravelPlan = AddANewTravelPlanView()
     
     // Currency options and selected currency
-    let currencies = ["USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "CNY (¥)", "INR (₹)"]
+    let currencies = [
+            "USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "CNY (¥)", "INR (₹)", 
+            "AUD ($)", "CAD ($)", "CHF (₣)", "NZD ($)", "HKD ($)", "SGD ($)", 
+            "KRW (₩)", "ZAR (R)", "MXN ($)", "BRL (R$)", "RUB (₽)", "SEK (kr)", 
+            "NOK (kr)", "DKK (kr)", "PLN (zł)", "THB (฿)", "IDR (Rp)", "TRY (₺)", 
+            "ILS (₪)", "MYR (RM)", "SAR (﷼)", "AED (د.إ)", "EGP (£)", "VND (₫)", 
+            "PHP (₱)", "PKR (₨)", "LKR (₨)", "BDT (৳)", "CZK (Kč)", "HUF (Ft)", 
+            "RON (lei)", "UAH (₴)", "KZT (₸)", "NGN (₦)", "KES (KSh)", "TZS (TSh)", 
+            "GHS (GH₵)", "MAD (د.م.)", "DZD (دج)", "TND (د.ت)", "IQD (ع.د)", "OMR (ر.ع.)", 
+            "BHD (ب.د)", "QAR (ر.ق)", "KWD (د.ك)", "JOD (د.ا)", "LBP (ل.ل)", "BND ($)", 
+            "MOP (MOP$)", "TWD (NT$)", "THB (฿)", "KHR (៛)", "LAK (₭)", "MMK (K)", 
+            "AFN (؋)", "IRR (﷼)", "MDL (L)", "ISK (kr)", "BAM (KM)", "HRK (kn)"
+        ]
     var selectedCurrency: String?
     
     override func loadView() {
@@ -32,10 +44,8 @@ class AddANewTravelViewController: UIViewController {
         currentUser = Auth.auth().currentUser
         
         // Configure the picker
-            addANewTravelPlan.currencyPicker.dataSource = self
-            addANewTravelPlan.currencyPicker.delegate = self
-            addANewTravelPlan.buttonAdd.addTarget(self, action: #selector(onAddButtonTapped), for: .touchUpInside)
-        
+        addANewTravelPlan.currencyPicker.dataSource = self
+        addANewTravelPlan.currencyPicker.delegate = self
         addANewTravelPlan.buttonAdd.addTarget(self, action: #selector(onAddButtonTapped), for: .touchUpInside)
     }
 
@@ -75,7 +85,8 @@ class AddANewTravelViewController: UIViewController {
             currency: selectedCurrency,
             categoryIds: [],
             expenseIds: [],
-            participantIds: [creatorId]
+            participantIds: [creatorId],
+            balanceIds: [] 
         )
         
         saveTravelToFirestore(travel: travel)

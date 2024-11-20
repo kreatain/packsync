@@ -5,6 +5,7 @@ class BudgetViewController: UIViewController {
     private var categories: [Category] = []
     private var spendingItems: [SpendingItem] = []
     private var participants: [User] = []
+    private var userIcons: [String: UIImage] = [:]
     private var travelPlan: Travel?
     private var totalBudget: Double = 0
     private var currencySymbol: String = "$" // Default to USD
@@ -90,39 +91,42 @@ class BudgetViewController: UIViewController {
     }
     
     func setTravelPlan(
-            _ travelPlan: Travel,
-            categories: [Category],
-            spendingItems: [SpendingItem],
-            participants: [User],
-            currencySymbol: String
-        ) {
-            self.travelPlan = travelPlan
-            self.categories = categories
-            self.spendingItems = spendingItems 
-            self.participants = participants
-            self.currencySymbol = currencySymbol
+        _ travelPlan: Travel,
+        categories: [Category],
+        spendingItems: [SpendingItem],
+        participants: [User],
+        currencySymbol: String,
+        userIcons: [String: UIImage]
+    ) {
+        self.travelPlan = travelPlan
+        self.categories = categories
+        self.spendingItems = spendingItems
+        self.participants = participants
+        self.currencySymbol = currencySymbol
+        self.userIcons = userIcons // Pass down user icons
 
         print("[BudgetViewController] Travel plan updated: \(travelPlan.travelTitle). Categories count: \(categories.count). Participants count: \(participants.count). Currency: \(currencySymbol).")
-        
+
         tableView.reloadData() // Refresh the table
-            
+        
         // Update the active BudgetDetailViewController if it exists
-            if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
-                // Find the category corresponding to the currently active detail view
-                if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
-                    let filteredSpendingItems = spendingItems.filter { $0.categoryId == activeCategory.id }
-                    detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems)
-                } else {
-                    print("[BudgetViewController] No matching category found for active BudgetDetailViewController.")
-                }
+        if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
+            // Find the category corresponding to the currently active detail view
+            if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
+                let filteredSpendingItems = spendingItems.filter { $0.categoryId == activeCategory.id }
+                detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems, userIcons: userIcons) // Pass userIcons
+            } else {
+                print("[BudgetViewController] No matching category found for active BudgetDetailViewController.")
             }
+        }
     }
     
     func updateBudgetDetailViewController(with category: Category, spendingItems: [SpendingItem]) {
         if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
-            detailVC.updateCategory(category, spendingItems: spendingItems)
+            detailVC.updateCategory(category, spendingItems: spendingItems, userIcons: userIcons)
         }
     }
+
     
     private func calculateSummary() {
            totalBudget = categories.reduce(0) { $0 + $1.budgetAmount }
@@ -134,11 +138,15 @@ class BudgetViewController: UIViewController {
             print("Error: travelPlan is nil.")
             return
         }
-        let addEditVC = BudgetAddEditViewController(travelId: travelPlan.id, totalBudget: totalBudget, currencySymbol: currencySymbol)
-        navigationController?.pushViewController(addEditVC, animated: true)
         
-        // Notify that travel data has changed
-        NotificationCenter.default.post(name: .travelDataChanged, object: nil)
+        let addEditVC = BudgetAddEditViewController(
+            travelId: travelPlan.id,
+            totalBudget: totalBudget,
+            currencySymbol: currencySymbol
+        )
+        addEditVC.modalPresentationStyle = .formSheet
+        addEditVC.modalTransitionStyle = .coverVertical
+        present(addEditVC, animated: true)
     }
     
     // Handle travel data changes
@@ -236,6 +244,7 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
     
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let category = categories[indexPath.row]
         guard let travelPlan = travelPlan else { return }
@@ -243,7 +252,7 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
         let filteredSpendingItems = spendingItems.filter { $0.categoryId == category.id }
 
         if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
-            detailVC.updateCategory(category, spendingItems: filteredSpendingItems)
+            detailVC.updateCategory(category, spendingItems: filteredSpendingItems, userIcons: userIcons) // Pass userIcons here
             navigationController?.popToViewController(detailVC, animated: true)
         } else {
             let detailVC = BudgetDetailViewController(
@@ -251,29 +260,36 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
                 spendingItems: filteredSpendingItems,
                 participants: participants,
                 currencySymbol: currencySymbol,
-                travelId: travelPlan.id
+                travelId: travelPlan.id,
+                userIcons: userIcons,
+                categories: categories
             )
             navigationController?.pushViewController(detailVC, animated: true)
         }
     }
     
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let editAction = UIContextualAction(style: .normal, title: "Edit") { [weak self] (action, view, completionHandler) in
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { [weak self] (_, _, completionHandler) in
             guard let self = self else { return }
             let category = self.categories[indexPath.row]
             guard let travelPlan = self.travelPlan else { return }
+
+            // Create and present BudgetAddEditViewController as a modal
             let addEditVC = BudgetAddEditViewController(
                 category: category,
                 travelId: travelPlan.id,
                 totalBudget: self.totalBudget,
                 currencySymbol: self.currencySymbol
             )
-            self.navigationController?.pushViewController(addEditVC, animated: true)
+            addEditVC.modalPresentationStyle = .formSheet
+            addEditVC.modalTransitionStyle = .coverVertical
+            self.present(addEditVC, animated: true)
+
             completionHandler(true)
         }
         editAction.backgroundColor = .systemBlue
 
-        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (action, view, completionHandler) in
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, completionHandler) in
             guard let self = self else { return }
             self.showDeleteConfirmation(for: indexPath)
             completionHandler(true)
@@ -281,4 +297,5 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
 
         return UISwipeActionsConfiguration(actions: [editAction, deleteAction])
     }
+    
 }

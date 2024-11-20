@@ -17,7 +17,8 @@ class SpendingViewController: UIViewController {
     private var categories: [Category] = []
     private var spendingItems: [SpendingItem] = []
     private var participants: [User] = []
-    private var groupExpenses: [GroupExpense] = []
+    private var balances: [Balance] = []
+    private var userIcons: [String: UIImage] = [:] // Dictionary to store user icons by user ID
 
     private lazy var overviewVC = OverviewViewController()
     private lazy var budgetVC = BudgetViewController()
@@ -143,13 +144,44 @@ class SpendingViewController: UIViewController {
         }
     }
     
+    private func fetchParticipantsAndIcons(for participantIds: [String], completion: @escaping ([User]) -> Void) {
+        SpendingFirebaseManager.shared.fetchUsersByIds(userIds: participantIds) { [weak self] fetchedParticipants in
+            guard let self = self else { return }
+
+            let dispatchGroup = DispatchGroup()
+            var icons: [String: UIImage] = [:]
+
+            for user in fetchedParticipants {
+                guard let profilePicURL = user.profilePicURL, let url = URL(string: profilePicURL) else {
+                    icons[user.id] = UIImage(systemName: "person.circle") // Default icon
+                    continue
+                }
+
+                dispatchGroup.enter()
+                URLSession.shared.dataTask(with: url) { data, _, _ in
+                    defer { dispatchGroup.leave() }
+                    if let data = data, let image = UIImage(data: data) {
+                        icons[user.id] = image
+                    } else {
+                        icons[user.id] = UIImage(systemName: "person.circle") // Default icon
+                    }
+                }.resume()
+            }
+
+            dispatchGroup.notify(queue: .main) {
+                self.userIcons = icons // Set user icons globally
+                completion(fetchedParticipants)
+            }
+        }
+    }
+    
     private func populateTravelPlanData(for travelPlanId: String) {
         print("populateTravelPlanData called for travelPlan ID: \(travelPlanId)")
         
         var localTravelPlan: Travel?
         var categories: [Category] = []
         var spendingItems: [SpendingItem] = []
-        var groupExpenses: [GroupExpense] = []
+        var balances: [Balance] = []
         var participants: [User] = []
 
         let dispatchGroup = DispatchGroup()
@@ -199,43 +231,40 @@ class SpendingViewController: UIViewController {
                 dispatchGroup.leave()
             }
 
-            // Step 4: Fetch group expenses using updated expense IDs
+            // Step 4: Fetch balances using updated balance IDs
             dispatchGroup.enter()
-            print("Fetching group expenses for travel plan ID: \(travelPlan.id) with updated expense IDs: \(travelPlan.expenseIds)")
-            SpendingFirebaseManager.shared.fetchGroupExpensesByIds(expenseIds: travelPlan.expenseIds) { fetchedGroupExpenses in
-                groupExpenses = fetchedGroupExpenses
-                print("Fetched \(fetchedGroupExpenses.count) group expenses.")
+            print("Fetching balances for travel plan ID: \(travelPlan.id) with updated balance IDs: \(travelPlan.balanceIds)")
+            SpendingFirebaseManager.shared.fetchBalances(for: travelPlan.id) { fetchedBalances in
+                balances = fetchedBalances
+                print("Fetched \(fetchedBalances.count) balances for travel plan ID \(travelPlan.id).")
                 dispatchGroup.leave()
             }
 
-            // Step 5: Fetch participants using updated participant IDs
-            dispatchGroup.enter()
-            print("Fetching participants for travel plan ID: \(travelPlan.id) with updated participant IDs: \(travelPlan.participantIds)")
-            SpendingFirebaseManager.shared.fetchUsersByIds(userIds: travelPlan.participantIds) { fetchedParticipants in
-                participants = fetchedParticipants
-                print("Fetched \(fetchedParticipants.count) participants.")
-                dispatchGroup.leave()
-            }
-
-            // Notify when all data is fetched
+            // Step 5: Fetch participants and their icons using updated participant IDs
             dispatchGroup.notify(queue: .main) {
-                print("All data fetches complete.")
-                
-                self.travelPlan = travelPlan
-                self.categories = categories
-                self.spendingItems = spendingItems
-                self.groupExpenses = groupExpenses
-                self.participants = participants
+                        dispatchGroup.enter()
+                        self.fetchParticipantsAndIcons(for: travelPlan.participantIds) { fetchedParticipants in
+                            participants = fetchedParticipants
+                            dispatchGroup.leave()
+                        }
 
-                print("[SpendingViewController] Finished populating data. Updating child views.")
-                self.updateUIWithTravelPlan(travelPlan)
+                        dispatchGroup.notify(queue: .main) {
+                            self.travelPlan = travelPlan
+                            self.categories = categories
+                            self.spendingItems = spendingItems
+                            self.balances = balances
+                            self.participants = participants
+
+                            print("[SpendingViewController] Finished populating data. Updating child views.")
+                            self.updateUIWithTravelPlan(travelPlan)
+                        }
+                    }
+                }
             }
-        }
-    }
     
     private func updateUIWithTravelPlan(_ travelPlan: Travel) {
         print("[SpendingViewController] Updating UI for travel plan: \(travelPlan.travelTitle).")
-        print("[SpendingViewController] Categories: \(categories.count), Spending Items: \(spendingItems.count), Group Expenses: \(groupExpenses.count), Participants: \(participants.count).")
+        print("[SpendingViewController] Categories: \(categories.count), Spending Items: \(spendingItems.count), Participants: \(participants.count).")
             
         travelTitleLabel.text = travelPlan.travelTitle
         spendingView.isHidden = false
@@ -254,16 +283,23 @@ class SpendingViewController: UIViewController {
             categories: categories,
             spendingItems: spendingItems, // Add spending items here
             participants: participants,
-            currencySymbol: travelPlan.currency
+            currencySymbol: travelPlan.currency,
+            userIcons: userIcons
         )
         expensesVC.setTravelPlan(
             travelPlan,
             categories: categories,
             spendingItems: spendingItems,
             participants: participants,
-            currencySymbol: travelPlan.currency
+            currencySymbol: travelPlan.currency,
+            userIcons: userIcons
         )
-        //splitVC.setTravelPlan(travelPlan, participants: participants)
+        splitVC.setTravelPlan(
+            travelPlan: travelPlan,
+            participants: participants,
+            currentBalance: balances.first { !$0.isSet } ?? Balance(travelId: travelPlan.id), // Provide a default Balance if none exists
+            settledBalances: balances.filter { $0.isSet } // Pass the settled balances
+        )
 
         // Restore the active tab
             switch currentTabIndex {

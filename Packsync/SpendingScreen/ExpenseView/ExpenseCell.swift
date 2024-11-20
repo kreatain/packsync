@@ -13,6 +13,7 @@ class ExpenseCell: UITableViewCell {
     private let amountLabel = UILabel()
     private let userIconView = UIImageView()
     private let dateLabel = UILabel()
+    private let receiptIndicatorLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -43,10 +44,10 @@ class ExpenseCell: UITableViewCell {
         contentView.addSubview(amountLabel)
         
         // User Icon
-        userIconView.contentMode = .scaleAspectFit
+        userIconView.contentMode = .scaleAspectFill
         userIconView.layer.cornerRadius = 20
         userIconView.layer.masksToBounds = true
-        userIconView.clipsToBounds = true 
+        userIconView.clipsToBounds = true
         userIconView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(userIconView)
         
@@ -56,43 +57,64 @@ class ExpenseCell: UITableViewCell {
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(dateLabel)
         
+        // Receipt Indicator Label
+        receiptIndicatorLabel.font = .systemFont(ofSize: 12)
+        receiptIndicatorLabel.textColor = .lightGray // Use a lighter color
+        receiptIndicatorLabel.textAlignment = .left // Align with the column
+        receiptIndicatorLabel.translatesAutoresizingMaskIntoConstraints = false
+        receiptIndicatorLabel.isHidden = true // Initially hidden
+        contentView.addSubview(receiptIndicatorLabel)
+        
         // Layout constraints
         NSLayoutConstraint.activate([
-            emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
-            emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            emojiLabel.widthAnchor.constraint(equalToConstant: 40),
-            
-            userIconView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            userIconView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            userIconView.widthAnchor.constraint(equalToConstant: 40),
-            userIconView.heightAnchor.constraint(equalToConstant: 40),
-            
-            amountLabel.trailingAnchor.constraint(equalTo: userIconView.leadingAnchor, constant: -10),
-            amountLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            amountLabel.widthAnchor.constraint(equalToConstant: 80),
-            
-            descriptionLabel.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 10),
-            descriptionLabel.trailingAnchor.constraint(equalTo: amountLabel.leadingAnchor, constant: -10),
-            descriptionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
-            
-            dateLabel.leadingAnchor.constraint(equalTo: descriptionLabel.leadingAnchor),
-            dateLabel.trailingAnchor.constraint(equalTo: descriptionLabel.trailingAnchor),
-            dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 5)
-        ])
+           emojiLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+           emojiLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+           emojiLabel.widthAnchor.constraint(equalToConstant: 40),
+
+           userIconView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+           userIconView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+           userIconView.widthAnchor.constraint(equalToConstant: 40),
+           userIconView.heightAnchor.constraint(equalToConstant: 40),
+
+           amountLabel.trailingAnchor.constraint(equalTo: userIconView.leadingAnchor, constant: -10),
+           amountLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+           amountLabel.widthAnchor.constraint(equalToConstant: 80),
+
+           descriptionLabel.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 10),
+           descriptionLabel.trailingAnchor.constraint(equalTo: amountLabel.leadingAnchor, constant: -10),
+           descriptionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
+
+           dateLabel.leadingAnchor.constraint(equalTo: descriptionLabel.leadingAnchor),
+           dateLabel.trailingAnchor.constraint(equalTo: descriptionLabel.trailingAnchor),
+           dateLabel.topAnchor.constraint(equalTo: descriptionLabel.bottomAnchor, constant: 5),
+
+           receiptIndicatorLabel.leadingAnchor.constraint(equalTo: dateLabel.leadingAnchor),
+           receiptIndicatorLabel.trailingAnchor.constraint(equalTo: dateLabel.trailingAnchor),
+           receiptIndicatorLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 2) 
+       ])
     }
 
-    func configure(with expense: SpendingItem, categoryEmoji: String, userIcon: UIImage?, dateString: String) {
+    func configure(with expense: SpendingItem, categoryEmoji: String, userIcon: UIImage?, dateString: String, hasReceipt: Bool) {
         // Set the emoji
         emojiLabel.text = categoryEmoji
-        
+
         // Set the description and amount
         descriptionLabel.text = expense.description
         amountLabel.text = "\(expense.amount)"
-        
+
         // Set the user icon
         userIconView.image = userIcon ?? UIImage(systemName: "person.circle")
-        
+
         // Set the date string
         dateLabel.text = dateString
+
+        // Set the receipt indicator
+        if hasReceipt {
+            receiptIndicatorLabel.text = "Receipt"
+            receiptIndicatorLabel.isHidden = false
+        } else {
+            receiptIndicatorLabel.isHidden = true
+        }
     }
+    
 }

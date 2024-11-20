@@ -13,8 +13,10 @@ class BudgetDetailViewController: UIViewController {
     private let addExpenseButton = UIButton(type: .system)
 
     private var category: Category
+    private var categories: [Category] 
     private var spendingItems: [SpendingItem]
     private var participants: [User]
+    private var userIcons: [String: UIImage] = [:]
     private var currencySymbol: String
     private var travelId: String
     
@@ -26,12 +28,20 @@ class BudgetDetailViewController: UIViewController {
         return indicator
     }()
     
-    init(category: Category, spendingItems: [SpendingItem], participants: [User], currencySymbol: String, travelId: String) {
+    init(category: Category, 
+         spendingItems: [SpendingItem], 
+         participants: [User], 
+         currencySymbol: String, 
+         travelId: String, 
+         userIcons: [String: UIImage], 
+         categories: [Category]) { 
         self.category = category
         self.spendingItems = spendingItems
         self.participants = participants
         self.currencySymbol = currencySymbol
         self.travelId = travelId
+        self.userIcons = userIcons
+        self.categories = categories 
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -73,6 +83,7 @@ class BudgetDetailViewController: UIViewController {
         view.addSubview(addExpenseButton)
         
         // Loading Indicator Setup
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(loadingIndicator)
 
         // Constraints
@@ -83,7 +94,6 @@ class BudgetDetailViewController: UIViewController {
                 tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 tableView.bottomAnchor.constraint(equalTo: addExpenseButton.topAnchor, constant: -10),
                 
-
                 // Add Expense Button Constraints
                 addExpenseButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
                 addExpenseButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
@@ -109,14 +119,13 @@ class BudgetDetailViewController: UIViewController {
     }
     
     
-    func updateCategory(_ category: Category, spendingItems: [SpendingItem]) {
+    func updateCategory(_ category: Category, spendingItems: [SpendingItem], userIcons: [String: UIImage]) {
         loadingIndicator.startAnimating() // Show the spinner
 
         DispatchQueue.global(qos: .userInitiated).async {
-            // Simulate processing
             self.category = category
-            self.spendingItems = spendingItems
-                .sorted { $0.date > $1.date } // Newest first
+            self.spendingItems = spendingItems.sorted { $0.date > $1.date } // Sort by date
+            self.userIcons = userIcons // Update user icons
 
             DispatchQueue.main.async {
                 self.title = "\(category.emoji) \(category.name)"
@@ -204,9 +213,14 @@ extension BudgetDetailViewController: UITableViewDataSource, UITableViewDelegate
         }
 
         let expense = spendingItems[indexPath.row]
+        let userIcon = userIcons[expense.spentByUserId] ?? UIImage(systemName: "person.circle") // Default icon
         let dateString = formattedDate(from: expense.date)
-
-        cell.configure(with: expense, categoryEmoji: category.emoji, userIcon: UIImage(systemName: "person.circle"), dateString: dateString)
+        
+        // Check if the expense has a receipt
+        let hasReceipt = expense.receiptURL != nil && !expense.receiptURL!.isEmpty
+        
+        // Configure the cell
+        cell.configure(with: expense, categoryEmoji: category.emoji, userIcon: userIcon, dateString: dateString, hasReceipt: hasReceipt)
 
         return cell
     }
@@ -273,11 +287,15 @@ extension BudgetDetailViewController: UITableViewDataSource, UITableViewDelegate
 
         let expense = spendingItems[indexPath.row]
         let spender = participants.first(where: { $0.id == expense.spentByUserId })
+
         let detailVC = ExpenseDetailsViewController(
             expense: expense,
             category: category,
             spender: spender,
-            currencySymbol: currencySymbol
+            currencySymbol: currencySymbol,
+            travelId: travelId,       // Pass the travelId
+            categories: categories,   // Pass the categories
+            participants: participants // Pass the participants
         )
         navigationController?.pushViewController(detailVC, animated: true)
     }

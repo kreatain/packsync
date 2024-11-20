@@ -98,6 +98,10 @@ class BudgetAddEditViewController: UIViewController {
         present(alert, animated: true, completion: nil)
     }
     
+    @objc private func dismissViewController() {
+        dismiss(animated: true)
+    }
+    
     @objc private func saveCategory() {
         guard let name = textFieldName.text,
               let budgetText = textFieldBudget.text,
@@ -140,7 +144,7 @@ class BudgetAddEditViewController: UIViewController {
             print("Category added/updated successfully. Refreshing travel plan...")
             NotificationCenter.default.post(name: .travelDataChanged, object: nil)
             DispatchQueue.main.async {
-                self.navigationController?.popViewController(animated: true)
+                self.dismiss(animated: true) // Dismiss the modal instead of popping the navigation controller
             }
         } else {
             self.showAlert(title: "Error", message: "Failed to save the category. Please try again.")

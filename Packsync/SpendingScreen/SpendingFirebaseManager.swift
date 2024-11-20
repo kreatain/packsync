@@ -77,32 +77,6 @@ class SpendingFirebaseManager {
         }
     }
 
-    // MARK: - Fetch Expenses by IDs
-    func fetchExpensesByIds(expenseIds: [String], completion: @escaping ([GroupExpense]) -> Void) {
-        let expenseCollection = db.collection("groupExpenses")
-        let dispatchGroup = DispatchGroup()
-        var expenses: [GroupExpense] = []
-        
-        for expenseId in expenseIds {
-            dispatchGroup.enter()
-            expenseCollection.document(expenseId).getDocument { document, error in
-                if let error = error {
-                    print("Error fetching expense \(expenseId): \(error.localizedDescription)")
-                    dispatchGroup.leave()
-                    return
-                }
-                if let document = document, let expense = try? document.data(as: GroupExpense.self) {
-                    expenses.append(expense)
-                }
-                dispatchGroup.leave()
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            completion(expenses)
-        }
-    }
-
     // MARK: - Fetch Users by IDs
     func fetchUsersByIds(userIds: [String], completion: @escaping ([User]) -> Void) {
         let userCollection = db.collection("users")
@@ -129,21 +103,6 @@ class SpendingFirebaseManager {
         }
     }
     
-    // MARK: - Fetch Group Expenses
-    func fetchGroupExpenses(for travelId: String, completion: @escaping ([GroupExpense]) -> Void) {
-        db.collection("travelPlans").document(travelId).collection("groupExpenses")
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching group expenses: \(error.localizedDescription)")
-                    completion([])
-                    return
-                }
-                let expenses = snapshot?.documents.compactMap { doc in
-                    try? doc.data(as: GroupExpense.self)
-                } ?? []
-                completion(expenses)
-            }
-    }
     
     
     // MARK: - Fetch Spending Items by IDs
@@ -435,147 +394,173 @@ class SpendingFirebaseManager {
         }
     }
     
-    // MARK: - Add Group Expense
-    func addGroupExpense(to travelId: String, groupExpense: GroupExpense, completion: @escaping (Bool) -> Void) {
-        let groupExpensesRef = db.collection("groupExpenses")
-        let travelRef = db.collection("travelPlans").document(travelId)
-
-        // Step 1: Add the group expense to the GroupExpenses table
-        var expenseToAdd = groupExpense
-        let newExpenseRef = groupExpensesRef.document() // Generate a new document ID
-        expenseToAdd.id = newExpenseRef.documentID // Assign Firestore-generated ID
-
-        do {
-            try newExpenseRef.setData(from: expenseToAdd) { error in
-                if let error = error {
-                    print("Error adding group expense to GroupExpenses table: \(error.localizedDescription)")
-                    completion(false)
-                    return
-                }
-
-                // Step 2: Update the Travel table with the new group expense ID
-                travelRef.updateData([
-                    "expenseIds": FieldValue.arrayUnion([expenseToAdd.id])
-                ]) { error in
+    // MARK: - Add Balance
+        func addBalance(for travelId: String, balance: Balance, completion: @escaping (Bool) -> Void) {
+            let balanceRef = db.collection("balances").document(balance.id)
+            let travelRef = db.collection("travelPlans").document(travelId)
+            
+            do {
+                try balanceRef.setData(from: balance) { error in
                     if let error = error {
-                        print("Error updating travel plan with new group expense ID: \(error.localizedDescription)")
+                        print("Error adding balance: \(error.localizedDescription)")
                         completion(false)
-                    } else {
-                        print("Group expense added successfully and linked to travel plan.")
-                        completion(true)
+                        return
+                    }
+                    
+                    // Update the travel plan to include the new balance ID
+                    travelRef.updateData([
+                        "balanceIds": FieldValue.arrayUnion([balance.id]) // Add balance ID to the list
+                    ]) { error in
+                        if let error = error {
+                            print("Error updating travel plan with new balance ID: \(error.localizedDescription)")
+                            completion(false)
+                        } else {
+                            print("Balance added and linked to travel plan successfully.")
+                            completion(true)
+                        }
                     }
                 }
+            } catch {
+                print("Error serializing balance: \(error.localizedDescription)")
+                completion(false)
             }
-        } catch {
-            print("Error encoding group expense: \(error.localizedDescription)")
-            completion(false)
+        }
+    
+    // MARK: - Fetch Single Balance
+    func fetchBalance(byId balanceId: String, completion: @escaping (Balance?) -> Void) {
+        db.collection("balances").document(balanceId).getDocument { document, error in
+            if let error = error {
+                print("Error fetching balance: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            if let document = document, let balance = try? document.data(as: Balance.self) {
+                completion(balance)
+            } else {
+                print("Balance with ID \(balanceId) not found or failed to decode.")
+                completion(nil)
+            }
         }
     }
     
-    // MARK: - Update Group Expense
-    func updateGroupExpense(groupExpense: GroupExpense, completion: @escaping (Bool) -> Void) {
-        let expenseRef = db.collection("groupExpenses").document(groupExpense.id)
+    // MARK: - Fetch All Balances for a Travel Plan
+        func fetchBalances(for travelId: String, completion: @escaping ([Balance]) -> Void) {
+            db.collection("balances")
+                .whereField("travelId", isEqualTo: travelId)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Error fetching balances: \(error.localizedDescription)")
+                        completion([])
+                        return
+                    }
 
+                    let balances = snapshot?.documents.compactMap { document in
+                        try? document.data(as: Balance.self)
+                    } ?? []
+
+                    print("Fetched \(balances.count) balances for travel ID \(travelId).")
+                    completion(balances)
+                }
+        }
+    
+    // MARK: - Fetch Active Balance
+        func fetchActiveBalance(for travelId: String, completion: @escaping (Balance?) -> Void) {
+            db.collection("balances")
+                .whereField("travelId", isEqualTo: travelId)
+                .whereField("isSet", isEqualTo: false)
+                .limit(to: 1)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Error fetching active balance: \(error.localizedDescription)")
+                        completion(nil)
+                        return
+                    }
+
+                    if let document = snapshot?.documents.first {
+                        let activeBalance = try? document.data(as: Balance.self)
+                        completion(activeBalance)
+                    } else {
+                        completion(nil)
+                    }
+                }
+        }
+    
+    // MARK: - Ensure Single Active Balance
+        func ensureActiveBalance(for travelId: String, completion: @escaping (Balance?) -> Void) {
+            fetchActiveBalance(for: travelId) { activeBalance in
+                if let activeBalance = activeBalance {
+                    // Return existing active balance
+                    print("Active balance already exists for travel ID \(travelId).")
+                    completion(activeBalance)
+                } else {
+                    // Create a new active balance if none exists
+                    self.createNewBalance(for: travelId, completion: completion)
+                }
+            }
+        }
+    
+    // MARK: - Create New Balance
+        func createNewBalance(for travelId: String, completion: @escaping (Balance?) -> Void) {
+            let newBalance = Balance(travelId: travelId)
+
+            addBalance(for: travelId, balance: newBalance) { success in
+                if success {
+                    print("New balance created successfully with ID \(newBalance.id).")
+                    completion(newBalance)
+                } else {
+                    print("Failed to create new balance.")
+                    completion(nil)
+                }
+            }
+        }
+    
+    // MARK: - Update Balance
+    func updateBalance(balance: Balance, completion: @escaping (Bool) -> Void) {
+        let balanceRef = db.collection("balances").document(balance.id)
+        
         do {
-            try expenseRef.setData(from: groupExpense) { error in
+            try balanceRef.setData(from: balance) { error in
                 if let error = error {
-                    print("Error updating group expense: \(error.localizedDescription)")
+                    print("Error updating balance: \(error.localizedDescription)")
                     completion(false)
                 } else {
-                    print("Group expense updated successfully.")
+                    print("Balance updated successfully.")
                     completion(true)
                 }
             }
         } catch {
-            print("Error serializing group expense for update: \(error.localizedDescription)")
+            print("Error serializing balance: \(error.localizedDescription)")
             completion(false)
         }
     }
     
-    // MARK: - Delete Group Expense
-    func deleteGroupExpense(from travelId: String, expenseId: String, completion: @escaping (Bool) -> Void) {
-        let expenseRef = db.collection("groupExpenses").document(expenseId)
-        let travelRef = db.collection("travelPlans").document(travelId)
+    // MARK: - Delete Balance
+        func deleteBalance(for travelId: String, balanceId: String, completion: @escaping (Bool) -> Void) {
+            let balanceRef = db.collection("balances").document(balanceId)
+            let travelRef = db.collection("travelPlans").document(travelId)
 
-        let batch = db.batch()
-
-        // Step 1: Delete the group expense from the GroupExpenses table
-        batch.deleteDocument(expenseRef)
-
-        // Step 2: Remove the expense ID from the Travel table
-        batch.updateData([
-            "expenseIds": FieldValue.arrayRemove([expenseId])
-        ], forDocument: travelRef)
-
-        batch.commit { error in
-            if let error = error {
-                print("Error deleting group expense: \(error.localizedDescription)")
-                completion(false)
-            } else {
-                print("Group expense deleted successfully.")
-                completion(true)
-            }
-        }
-    }
-    
-    // MARK: - Fetch Group Expenses by IDs
-    func fetchGroupExpensesByIds(expenseIds: [String], completion: @escaping ([GroupExpense]) -> Void) {
-        print("Starting fetchGroupExpensesByIds with expense IDs: \(expenseIds)")
-        let groupExpensesRef = db.collection("groupExpenses")
-        let dispatchGroup = DispatchGroup()
-        var groupExpenses: [GroupExpense] = []
-
-        for expenseId in expenseIds {
-            print("Fetching group expense with ID: \(expenseId)")
-            dispatchGroup.enter()
-            groupExpensesRef.document(expenseId).getDocument { document, error in
+            balanceRef.delete { error in
                 if let error = error {
-                    print("Error fetching group expense \(expenseId): \(error.localizedDescription)")
-                    dispatchGroup.leave()
+                    print("Error deleting balance: \(error.localizedDescription)")
+                    completion(false)
                     return
                 }
-                if let document = document, let expense = try? document.data(as: GroupExpense.self) {
-                    print("Successfully fetched group expense with ID: \(expenseId) - Amount Owed: \(expense.amountOwed), Amount Paid: \(expense.amountPaid)")
-                    groupExpenses.append(expense)
-                } else {
-                    print("Group expense with ID: \(expenseId) not found or failed to decode.")
+
+                // Update the travel plan to remove the balance ID
+                travelRef.updateData([
+                    "balanceIds": FieldValue.arrayRemove([balanceId]) // Remove balance ID from the list
+                ]) { error in
+                    if let error = error {
+                        print("Error updating travel plan after balance deletion: \(error.localizedDescription)")
+                        completion(false)
+                    } else {
+                        print("Balance deleted and unlinked from travel plan successfully.")
+                        completion(true)
+                    }
                 }
-                dispatchGroup.leave()
             }
         }
-
-        dispatchGroup.notify(queue: .main) {
-            print("Finished fetching group expenses. Total fetched: \(groupExpenses.count)")
-            for expense in groupExpenses {
-                print(" - Group Expense ID: \(expense.id), Amount Owed: \(expense.amountOwed), Amount Paid: \(expense.amountPaid), Settled: \(expense.isSet)")
-            }
-            completion(groupExpenses)
-        }
-    }
-    
-    // MARK: - Fetch All Group Expenses for Travel Plan
-    func fetchAllGroupExpenses(for travelId: String, completion: @escaping ([GroupExpense]) -> Void) {
-        let travelRef = db.collection("travelPlans").document(travelId)
-
-        travelRef.getDocument { document, error in
-            if let error = error {
-                print("Error fetching travel plan: \(error.localizedDescription)")
-                completion([])
-                return
-            }
-            guard let document = document, let travel = try? document.data(as: Travel.self) else {
-                print("Failed to decode travel plan or travel plan does not exist.")
-                completion([])
-                return
-            }
-
-            // Use `fetchGroupExpensesByIds` to fetch group expenses by IDs
-            self.fetchGroupExpensesByIds(expenseIds: travel.expenseIds) { groupExpenses in
-                completion(groupExpenses)
-            }
-        }
-    }
-    
     
 }
 

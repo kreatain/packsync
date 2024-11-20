@@ -15,8 +15,10 @@ class ExpensesViewController: UIViewController {
     private var expenses: [SpendingItem] = []
     private var categories: [Category] = []
     private var participants: [User] = []
+    private var userIcons: [String: UIImage] = [:]
     private var currencySymbol: String = "$"
     private var travelPlan: Travel?
+    private var activeDetailViewControllers: [ExpenseDetailsViewController] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -82,16 +84,46 @@ class ExpensesViewController: UIViewController {
         categories: [Category],
         spendingItems: [SpendingItem],
         participants: [User],
-        currencySymbol: String
+        currencySymbol: String,
+        userIcons: [String: UIImage]
     ) {
         self.travelPlan = travelPlan
         self.categories = categories
-        self.expenses = spendingItems
+
+        // Sort spending items from new to old
+        self.expenses = spendingItems.sorted { item1, item2 in
+            guard let date1 = ISO8601DateFormatter().date(from: item1.date),
+                  let date2 = ISO8601DateFormatter().date(from: item2.date) else {
+                return false
+            }
+            return date1 > date2 // Descending order: Newest first
+        }
+
         self.participants = participants
         self.currencySymbol = currencySymbol
-        
+        self.userIcons = userIcons
+
+        // Refresh the table view
         tableView.reloadData()
-        updateTotalExpenseLabel() // Update the total expense label when setting the travel plan
+
+        // Update the total expense label
+        updateTotalExpenseLabel()
+
+        // Refresh all active details view controllers
+        for detailVC in activeDetailViewControllers {
+            if let updatedExpense = expenses.first(where: { $0.id == detailVC.expense.id }),
+               let updatedCategory = categories.first(where: { $0.id == updatedExpense.categoryId }) {
+                detailVC.refreshWithUpdatedData(
+                    expense: updatedExpense,
+                    category: updatedCategory,
+                    participants: participants,
+                    currencySymbol: currencySymbol,
+                    travelId: travelPlan.id
+                )
+            } else {
+                print("[ExpensesViewController] Failed to find matching data for ExpenseDetailsViewController.")
+            }
+        }
     }
 
     @objc private func addExpenseButtonTapped() {
@@ -107,28 +139,6 @@ class ExpensesViewController: UIViewController {
         present(navController, animated: true, completion: nil)
     }
 
-    private func getUserIcon(forUserId userId: String, completion: @escaping (UIImage?) -> Void) {
-        // Try to find the user by ID in the participants array
-        if let user = participants.first(where: { $0.id == userId }) {
-            if let profilePicURL = user.profilePicURL, let url = URL(string: profilePicURL) {
-                // Asynchronous fetch using URLSession
-                URLSession.shared.dataTask(with: url) { data, response, error in
-                    if let data = data, let image = UIImage(data: data) {
-                        DispatchQueue.main.async {
-                            completion(image)
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            completion(UIImage(systemName: "person.circle")) // Placeholder if image fails to load
-                        }
-                    }
-                }.resume()
-                return
-            }
-        }
-        // Return placeholder if user or profilePicURL is not found
-        completion(UIImage(systemName: "person.circle"))
-    }
     
     private func formattedDate(from isoDate: String) -> String {
         let isoFormatter = ISO8601DateFormatter()
@@ -158,13 +168,12 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
         let emoji = category?.emoji ?? "❓"
         let dateString = formattedDate(from: expense.date)
 
-        cell.configure(with: expense, categoryEmoji: emoji, userIcon: UIImage(systemName: "person.circle"), dateString: dateString)
+        // Use userIcons dictionary for the user icon
+        let userIcon = userIcons[expense.spentByUserId] ?? UIImage(systemName: "person.circle") // Default icon
 
-        getUserIcon(forUserId: expense.spentByUserId) { userIcon in
-            if let currentIndexPath = tableView.indexPath(for: cell), currentIndexPath == indexPath {
-                cell.configure(with: expense, categoryEmoji: emoji, userIcon: userIcon, dateString: dateString)
-            }
-        }
+        // Check if receipt exists and configure the cell
+        let hasReceipt = expense.receiptURL != nil && !expense.receiptURL!.isEmpty
+        cell.configure(with: expense, categoryEmoji: emoji, userIcon: userIcon, dateString: dateString, hasReceipt: hasReceipt)
 
         return cell
     }
@@ -173,13 +182,28 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
         let expense = expenses[indexPath.row]
         guard let category = categories.first(where: { $0.spendingItemIds.contains(expense.id) }) else { return }
         let spender = participants.first(where: { $0.id == expense.spentByUserId })
-        
+
+        guard let travelId = travelPlan?.id else {
+            print("Error: Travel ID not found")
+            return
+        }
+
         let detailsVC = ExpenseDetailsViewController(
             expense: expense,
             category: category,
             spender: spender,
-            currencySymbol: currencySymbol // Pass the currency symbol from parent VC
+            currencySymbol: currencySymbol,
+            travelId: travelId,
+            categories: categories, // Pass categories
+            participants: participants // Pass participants
         )
+        
+        // Add to active controllers
+        activeDetailViewControllers.append(detailsVC)
+        detailsVC.onDeinit = { [weak self] vc in
+            self?.activeDetailViewControllers.removeAll { $0 === vc }
+        }
+        
         navigationController?.pushViewController(detailsVC, animated: true)
     }
 
