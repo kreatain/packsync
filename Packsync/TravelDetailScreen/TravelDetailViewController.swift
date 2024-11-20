@@ -61,7 +61,7 @@ class TravelDetailViewController: UIViewController {
             print("No travel plan available")
             return
         }
-        let packingListVC = PackingListViewController()
+        let packingListVC = PackinListViewController()
         packingListVC.travel = self.travel
         navigationController?.pushViewController(packingListVC, animated: true)
     }

@@ -179,6 +179,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.activePlanTitleLabel.text = ""
         travelView.activePlanDateLabel.text = ""
         travelView.activePlanLocationLabel.text = ""
+        travelView.activePlanParticipantIdsLabel.text = ""
         travelView.activePlanDetailView.isHidden = true
     }
     private func loadActivePlanLocally() -> Travel? {
