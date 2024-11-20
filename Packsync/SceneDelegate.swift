@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Create view controllers for each screen
         let travelsVC = TravelViewController()
-        let packingVC = PackinListActiveViewController()
+        let packingVC = PackinListViewController()
         let spendingVC = SpendingViewController()
         let billboardVC = BillboardViewController()
         let profileVC = ProfileViewController()
@@ -57,5 +57,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         // Set tab bar controller as root view controller
         window?.rootViewController = tabBarController
+    }
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        if let navController = viewController as? UINavigationController,
+           let packingVC = navController.topViewController as? PackinListViewController {
+            packingVC.updateUI()
+        }
+        return true
     }
 }
