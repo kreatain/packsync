@@ -116,7 +116,8 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                     let itemNumber = data["itemNumber"] as? String ?? ""
                     let isPacked = data["isPacked"] as? Bool ?? false
                     let isPackedBy = data["isPackedBy"] as? String
-                    return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber)
+                    let photoURL = data["photoURL"] as? String
+                    return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber, photoURL: photoURL)
                 }
                 self.packingItems.sort {
                     let firstLetter1 = $0.name.prefix(1).uppercased()
@@ -209,7 +210,6 @@ extension PackingListViewController: UITableViewDelegate, UITableViewDataSource 
         let detailVC = PackingItemDetailViewController()
         detailVC.packingItem = item
         detailVC.travel = self.travel
-        print("travelTitle: \(travel?.travelTitle)")
         navigationController?.pushViewController(detailVC, animated: true)
     }
 

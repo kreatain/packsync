@@ -41,6 +41,21 @@ class PackingItemDetailView: UIView {
         return label
     }()
     
+    let itemImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.backgroundColor = .lightGray
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        return imageView
+    }()
+
+    let uploadPhotoButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Upload Photo", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -55,7 +70,7 @@ class PackingItemDetailView: UIView {
         addSubview(scrollView)
         scrollView.addSubview(contentView)
         
-        [nameLabel, itemNumberLabel, packedByLabel].forEach { contentView.addSubview($0) }
+        [nameLabel, itemNumberLabel, packedByLabel, itemImageView, uploadPhotoButton].forEach { contentView.addSubview($0) }
         
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
@@ -80,6 +95,14 @@ class PackingItemDetailView: UIView {
             packedByLabel.topAnchor.constraint(equalTo: itemNumberLabel.bottomAnchor, constant: 10),
                 packedByLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
                 packedByLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            itemImageView.topAnchor.constraint(equalTo: packedByLabel.bottomAnchor, constant: 20),
+                        itemImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                        itemImageView.widthAnchor.constraint(equalToConstant: 200),
+                        itemImageView.heightAnchor.constraint(equalToConstant: 200),
+
+                        uploadPhotoButton.topAnchor.constraint(equalTo: itemImageView.bottomAnchor, constant: 20),
+                        uploadPhotoButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+                        uploadPhotoButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
 
         ])
     }
