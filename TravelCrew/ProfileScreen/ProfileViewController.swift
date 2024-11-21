@@ -259,79 +259,72 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                   animated:true)
       }
 
-      func acceptInvitation(_ invitation:
-          Invitation) {
-          guard let userId =
-              Auth.auth().currentUser?.uid else { return }
-
-          // Update the invitation status to accepted.
-          db.collection("invitations").document(invitation.id).updateData(["isAccepted": 1]) { error in
-              if let error =
-                  error {
-                  print("Error updating invitation status: \(error)")
-                  return
-              }
-              
-              // Add user to travel plan's participantIds.
-              let travelRef =
-                  self.db.collection("travelPlans").document(invitation.travelId)
-
-              self.db.runTransaction({ (transaction,
-                  errorPointer) -> Any? in
+    func acceptInvitation(_ invitation: Invitation) {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        
+        // Update the invitation status to accepted.
+        db.collection("invitations").document(invitation.id).updateData(["isAccepted": 1]) { error in
+            if let error = error {
+                print("Error updating invitation status: \(error)")
+                return
+            }
+            
+            // Add user to travel plan's participantIds and participantNames.
+            let travelRef = self.db.collection("travelPlans").document(invitation.travelId)
+            self.db.runTransaction({ (transaction, errorPointer) -> Any? in
+                let travelDocument: DocumentSnapshot
+                do {
+                    try travelDocument = transaction.getDocument(travelRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
                 
-                  let travelDocument:
-                      DocumentSnapshot
+                guard var travelPlan = try? travelDocument.data(as: Travel.self) else {
+                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Unable to fetch travel plan"])
+                    errorPointer?.pointee = error
+                    return nil
+                }
                 
-                  do {
-                      try travelDocument =
-                          transaction.getDocument(travelRef)
-                  } catch let fetchError as NSError {
-                      errorPointer?.pointee =
-                          fetchError
-                      return nil
-                  }
-                  
-                  guard var travelPlan =
-                      try? travelDocument.data(as:
-                          Travel.self) else {
-                              let error =
-                                  NSError(domain:"AppErrorDomain", code:-1,
-                                          userInfo:[NSLocalizedDescriptionKey :
-                                          "Unable to fetch travel plan"])
-                              errorPointer?.pointee =
-                                  error
-                              return nil
-                          }
-                  
-                  if !travelPlan.participantIds.contains(userId) {
-                      travelPlan.participantIds.append(userId)
-                      do {
-                          try transaction.setData(from:
-                              travelPlan,
-                              forDocument:
-                              travelRef)
-                      } catch let error as NSError {
-                          errorPointer?.pointee =
-                              error
-                          return nil
-                      }
-                  }
-                  
-                  return nil
-              }) { (_, error) in
-                  if let error =
-                      error {
-                      print("Transaction failed while adding participant ID to travel plan \(error)")
-                  } else {
-                      print("Successfully accepted invitation and added participant.")
-                      NotificationCenter.default.post(name: .travelDataChanged, object: nil, userInfo: ["travelId": invitation.travelId])
-                      self.triggerFirebaseUpdate(for: invitation.travelId)
-                  }
-              }
-              
-              print("Invitation accepted.")
-          }
-      }
+                if !travelPlan.participantIds.contains(userId) {
+                    travelPlan.participantIds.append(userId)
+                    
+                    // Fetch the user's displayName
+                    let userRef = self.db.collection("users").document(userId)
+                    do {
+                        let userDocument = try transaction.getDocument(userRef)
+                        if let displayName = userDocument.data()?["displayName"] as? String {
+                            travelPlan.participantNames.append(displayName)
+                        } else {
+                            travelPlan.participantNames.append("Unknown User")
+                        }
+                    } catch {
+                        print("Error fetching user document: \(error)")
+                        travelPlan.participantNames.append("Unknown User")
+                    }
+                    
+                    do {
+                        try transaction.setData(from: travelPlan, forDocument: travelRef)
+                    } catch let error as NSError {
+                        errorPointer?.pointee = error
+                        return nil
+                    }
+                }
+                
+                return nil
+            }) { (_, error) in
+                if let error = error {
+                    print("Transaction failed while adding participant ID to travel plan \(error)")
+                } else {
+                    print("Successfully accepted invitation and added participant.")
+                    NotificationCenter.default.post(name: .travelDataChanged, object: nil, userInfo: ["travelId": invitation.travelId])
+                    self.triggerFirebaseUpdate(for: invitation.travelId)
+                }
+            }
+            
+            print("Invitation accepted.")
+        }
+    }
     
     private func triggerFirebaseUpdate(for travelId: String) {
         let travelRef = db.collection("travelPlans").document(travelId)

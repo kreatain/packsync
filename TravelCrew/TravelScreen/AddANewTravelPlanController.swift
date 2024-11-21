@@ -56,8 +56,7 @@ class AddANewTravelViewController: UIViewController {
         }
         
         let creatorId = currentUser.uid
-        let creatorName = currentUser.displayName!
-        
+        let creatorName = currentUser.displayName ?? "Unknown User"
         
         guard let travelTitle = addANewTravelPlan.textFieldTravelTitle.text,
               let travelStartDate = addANewTravelPlan.textFieldTravelStartDate.text,
@@ -70,6 +69,13 @@ class AddANewTravelViewController: UIViewController {
         
         guard let selectedCurrency = selectedCurrency else {
             showAlert(message: "Please select a currency.")
+            return
+        }
+        
+        // Check if travelCountryAndCity follows the pattern "city, country"
+        let components = travelCountryAndCity.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+        guard components.count == 2, !components[0].isEmpty, !components[1].isEmpty else {
+            showAlert(message: "Please enter the location in the format 'City, Country'")
             return
         }
 
@@ -86,7 +92,9 @@ class AddANewTravelViewController: UIViewController {
             categoryIds: [],
             expenseIds: [],
             participantIds: [creatorId],
-            balanceIds: [] 
+            participantNames: [creatorName],
+            balanceIds: [],
+            billboardIds: []
         )
         
         saveTravelToFirestore(travel: travel)

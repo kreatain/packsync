@@ -18,6 +18,7 @@ class TravelDetailView: UIView {
     var buttonInviteFriend: UIButton!
     var buttonSpending: UIButton!
     var buttonBillboard: UIButton!
+    var labelFriendsList: UILabel!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,11 +27,13 @@ class TravelDetailView: UIView {
         setupLabelDateRange()
         setupLabelCountryAndCity()
         setupLabelCurrency()
-        setupLabelCreatorName() // Initialize the creator's name label
+        setupLabelCreatorName()
         setupButtonPackingList()
         setupButtonInviteFriend()
         setupButtonBillboard()
         setupButtonSpending()
+        setupLabelFriendsList()
+        
         initConstraints()
     }
     
@@ -79,7 +82,7 @@ class TravelDetailView: UIView {
     func setupButtonInviteFriend() {
         buttonInviteFriend = UIButton(type: .system)
         buttonInviteFriend.setTitle("Invite Friend", for: .normal)
-        buttonInviteFriend.backgroundColor = .systemBlue
+        buttonInviteFriend.backgroundColor = .systemGreen
         buttonInviteFriend.setTitleColor(.white, for: .normal)
         buttonInviteFriend.layer.cornerRadius = 8
         buttonInviteFriend.translatesAutoresizingMaskIntoConstraints = false
@@ -111,7 +114,15 @@ class TravelDetailView: UIView {
            labelCreatorName.font = UIFont.systemFont(ofSize: 16)
            labelCreatorName.translatesAutoresizingMaskIntoConstraints = false
            self.addSubview(labelCreatorName)
-       }
+    }
+    
+    func setupLabelFriendsList() {
+        labelFriendsList = UILabel()
+        labelFriendsList.font = UIFont.systemFont(ofSize: 16)
+        labelFriendsList.numberOfLines = 0
+        labelFriendsList.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelFriendsList)
+    }
 
     
     func initConstraints() {
@@ -119,17 +130,16 @@ class TravelDetailView: UIView {
             labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
             labelTravelTitle.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelTravelTitle.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+
+            labelCreatorName.topAnchor.constraint(equalTo: labelTravelTitle.bottomAnchor, constant: 20),
+            labelCreatorName.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelCreatorName.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
-            labelDateRange.topAnchor.constraint(equalTo: labelTravelTitle.bottomAnchor, constant: 20),
+            labelDateRange.topAnchor.constraint(equalTo: labelCreatorName.bottomAnchor, constant: 20),
             labelDateRange.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelDateRange.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
 
-            // Constraints for creator's name
-            labelCreatorName.topAnchor.constraint(equalTo: labelDateRange.bottomAnchor, constant: 20),
-            labelCreatorName.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            labelCreatorName.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-
-            labelCountryAndCity.topAnchor.constraint(equalTo: labelCreatorName.bottomAnchor, constant: 20),
+            labelCountryAndCity.topAnchor.constraint(equalTo: labelDateRange.bottomAnchor, constant: 20),
             labelCountryAndCity.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelCountryAndCity.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
 
@@ -141,13 +151,9 @@ class TravelDetailView: UIView {
             buttonPackingList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonPackingList.heightAnchor.constraint(equalToConstant: 44),
+
             
-            buttonInviteFriend.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
-            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
-            
-            buttonSpending.topAnchor.constraint(equalTo: buttonInviteFriend.bottomAnchor, constant: 20),
+            buttonSpending.topAnchor.constraint(equalTo: buttonPackingList.bottomAnchor, constant: 20),
             buttonSpending.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonSpending.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonSpending.heightAnchor.constraint(equalToConstant: 44),
@@ -156,7 +162,17 @@ class TravelDetailView: UIView {
             buttonBillboard.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonBillboard.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             buttonBillboard.heightAnchor.constraint(equalToConstant: 44),
-            buttonBillboard.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            
+            labelFriendsList.topAnchor.constraint(equalTo: buttonBillboard.bottomAnchor, constant: 30),
+            labelFriendsList.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelFriendsList.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            
+            buttonInviteFriend.topAnchor.constraint(equalTo: labelFriendsList.bottomAnchor, constant: 20),
+            buttonInviteFriend.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            buttonInviteFriend.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+            buttonInviteFriend.heightAnchor.constraint(equalToConstant: 44),
+            
+            buttonInviteFriend.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
     }
     
@@ -164,10 +180,9 @@ class TravelDetailView: UIView {
         labelTravelTitle.text = "Travel Title: \(travel.travelTitle)"
         labelDateRange.text = "Travel Date: \(formatDate(travel.travelStartDate)) - \(formatDate(travel.travelEndDate))"
         labelCountryAndCity.text = "Country and City: \(travel.countryAndCity)"
-        // Set the creator's name (assuming you have a way to fetch it)
         labelCreatorName.text = "Created by \(travel.creatorName)"
-        labelCurrency.text = "Currency: \(travel.currency)" // Display the currency
-        
+        labelCurrency.text = "Currency: \(travel.currency)" 
+        labelFriendsList.text = "Participants: \(travel.participantNames.joined(separator: ", "))"
     }
     
     func formatDate(_ dateString: String) -> String {

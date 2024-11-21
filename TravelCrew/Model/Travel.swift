@@ -20,6 +20,7 @@ struct Travel: Codable {
     var categoryIds: [String] // Array of IDs for budget categories associated with the travel
     var expenseIds: [String] // Array of IDs for spending items associated with the travel [Not In Use]
     var participantIds: [String] // List of user IDs for participants in the travel plan
+    var participantNames: [String]
     var balanceIds: [String] // Array of balance IDs for tracking splits
     var billboardIds: [String]
 
@@ -35,7 +36,8 @@ struct Travel: Codable {
         categoryIds: [String] = [],
         expenseIds: [String] = [],
         participantIds: [String] = [],
-        balanceIds: [String] = [], 
+        participantNames: [String] = [],
+        balanceIds: [String] = [],
         billboardIds: [String] = []
     ) {
         self.id = id
@@ -49,6 +51,7 @@ struct Travel: Codable {
         self.categoryIds = categoryIds
         self.expenseIds = expenseIds
         self.participantIds = participantIds
+        self.participantNames = participantNames
         self.balanceIds = balanceIds
         self.billboardIds = billboardIds
     }
