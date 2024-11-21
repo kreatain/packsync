@@ -126,7 +126,7 @@ class SpendingViewController: UIViewController {
     }
     
     private func setupNoActivePlanLabel() {
-        noActivePlanLabel.text = "Please select an active travel plan to view spending details."
+        noActivePlanLabel.text = "Please select an active travel plan to view Spending details."
         noActivePlanLabel.textAlignment = .center
         noActivePlanLabel.numberOfLines = 0
         noActivePlanLabel.textColor = .gray

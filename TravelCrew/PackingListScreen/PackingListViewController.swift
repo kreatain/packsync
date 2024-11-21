@@ -31,6 +31,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
     private func setupUI() {
         view.backgroundColor = .systemBackground
         noActiveplanLabel.text = "Please select an active travel plan to view Packing list details."
+        noActiveplanLabel.textColor = .gray
         noActiveplanLabel.textAlignment = .center
         noActiveplanLabel.numberOfLines = 0
         noActiveplanLabel.translatesAutoresizingMaskIntoConstraints = false
