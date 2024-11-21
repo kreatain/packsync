@@ -219,12 +219,20 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
                 let expenseToDelete = self.expenses[indexPath.row]
+                
                 guard let category = self.categories.first(where: { $0.spendingItemIds.contains(expenseToDelete.id) }) else {
                     completionHandler(false)
                     return
                 }
                 
-                SpendingFirebaseManager.shared.deleteSpendingItem(from: category.id, spendingItemId: expenseToDelete.id) { success in
+                // Ensure travelId is available
+                guard let travelId = self.travelPlan?.id else {
+                    print("Error: Travel ID not found")
+                    completionHandler(false)
+                    return
+                }
+                
+                SpendingFirebaseManager.shared.deleteSpendingItem(from: category.id, spendingItemId: expenseToDelete.id, travelId: travelId) { success in
                     if success {
                         self.expenses.remove(at: indexPath.row)
                         tableView.deleteRows(at: [indexPath], with: .automatic)

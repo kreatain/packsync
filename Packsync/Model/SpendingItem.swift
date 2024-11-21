@@ -17,6 +17,8 @@ struct SpendingItem: Codable {
     var spentByUserId: String // User ID of the person who actually spent the money
     var categoryId: String // ID of the associated category
     var participants: [String] // List of user IDs involved in the split
+    var travelId: String // ID of the associated travel plan
+    var isSettled: Bool // New field: Indicates if this spending item is settled
 
     init(
         id: String = UUID().uuidString, // Generate a unique ID if not provided
@@ -27,7 +29,9 @@ struct SpendingItem: Codable {
         spentByUserId: String? = nil, // Defaults to addedByUserId if not provided
         categoryId: String, // Associate a category ID
         receiptURL: String? = nil,
-        participants: [String]
+        participants: [String],
+        travelId: String,
+        isSettled: Bool = false // Defaults to false
     ) {
         self.id = id
         self.amount = amount
@@ -38,5 +42,7 @@ struct SpendingItem: Codable {
         self.categoryId = categoryId
         self.receiptURL = receiptURL
         self.participants = participants
+        self.travelId = travelId
+        self.isSettled = isSettled
     }
 }

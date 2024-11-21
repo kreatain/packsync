@@ -43,16 +43,24 @@ extension BalanceDetailViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "ParticipantBalanceCell", for: indexPath) as! ParticipantBalanceCell
-        let participantId = Array(balance.balances.keys)[indexPath.row]
         
-        if let participant = participants.first(where: { $0.id == participantId }) {
-            cell.configure(with: participant, balance: balance)
+        // Get the participant's balance entry at the current index
+        let sortedBalances = balance.balances.sorted { $0.value > $1.value } // Sort balances descending for clarity
+        let debtorId = sortedBalances[indexPath.row].key
+        let amount = sortedBalances[indexPath.row].value
+
+        if amount > 0, // Only consider positive balances as debtors
+           let debtor = participants.first(where: { $0.id == debtorId }),
+           let creditor = participants.first(where: { balance.balances[$0.id] == -amount }) {
+            // Configure the cell with the debtor, creditor, and absolute amount
+            cell.configure(with: (debtor: debtor, creditor: creditor, amount: abs(amount)))
         } else {
-            // Handle the case where the participant is not found
-            let placeholderUser = User(id: participantId, email: "Unknown", password: "")
-            cell.configure(with: placeholderUser, balance: balance)
+            // Handle case where no matching creditor is found
+            let placeholderUser = User(id: debtorId, email: "Unknown", password: "")
+            let creditor = User(id: "unknown-creditor", email: "Unknown Creditor", password: "")
+            cell.configure(with: (debtor: placeholderUser, creditor: creditor, amount: abs(amount)))
         }
-        
+
         return cell
     }
 }

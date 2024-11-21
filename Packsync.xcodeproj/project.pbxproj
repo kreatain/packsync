@@ -17,12 +17,11 @@
 		0430CA982CEBED900076BBA1 /* FullscreenImageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA972CEBED900076BBA1 /* FullscreenImageViewController.swift */; };
 		0430CA9A2CEBF1AC0076BBA1 /* BudgetDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */; };
 		0430CA9C2CED32B70076BBA1 /* Balance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA9B2CED32B70076BBA1 /* Balance.swift */; };
-		0430CA9E2CED3EA50076BBA1 /* BalanceDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA9D2CED3EA50076BBA1 /* BalanceDetailViewController.swift */; };
-		0430CAA02CED3EB20076BBA1 /* ParticipantBalanceCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CA9F2CED3EB20076BBA1 /* ParticipantBalanceCell.swift */; };
-		0430CAA22CED49850076BBA1 /* CurrentBalanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA12CED49850076BBA1 /* CurrentBalanceViewController.swift */; };
-		0430CAA42CED498D0076BBA1 /* SettledBalancesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA32CED498D0076BBA1 /* SettledBalancesViewController.swift */; };
 		0430CAA62CED52C60076BBA1 /* ParticipantSelectorCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA52CED52C60076BBA1 /* ParticipantSelectorCell.swift */; };
 		0430CAA82CED64780076BBA1 /* ParticipantSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0430CAA72CED64780076BBA1 /* ParticipantSelectorViewController.swift */; };
+		046217612CEE9F95007C99FA /* CurrentBalanceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046217602CEE9F95007C99FA /* CurrentBalanceViewController.swift */; };
+		046217632CEE9FA7007C99FA /* SettledExpensesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046217622CEE9FA7007C99FA /* SettledExpensesViewController.swift */; };
+		046217652CEE9FBF007C99FA /* TransactionCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 046217642CEE9FBF007C99FA /* TransactionCell.swift */; };
 		3627BA582CEA976F00D56011 /* PackingListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3627BA572CEA976F00D56011 /* PackingListViewController.swift */; };
 		3633E3712CED045200F14439 /* PackingItemDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */; };
 		3633E3742CED085600F14439 /* PackingItemDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3633E3732CED085600F14439 /* PackingItemDetailView.swift */; };
@@ -121,12 +120,11 @@
 		0430CA972CEBED900076BBA1 /* FullscreenImageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullscreenImageViewController.swift; sourceTree = "<group>"; };
 		0430CA992CEBF1AC0076BBA1 /* BudgetDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BudgetDetailViewController.swift; sourceTree = "<group>"; };
 		0430CA9B2CED32B70076BBA1 /* Balance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Balance.swift; sourceTree = "<group>"; };
-		0430CA9D2CED3EA50076BBA1 /* BalanceDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BalanceDetailViewController.swift; sourceTree = "<group>"; };
-		0430CA9F2CED3EB20076BBA1 /* ParticipantBalanceCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantBalanceCell.swift; sourceTree = "<group>"; };
-		0430CAA12CED49850076BBA1 /* CurrentBalanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBalanceViewController.swift; sourceTree = "<group>"; };
-		0430CAA32CED498D0076BBA1 /* SettledBalancesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettledBalancesViewController.swift; sourceTree = "<group>"; };
 		0430CAA52CED52C60076BBA1 /* ParticipantSelectorCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantSelectorCell.swift; sourceTree = "<group>"; };
 		0430CAA72CED64780076BBA1 /* ParticipantSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticipantSelectorViewController.swift; sourceTree = "<group>"; };
+		046217602CEE9F95007C99FA /* CurrentBalanceViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBalanceViewController.swift; sourceTree = "<group>"; };
+		046217622CEE9FA7007C99FA /* SettledExpensesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettledExpensesViewController.swift; sourceTree = "<group>"; };
+		046217642CEE9FBF007C99FA /* TransactionCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionCell.swift; sourceTree = "<group>"; };
 		20612AFFA4052AB7EDDC2562 /* Pods-Packsync-PacksyncUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Packsync-PacksyncUITests.release.xcconfig"; path = "Target Support Files/Pods-Packsync-PacksyncUITests/Pods-Packsync-PacksyncUITests.release.xcconfig"; sourceTree = "<group>"; };
 		3627BA572CEA976F00D56011 /* PackingListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingListViewController.swift; sourceTree = "<group>"; };
 		3633E3702CED045200F14439 /* PackingItemDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackingItemDetailViewController.swift; sourceTree = "<group>"; };
@@ -418,10 +416,9 @@
 		4CC0790B2CE42AD4009364D8 /* SplitView */ = {
 			isa = PBXGroup;
 			children = (
-				0430CAA32CED498D0076BBA1 /* SettledBalancesViewController.swift */,
-				0430CAA12CED49850076BBA1 /* CurrentBalanceViewController.swift */,
-				0430CA9F2CED3EB20076BBA1 /* ParticipantBalanceCell.swift */,
-				0430CA9D2CED3EA50076BBA1 /* BalanceDetailViewController.swift */,
+				046217642CEE9FBF007C99FA /* TransactionCell.swift */,
+				046217622CEE9FA7007C99FA /* SettledExpensesViewController.swift */,
+				046217602CEE9F95007C99FA /* CurrentBalanceViewController.swift */,
 				4CC0790A2CE42AD4009364D8 /* SplitViewController.swift */,
 			);
 			path = SplitView;
@@ -787,7 +784,6 @@
 				3633E3712CED045200F14439 /* PackingItemDetailViewController.swift in Sources */,
 				4CC0792C2CE42AD4009364D8 /* TravelPlanManager.swift in Sources */,
 				4CC0792F2CE42AD4009364D8 /* BillboardView.swift in Sources */,
-				0430CAA42CED498D0076BBA1 /* SettledBalancesViewController.swift in Sources */,
 				04112FC82CE857D300371ABD /* BudgetViewController.swift in Sources */,
 				0430CA8E2CEA92240076BBA1 /* ExpenseCell.swift in Sources */,
 				4CC079302CE42AD4009364D8 /* BillboardViewController.swift in Sources */,
@@ -800,6 +796,7 @@
 				4CC079372CE42AD4009364D8 /* Category.swift in Sources */,
 				4CC079392CE42AD4009364D8 /* Invitation.swift in Sources */,
 				3627BA582CEA976F00D56011 /* PackingListViewController.swift in Sources */,
+				046217612CEE9F95007C99FA /* CurrentBalanceViewController.swift in Sources */,
 				3633E3742CED085600F14439 /* PackingItemDetailView.swift in Sources */,
 				4CC0793A2CE42AD4009364D8 /* PackingItem.swift in Sources */,
 				365D8EB52CE82DC900453F2E /* CreateVoteView.swift in Sources */,
@@ -808,7 +805,6 @@
 				4CC0793C2CE42AD4009364D8 /* Travel.swift in Sources */,
 				4CC0793D2CE42AD4009364D8 /* User.swift in Sources */,
 				4C8783982CE9B91F00B4F5C0 /* InvitationCell.swift in Sources */,
-				0430CA9E2CED3EA50076BBA1 /* BalanceDetailViewController.swift in Sources */,
 				0430CA982CEBED900076BBA1 /* FullscreenImageViewController.swift in Sources */,
 				4CC079402CE42AD4009364D8 /* ProfileView.swift in Sources */,
 				4CC079412CE42AD4009364D8 /* ProfileViewController.swift in Sources */,
@@ -830,6 +826,7 @@
 				4CC0794F2CE42AD4009364D8 /* SpendingViewController.swift in Sources */,
 				4CC079502CE42AD4009364D8 /* EditTravelDetailView.swift in Sources */,
 				4CC079512CE42AD4009364D8 /* EditTravelDetailViewController.swift in Sources */,
+				046217632CEE9FA7007C99FA /* SettledExpensesViewController.swift in Sources */,
 				4CC079522CE42AD4009364D8 /* TravelDetailView.swift in Sources */,
 				0430CAA62CED52C60076BBA1 /* ParticipantSelectorCell.swift in Sources */,
 				73A96CDE2CEA790F006F1F9F /* PhotoFullScreenViewController.swift in Sources */,
@@ -837,8 +834,8 @@
 				4CC079542CE42AD4009364D8 /* ActivePlanViewController.swift in Sources */,
 				4CC079552CE42AD4009364D8 /* AddANewTravelPlanController.swift in Sources */,
 				4CC079562CE42AD4009364D8 /* AddANewTravelPlanView.swift in Sources */,
-				0430CAA02CED3EB20076BBA1 /* ParticipantBalanceCell.swift in Sources */,
 				4CC079572CE42AD4009364D8 /* LeftBarButttonManager.swift in Sources */,
+				046217652CEE9FBF007C99FA /* TransactionCell.swift in Sources */,
 				4CC079582CE42AD4009364D8 /* TravelPlanTableViewCell.swift in Sources */,
 				4CC0795A2CE42AD4009364D8 /* TravelView.swift in Sources */,
 				4CC0795B2CE42AD4009364D8 /* TravelViewController.swift in Sources */,
@@ -849,7 +846,6 @@
 				04112FC02CE7C75B00371ABD /* BudgetAddEditViewController.swift in Sources */,
 				4C7E69982CE6B6E10056E8CC /* AddPackingItemView.swift in Sources */,
 				04112FC22CE7CF0800371ABD /* EmojiTextField.swift in Sources */,
-				0430CAA22CED49850076BBA1 /* CurrentBalanceViewController.swift in Sources */,
 				4C7E69992CE6B6E10056E8CC /* PackingListView.swift in Sources */,
 				4C7E699A2CE6B6E10056E8CC /* AddPackingItemViewController.swift in Sources */,
 				4CC0795C2CE42AD4009364D8 /* AppDelegate.swift in Sources */,

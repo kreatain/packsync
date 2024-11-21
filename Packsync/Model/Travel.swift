@@ -18,7 +18,7 @@ struct Travel: Codable {
     var countryAndCity: String
     var currency: String // ISO 4217 currency code (e.g., USD, EUR, JPY)
     var categoryIds: [String] // Array of IDs for budget categories associated with the travel
-    var expenseIds: [String] // Array of IDs for group expenses associated with the travel
+    var expenseIds: [String] // Array of IDs for spending items associated with the travel [Not In Use]
     var participantIds: [String] // List of user IDs for participants in the travel plan
     var balanceIds: [String] // Array of balance IDs for tracking splits
     var billboardIds: [String]

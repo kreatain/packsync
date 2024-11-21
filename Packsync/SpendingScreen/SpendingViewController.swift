@@ -19,7 +19,7 @@ class SpendingViewController: UIViewController {
     private var participants: [User] = []
     private var balances: [Balance] = []
     private var userIcons: [String: UIImage] = [:] // Dictionary to store user icons by user ID
-
+    
     private lazy var overviewVC = OverviewViewController()
     private lazy var budgetVC = BudgetViewController()
     private lazy var expensesVC = ExpensesViewController()
@@ -27,7 +27,7 @@ class SpendingViewController: UIViewController {
     
     private let travelTitleLabel = UILabel() // Label to show the travel plan's name on top of the tab bar
     
-
+    
     // Initializer to accept travelID parameter
     init(travelID: String? = nil) {
         self.travelID = travelID
@@ -56,7 +56,7 @@ class SpendingViewController: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(loadTravelPlan), name: .activeTravelPlanChanged, object: nil)
         // Add observer to listen for updates
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTravelData), name: .travelDataChanged, object: nil)
-            
+        
     }
     
     override func viewDidLayoutSubviews() {
@@ -97,31 +97,31 @@ class SpendingViewController: UIViewController {
     }
     
     private func setupTravelTitleLabel() {
-               travelTitleLabel.font = .boldSystemFont(ofSize: 18)
-               travelTitleLabel.textAlignment = .center
-               travelTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-               spendingView.addSubview(travelTitleLabel)
-               
-               let topAnchorConstraint: NSLayoutConstraint
-               if let _ = navigationController, travelID != nil {
-                   // In a navigation stack with back button
-                   topAnchorConstraint = travelTitleLabel.topAnchor.constraint(equalTo: spendingView.safeAreaLayoutGuide.topAnchor, constant: 0)
-               } else {
-                   // No navigation stack, align directly to the top
-                   topAnchorConstraint = travelTitleLabel.topAnchor.constraint(equalTo: spendingView.topAnchor, constant: 70)
-               }
-
-               NSLayoutConstraint.activate([
-                   topAnchorConstraint,
-                   travelTitleLabel.leadingAnchor.constraint(equalTo: spendingView.leadingAnchor),
-                   travelTitleLabel.trailingAnchor.constraint(equalTo: spendingView.trailingAnchor)
-               ])
-           }
+        travelTitleLabel.font = .boldSystemFont(ofSize: 18)
+        travelTitleLabel.textAlignment = .center
+        travelTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        spendingView.addSubview(travelTitleLabel)
+        
+        let topAnchorConstraint: NSLayoutConstraint
+        if let _ = navigationController, travelID != nil {
+            // In a navigation stack with back button
+            topAnchorConstraint = travelTitleLabel.topAnchor.constraint(equalTo: spendingView.safeAreaLayoutGuide.topAnchor, constant: 0)
+        } else {
+            // No navigation stack, align directly to the top
+            topAnchorConstraint = travelTitleLabel.topAnchor.constraint(equalTo: spendingView.topAnchor, constant: 70)
+        }
+        
+        NSLayoutConstraint.activate([
+            topAnchorConstraint,
+            travelTitleLabel.leadingAnchor.constraint(equalTo: spendingView.leadingAnchor),
+            travelTitleLabel.trailingAnchor.constraint(equalTo: spendingView.trailingAnchor)
+        ])
+    }
     
     // MARK: - Load Travel Plan
     @objc private func loadTravelPlan() {
         print("[SpendingViewController] loadTravelPlan called.")
-
+        
         if let travelID = travelID {
             // Case 1: Using provided travel ID
             print("[SpendingViewController] Fetching travel plan with ID: \(travelID).")
@@ -148,16 +148,16 @@ class SpendingViewController: UIViewController {
     private func fetchParticipantsAndIcons(for participantIds: [String], completion: @escaping ([User]) -> Void) {
         SpendingFirebaseManager.shared.fetchUsersByIds(userIds: participantIds) { [weak self] fetchedParticipants in
             guard let self = self else { return }
-
+            
             let dispatchGroup = DispatchGroup()
             var icons: [String: UIImage] = [:]
-
+            
             for user in fetchedParticipants {
                 guard let profilePicURL = user.profilePicURL, let url = URL(string: profilePicURL) else {
                     icons[user.id] = UIImage(systemName: "person.circle") // Default icon
                     continue
                 }
-
+                
                 dispatchGroup.enter()
                 URLSession.shared.dataTask(with: url) { data, _, _ in
                     defer { dispatchGroup.leave() }
@@ -168,7 +168,7 @@ class SpendingViewController: UIViewController {
                     }
                 }.resume()
             }
-
+            
             dispatchGroup.notify(queue: .main) {
                 self.userIcons = icons // Set user icons globally
                 completion(fetchedParticipants)
@@ -184,9 +184,9 @@ class SpendingViewController: UIViewController {
         var spendingItems: [SpendingItem] = []
         var balances: [Balance] = []
         var participants: [User] = []
-
+        
         let dispatchGroup = DispatchGroup()
-
+        
         // Step 1: Fetch the latest travel plan from Firestore
         dispatchGroup.enter()
         SpendingFirebaseManager.shared.fetchTravel(for: travelPlanId) { fetchedTravelPlan in
@@ -195,7 +195,7 @@ class SpendingViewController: UIViewController {
                 dispatchGroup.leave()
                 return
             }
-
+            
             localTravelPlan = fetchedTravelPlan
             print("Fetched latest travel plan:")
             print("""
@@ -206,14 +206,14 @@ class SpendingViewController: UIViewController {
             """)
             dispatchGroup.leave()
         }
-
+        
         // Wait for travel plan to be fetched before proceeding
         dispatchGroup.notify(queue: .global()) {
             guard let travelPlan = localTravelPlan else {
                 print("Error: Local travel plan is nil. Aborting data fetch.")
                 return
             }
-
+            
             // Step 2: Fetch categories using updated category IDs
             dispatchGroup.enter()
             print("Fetching categories for travel plan ID: \(travelPlan.id) with updated category IDs: \(travelPlan.categoryIds)")
@@ -222,7 +222,7 @@ class SpendingViewController: UIViewController {
                 print("Fetched \(fetchedCategories.count) categories.")
                 dispatchGroup.leave()
             }
-
+            
             // Step 3: Fetch spending items using updated category IDs
             dispatchGroup.enter()
             print("Fetching spending items for updated category IDs: \(travelPlan.categoryIds)")
@@ -231,7 +231,7 @@ class SpendingViewController: UIViewController {
                 print("Fetched \(fetchedSpendingItems.count) spending items.")
                 dispatchGroup.leave()
             }
-
+            
             // Step 4: Fetch balances using updated balance IDs
             dispatchGroup.enter()
             print("Fetching balances for travel plan ID: \(travelPlan.id) with updated balance IDs: \(travelPlan.balanceIds)")
@@ -240,69 +240,83 @@ class SpendingViewController: UIViewController {
                 print("Fetched \(fetchedBalances.count) balances for travel plan ID \(travelPlan.id).")
                 dispatchGroup.leave()
             }
-
+            
             // Step 5: Fetch participants and their icons using updated participant IDs
             dispatchGroup.notify(queue: .main) {
-                        dispatchGroup.enter()
-                        self.fetchParticipantsAndIcons(for: travelPlan.participantIds) { fetchedParticipants in
-                            participants = fetchedParticipants
-                            dispatchGroup.leave()
-                        }
-
-                        dispatchGroup.notify(queue: .main) {
-                            self.travelPlan = travelPlan
-                            self.categories = categories
-                            self.spendingItems = spendingItems
-                            self.balances = balances
-                            self.participants = participants
-
-                            print("[SpendingViewController] Finished populating data. Updating child views.")
-                            self.updateUIWithTravelPlan(travelPlan)
-                        }
-                    }
+                dispatchGroup.enter()
+                self.fetchParticipantsAndIcons(for: travelPlan.participantIds) { fetchedParticipants in
+                    participants = fetchedParticipants
+                    dispatchGroup.leave()
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    self.travelPlan = travelPlan
+                    self.categories = categories
+                    self.spendingItems = spendingItems
+                    self.balances = balances
+                    self.participants = participants
+                    
+                    print("[SpendingViewController] Finished populating data. Updating child views.")
+                    self.updateUIWithTravelPlan(travelPlan)
                 }
             }
+        }
+    }
     
     private func updateUIWithTravelPlan(_ travelPlan: Travel) {
         print("[SpendingViewController] Updating UI for travel plan: \(travelPlan.travelTitle).")
         print("[SpendingViewController] Categories: \(categories.count), Spending Items: \(spendingItems.count), Participants: \(participants.count).")
-            
+        
         travelTitleLabel.text = travelPlan.travelTitle
         spendingView.isHidden = false
         noActivePlanLabel.isHidden = true
-
-        // Pass resolved data to child view controllers
-        overviewVC.setTravelPlan(
-            travelPlan,
-            categories: categories,
-            spendingItems: spendingItems,
-            participants: participants,
-            currencySymbol: travelPlan.currency
-        )
-        budgetVC.setTravelPlan(
-            travelPlan,
-            categories: categories,
-            spendingItems: spendingItems, // Add spending items here
-            participants: participants,
-            currencySymbol: travelPlan.currency,
-            userIcons: userIcons
-        )
-        expensesVC.setTravelPlan(
-            travelPlan,
-            categories: categories,
-            spendingItems: spendingItems,
-            participants: participants,
-            currencySymbol: travelPlan.currency,
-            userIcons: userIcons
-        )
-        splitVC.setTravelPlan(
-            travelPlan: travelPlan,
-            participants: participants,
-            currentBalance: balances.first { !$0.isSet } ?? Balance(travelId: travelPlan.id), // Provide a default Balance if none exists
-            settledBalances: balances.filter { $0.isSet } // Pass the settled balances
-        )
-
-        // Restore the active tab
+        
+        // Ensure we get the active balance or create a new one if none exists
+        SpendingFirebaseManager.shared.ensureActiveBalance(for: travelPlan.id) { [weak self] activeBalance in
+            guard let self = self else { return }
+            
+            let activeBalance = activeBalance ?? Balance(travelId: travelPlan.id)
+            
+            // Filter spending items for unsettled/settled items
+            let unsettledSpendingItems = self.spendingItems.filter { !$0.isSettled }
+            let settledSpendingItems = self.spendingItems.filter { $0.isSettled }
+            
+            // Pass resolved data to child view controllers
+            overviewVC.setTravelPlan(
+                travelPlan,
+                categories: categories,
+                spendingItems: spendingItems,
+                participants: participants,
+                currencySymbol: travelPlan.currency
+            )
+            budgetVC.setTravelPlan(
+                travelPlan,
+                categories: categories,
+                spendingItems: spendingItems, // Add spending items here
+                participants: participants,
+                currencySymbol: travelPlan.currency,
+                userIcons: userIcons
+            )
+            expensesVC.setTravelPlan(
+                travelPlan,
+                categories: categories,
+                spendingItems: spendingItems,
+                participants: participants,
+                currencySymbol: travelPlan.currency,
+                userIcons: userIcons
+            )
+            splitVC.setTravelPlan(
+                travelPlan: travelPlan,
+                participants: self.participants,
+                currentBalance: activeBalance, 
+                unsettledSpendingItems: unsettledSpendingItems,
+                settledSpendingItems: settledSpendingItems,
+                categories: categories,
+                userIcons: userIcons,
+                currencySymbol: travelPlan.currency
+            )
+            
+            // Restore the active tab
             switch currentTabIndex {
             case 0:
                 switchToViewController(overviewVC)
@@ -315,6 +329,7 @@ class SpendingViewController: UIViewController {
             default:
                 switchToViewController(overviewVC)
             }
+        }
     }
     
     

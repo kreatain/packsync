@@ -176,15 +176,13 @@ class SpendingFirebaseManager {
     func addSpendingItem(to categoryId: String, spendingItem: SpendingItem, completion: @escaping (Bool) -> Void) {
         let spendingItemsRef = db.collection("spendingItems")
         let categoryRef = db.collection("categories").document(categoryId)
-        
-        // Generate a new spending item with a unique ID
+
         var spendingItemToAdd = spendingItem
-        let newSpendingItemRef = spendingItemsRef.document() // Generate a new document ID
-        spendingItemToAdd.id = newSpendingItemRef.documentID // Assign the generated ID
-        spendingItemToAdd.categoryId = categoryId // Ensure categoryId is assigned
+        let newSpendingItemRef = spendingItemsRef.document()
+        spendingItemToAdd.id = newSpendingItemRef.documentID
+        spendingItemToAdd.categoryId = categoryId
 
         do {
-            // Add the spending item to the spendingItems collection
             try newSpendingItemRef.setData(from: spendingItemToAdd) { error in
                 if let error = error {
                     print("Error adding spending item: \(error.localizedDescription)")
@@ -192,16 +190,18 @@ class SpendingFirebaseManager {
                     return
                 }
 
-                // Update the category to include the new spending item ID
                 categoryRef.updateData([
-                    "spendingItemIds": FieldValue.arrayUnion([spendingItemToAdd.id]) // Add the ID to the array
+                    "spendingItemIds": FieldValue.arrayUnion([spendingItemToAdd.id])
                 ]) { error in
                     if let error = error {
                         print("Error updating category with new spending item ID: \(error.localizedDescription)")
                         completion(false)
-                    } else {
-                        print("Spending item added successfully and linked to category ID: \(categoryId)")
-                        completion(true)
+                        return
+                    }
+
+                    print("Spending item added successfully. Updating active balance...")
+                    self.updateActiveBalance(for: spendingItemToAdd.travelId) { success in
+                        completion(success)
                     }
                 }
             }
@@ -220,9 +220,12 @@ class SpendingFirebaseManager {
                 if let error = error {
                     print("Error updating spending item: \(error.localizedDescription)")
                     completion(false)
-                } else {
-                    print("Spending item updated successfully.")
-                    completion(true)
+                    return
+                }
+
+                print("Spending item updated successfully. Updating active balance...")
+                self.updateActiveBalance(for: spendingItem.travelId) { success in
+                    completion(success)
                 }
             }
         } catch {
@@ -230,13 +233,39 @@ class SpendingFirebaseManager {
             completion(false)
         }
     }
+    
+    // MARK: - Update Spending Items [Bulk]
+    func updateSpendingItems(_ spendingItems: [SpendingItem], completion: @escaping (Bool) -> Void) {
+        let spendingItemsRef = db.collection("spendingItems")
+        let batch = db.batch()
+        
+        for item in spendingItems {
+            let documentRef = spendingItemsRef.document(item.id)
+            do {
+                try batch.setData(from: item, forDocument: documentRef)
+            } catch {
+                print("Error serializing spending item \(item.id): \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+        }
+        
+        batch.commit { error in
+            if let error = error {
+                print("Error updating spending items batch: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("Successfully updated spending items batch.")
+                completion(true)
+            }
+        }
+    }
 
     // MARK: - Delete Spending Item
-    func deleteSpendingItem(from categoryId: String, spendingItemId: String, completion: @escaping (Bool) -> Void) {
+    func deleteSpendingItem(from categoryId: String, spendingItemId: String, travelId: String, completion: @escaping (Bool) -> Void) {
         let spendingItemRef = db.collection("spendingItems").document(spendingItemId)
         let categoryRef = db.collection("categories").document(categoryId)
 
-        // Delete the spending item
         spendingItemRef.delete { error in
             if let error = error {
                 print("Error deleting spending item: \(error.localizedDescription)")
@@ -244,16 +273,18 @@ class SpendingFirebaseManager {
                 return
             }
 
-            // Update the category to remove the spending item ID
             categoryRef.updateData([
                 "spendingItemIds": FieldValue.arrayRemove([spendingItemId])
             ]) { error in
                 if let error = error {
                     print("Error updating category after spending item deletion: \(error.localizedDescription)")
                     completion(false)
-                } else {
-                    print("Spending item deleted successfully and unlinked from category.")
-                    completion(true)
+                    return
+                }
+
+                print("Spending item deleted successfully. Updating active balance...")
+                self.updateActiveBalance(for: travelId) { success in
+                    completion(success)
                 }
             }
         }
@@ -395,36 +426,38 @@ class SpendingFirebaseManager {
     }
     
     // MARK: - Add Balance
-        func addBalance(for travelId: String, balance: Balance, completion: @escaping (Bool) -> Void) {
-            let balanceRef = db.collection("balances").document(balance.id)
-            let travelRef = db.collection("travelPlans").document(travelId)
-            
-            do {
-                try balanceRef.setData(from: balance) { error in
+    func addBalance(for travelId: String, balance: Balance, completion: @escaping (Bool) -> Void) {
+        let balanceRef = db.collection("balances").document(balance.id)
+        let travelRef = db.collection("travelPlans").document(travelId)
+
+        var mutableBalance = balance
+        mutableBalance.spendingItemIds = [] // Initialize spendingItemIds if not set
+
+        do {
+            try balanceRef.setData(from: mutableBalance) { error in
+                if let error = error {
+                    print("Error adding balance: \(error.localizedDescription)")
+                    completion(false)
+                    return
+                }
+
+                travelRef.updateData([
+                    "balanceIds": FieldValue.arrayUnion([mutableBalance.id])
+                ]) { error in
                     if let error = error {
-                        print("Error adding balance: \(error.localizedDescription)")
+                        print("Error updating travel plan with new balance ID: \(error.localizedDescription)")
                         completion(false)
-                        return
-                    }
-                    
-                    // Update the travel plan to include the new balance ID
-                    travelRef.updateData([
-                        "balanceIds": FieldValue.arrayUnion([balance.id]) // Add balance ID to the list
-                    ]) { error in
-                        if let error = error {
-                            print("Error updating travel plan with new balance ID: \(error.localizedDescription)")
-                            completion(false)
-                        } else {
-                            print("Balance added and linked to travel plan successfully.")
-                            completion(true)
-                        }
+                    } else {
+                        print("Balance added and linked to travel plan successfully.")
+                        completion(true)
                     }
                 }
-            } catch {
-                print("Error serializing balance: \(error.localizedDescription)")
-                completion(false)
             }
+        } catch {
+            print("Error serializing balance: \(error.localizedDescription)")
+            completion(false)
         }
+    }
     
     // MARK: - Fetch Single Balance
     func fetchBalance(byId balanceId: String, completion: @escaping (Balance?) -> Void) {
@@ -535,6 +568,51 @@ class SpendingFirebaseManager {
         }
     }
     
+    // MARK: - Auto Update Active Balance
+    private func updateActiveBalance(for travelId: String, completion: @escaping (Bool) -> Void) {
+        print("Updating active balance for travel ID: \(travelId)")
+
+        ensureActiveBalance(for: travelId) { [weak self] activeBalance in
+            guard let self = self, var activeBalance = activeBalance else {
+                print("Failed to ensure or fetch active balance for travel ID: \(travelId).")
+                completion(false)
+                return
+            }
+
+            self.fetchTravel(for: travelId) { travel in
+                guard let travel = travel else {
+                    print("Failed to fetch travel plan for travel ID: \(travelId).")
+                    completion(false)
+                    return
+                }
+
+                let categoryIds = travel.categoryIds
+                self.fetchSpendingItemsByCategoryIds(categoryIds: categoryIds) { spendingItems in
+                    var updatedBalances: [String: Double] = [:]
+                    var associatedSpendingItemIds: [String] = []
+
+                    for item in spendingItems where !item.isSettled {
+                        let perPersonShare = item.amount / Double(item.participants.count)
+                        associatedSpendingItemIds.append(item.id)
+
+                        for participantId in item.participants {
+                            if participantId == item.spentByUserId {
+                                let totalCredit = perPersonShare * Double(item.participants.count - 1)
+                                updatedBalances[participantId, default: 0] += totalCredit
+                            } else {
+                                updatedBalances[participantId, default: 0] -= perPersonShare
+                            }
+                        }
+                    }
+
+                    activeBalance.balances = updatedBalances
+                    activeBalance.spendingItemIds = associatedSpendingItemIds
+                    self.updateBalance(balance: activeBalance, completion: completion)
+                }
+            }
+        }
+    }
+    
     // MARK: - Delete Balance
         func deleteBalance(for travelId: String, balanceId: String, completion: @escaping (Bool) -> Void) {
             let balanceRef = db.collection("balances").document(balanceId)
@@ -561,6 +639,36 @@ class SpendingFirebaseManager {
                 }
             }
         }
+    
+    // MARK: - Settle Balance
+    func settleBalance(for balanceId: String, travelId: String, completion: @escaping (Bool) -> Void) {
+        fetchBalance(byId: balanceId) { [weak self] balance in
+            guard let self = self, let balance = balance else {
+                completion(false)
+                return
+            }
+
+            self.fetchSpendingItemsByIds(spendingItemIds: balance.spendingItemIds) { spendingItems in
+                let updatedItems = spendingItems.map { item -> SpendingItem in
+                    var mutableItem = item
+                    mutableItem.isSettled = true
+                    return mutableItem
+                }
+
+                self.updateSpendingItems(updatedItems) { success in
+                    if success {
+                        var mutableBalance = balance
+                        mutableBalance.isSet = true // Mark balance as settled
+                        self.updateBalance(balance: mutableBalance) { updateSuccess in
+                            completion(updateSuccess)
+                        }
+                    } else {
+                        completion(false)
+                    }
+                }
+            }
+        }
+    }
     
 }
 

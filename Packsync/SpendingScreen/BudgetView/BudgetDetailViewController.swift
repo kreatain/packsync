@@ -56,7 +56,6 @@ class BudgetDetailViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         updateLabels()
-    
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -140,7 +139,7 @@ class BudgetDetailViewController: UIViewController {
         let navController = UINavigationController(rootViewController: addEditExpenseVC)
         present(navController, animated: true)
     }
-    
+
     
     func updateCategory(_ category: Category, spendingItems: [SpendingItem], userIcons: [String: UIImage]) {
         loadingIndicator.startAnimating() // Show the spinner
@@ -153,6 +152,7 @@ class BudgetDetailViewController: UIViewController {
             DispatchQueue.main.async {
                 self.title = "\(category.emoji) \(category.name)"
                 self.tableView.reloadData()
+                self.updateLabels() // Refresh labels here
                 self.loadingIndicator.stopAnimating() // Hide the spinner
             }
         }
@@ -162,7 +162,7 @@ class BudgetDetailViewController: UIViewController {
         return category.id
     }
     
-    private func updateLabels() {
+    func updateLabels() {
             // Compute totals
             let totalBudget = category.budgetAmount
             let totalExpenses = spendingItems.reduce(0) { $0 + $1.amount }
@@ -198,16 +198,23 @@ class BudgetDetailViewController: UIViewController {
         loadingIndicator.startAnimating() // Show the spinner
 
         let expenseToDelete = spendingItems[indexPath.row]
-        SpendingFirebaseManager.shared.deleteSpendingItem(from: category.id, spendingItemId: expenseToDelete.id) { success in
+        SpendingFirebaseManager.shared.deleteSpendingItem(from: category.id, spendingItemId: expenseToDelete.id, travelId: travelId) { success in
             DispatchQueue.main.async {
                 if success {
+                    // Remove the deleted expense from the spendingItems array
                     self.spendingItems.remove(at: indexPath.row)
+                    // Update the table view to reflect the deletion
                     self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                    // Refresh the total budget and expenses labels
+                    self.updateLabels()
+                    // Post a notification to inform other views of the change
                     NotificationCenter.default.post(name: .travelDataChanged, object: nil)
                 } else {
+                    // Show an error alert if deletion failed
                     self.showAlert(title: "Error", message: "Failed to delete the expense.")
                 }
-                self.loadingIndicator.stopAnimating() // Hide the spinner
+                // Stop the spinner in either case
+                self.loadingIndicator.stopAnimating()
             }
         }
     }

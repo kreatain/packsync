@@ -58,11 +58,25 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         setupUI()
         configureWithExpense()
         
+        // Initialize selectedParticipants with all participants
+        if selectedParticipants.isEmpty {
+            selectedParticipants = Set(participants.map { $0.id })
+        }
+        updateParticipantsButtonText()
+
+        // Pre-select the current user as the payer
+        if selectedPayerId == nil, let currentUserId = Auth.auth().currentUser?.uid {
+            selectedPayerId = currentUserId
+            let currentUser = participants.first { $0.id == currentUserId }
+            payerButton.setTitle(currentUser?.displayName ?? currentUser?.email ?? "Select Payer", for: .normal)
+        }
+        
         // Show alert only if there are no categories and no fixed category
-            if categories.isEmpty && fixedCategory == nil {
-                showAlertAndGoBack()
-                return // Stop further execution to prevent crashes due to empty categories
-            }
+        if categories.isEmpty && fixedCategory == nil {
+            showAlertAndGoBack()
+            return // Stop further execution to prevent crashes due to empty categories
+        }
+        
     }
     
     @objc private func debugTap(_ recognizer: UITapGestureRecognizer) {
@@ -475,12 +489,12 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 spentByUserId: payerId,
                 categoryId: selectedCategory.id,
                 receiptURL: selectedReceiptURL ?? existingExpense.receiptURL, // Use the updated receipt URL if available
-                participants: Array(selectedParticipants)
+                participants: Array(selectedParticipants),
+                travelId: travelId
             )
 
             SpendingFirebaseManager.shared.updateSpendingItem(spendingItem: updatedExpense) { success in
                 if success {
-                    self.updateBalances(for: updatedExpense)
                     NotificationCenter.default.post(
                         name: .travelDataChanged,
                         object: nil,
@@ -502,12 +516,12 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 spentByUserId: payerId,
                 categoryId: selectedCategory.id,
                 receiptURL: selectedReceiptURL,
-                participants: Array(selectedParticipants)
+                participants: Array(selectedParticipants),
+                travelId: travelId
             )
 
             SpendingFirebaseManager.shared.addSpendingItem(to: selectedCategory.id, spendingItem: newExpense) { success in
                 if success {
-                    self.updateBalances(for: newExpense)
                     NotificationCenter.default.post(
                         name: .travelDataChanged,
                         object: nil,
@@ -522,32 +536,6 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
         }
     }
-    
-    private func updateBalances(for spendingItem: SpendingItem) {
-            SpendingFirebaseManager.shared.ensureActiveBalance(for: travelId) { activeBalance in
-                guard var activeBalance = activeBalance else {
-                    print("Failed to fetch or create active balance.")
-                    return
-                }
-
-                let splitAmount = spendingItem.amount / Double(spendingItem.participants.count)
-                spendingItem.participants.forEach { participantId in
-                    if participantId == spendingItem.spentByUserId {
-                        activeBalance.balances[participantId, default: 0.0] -= splitAmount * Double(spendingItem.participants.count - 1)
-                    } else {
-                        activeBalance.balances[participantId, default: 0.0] += splitAmount
-                    }
-                }
-
-                SpendingFirebaseManager.shared.updateBalance(balance: activeBalance) { success in
-                    if success {
-                        print("Balance updated successfully.")
-                    } else {
-                        print("Failed to update balance.")
-                    }
-                }
-            }
-        }
 
     
     private func showAlert(title: String, message: String) {

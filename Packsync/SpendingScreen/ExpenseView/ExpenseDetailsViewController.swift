@@ -14,10 +14,12 @@ class ExpenseDetailsViewController: UIViewController {
     private let editButton = UIButton(type: .system)
     private let deleteButton = UIButton(type: .system)
     
+    private let settledLabel = UILabel()
     private let descriptionLabel = UILabel()
     private let categoryLabel = UILabel()
     private let amountLabel = UILabel()
     private let spentByLabel = UILabel()
+    private let participantsLabel = UILabel()
     private let dateLabel = UILabel()
     private let receiptImageView = UIImageView()
     
@@ -46,6 +48,15 @@ class ExpenseDetailsViewController: UIViewController {
         self.categories = categories
         self.participants = participants
         super.init(nibName: nil, bundle: nil)
+        
+        // Set initial values
+        let participantNames = participants
+            .filter { expense.participants.contains($0.id) }
+            .map { $0.displayName ?? $0.email }
+            .joined(separator: ", ")
+        participantsLabel.text = "Participants: \(participantNames.isEmpty ? "None" : participantNames)"
+        settledLabel.text = expense.isSettled ? "Settled" : "Not Settled"
+        settledLabel.textColor = expense.isSettled ? .systemGreen : .systemRed
     }
     
     required init?(coder: NSCoder) {
@@ -58,11 +69,11 @@ class ExpenseDetailsViewController: UIViewController {
         configureWithExpense()
         
         NotificationCenter.default.addObserver(
-                    self,
-                    selector: #selector(handleTravelDataChanged),
-                    name: .travelDataChanged,
-                    object: nil
-                )
+            self,
+            selector: #selector(handleTravelDataChanged),
+            name: .travelDataChanged,
+            object: nil
+        )
     }
     
     
@@ -73,6 +84,13 @@ class ExpenseDetailsViewController: UIViewController {
         
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Settled Label Setup
+        settledLabel.font = .boldSystemFont(ofSize: 16)
+        settledLabel.textAlignment = .left
+        settledLabel.textColor = .systemRed
+        settledLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(settledLabel)
         
         // Configure Buttons
         editButton.setTitle("Edit", for: .normal)
@@ -106,6 +124,10 @@ class ExpenseDetailsViewController: UIViewController {
         spentByLabel.font = .systemFont(ofSize: 16)
         spentByLabel.translatesAutoresizingMaskIntoConstraints = false
         
+        participantsLabel.font = .systemFont(ofSize: 16)
+        participantsLabel.numberOfLines = 0
+        participantsLabel.translatesAutoresizingMaskIntoConstraints = false
+        
         dateLabel.font = .systemFont(ofSize: 16)
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
         
@@ -122,6 +144,7 @@ class ExpenseDetailsViewController: UIViewController {
         contentView.addSubview(spentByLabel)
         contentView.addSubview(dateLabel)
         contentView.addSubview(receiptImageView)
+        contentView.addSubview(participantsLabel)
         
         // Constraints
         NSLayoutConstraint.activate([
@@ -148,11 +171,19 @@ class ExpenseDetailsViewController: UIViewController {
             
             spentByLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 20),
             spentByLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+
+            participantsLabel.topAnchor.constraint(equalTo: spentByLabel.bottomAnchor, constant: 20),
+            participantsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            participantsLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
-            dateLabel.topAnchor.constraint(equalTo: spentByLabel.bottomAnchor, constant: 20),
+            dateLabel.topAnchor.constraint(equalTo: participantsLabel.bottomAnchor, constant: 20),
             dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             
-            receiptImageView.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 20),
+            settledLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 20),
+            settledLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            settledLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            
+            receiptImageView.topAnchor.constraint(equalTo: settledLabel.bottomAnchor, constant: 20),
             receiptImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             receiptImageView.widthAnchor.constraint(equalToConstant: 200),
             receiptImageView.heightAnchor.constraint(equalToConstant: 200),
@@ -176,7 +207,19 @@ class ExpenseDetailsViewController: UIViewController {
         amountLabel.text = "Amount: \(currencySymbol)\(String(format: "%.2f", expense.amount))"
         spentByLabel.text = "Spent By: \(spender?.displayName ?? spender?.email ?? "Unknown")"
         dateLabel.text = "Date: \(formattedDate(from: expense.date))"
-        
+
+        // Configure participantsLabel
+        let participantNames = participants
+            .filter { expense.participants.contains($0.id) }
+            .map { $0.displayName ?? $0.email }
+            .joined(separator: ", ")
+        participantsLabel.text = "Participants: \(participantNames.isEmpty ? "None" : participantNames)"
+
+        // Configure settledLabel
+        settledLabel.text = "Status: \(expense.isSettled ? "Settled" : "Editable")"
+        // settledLabel.textColor = expense.isSettled ? .systemGreen : .systemRed
+
+        // Configure receipt image
         if let receiptURLString = expense.receiptURL, let receiptURL = URL(string: receiptURLString) {
             DispatchQueue.global().async {
                 if let data = try? Data(contentsOf: receiptURL), let image = UIImage(data: data) {
@@ -187,6 +230,13 @@ class ExpenseDetailsViewController: UIViewController {
                 }
             }
         }
+        
+        // Disable buttons if the expense is settled
+        let isEditable = !expense.isSettled
+        editButton.isEnabled = isEditable
+        deleteButton.isEnabled = isEditable
+        editButton.alpha = isEditable ? 1.0 : 0.5
+        deleteButton.alpha = isEditable ? 1.0 : 0.5
     }
     
     private func formattedDate(from isoDate: String) -> String {
@@ -236,7 +286,8 @@ class ExpenseDetailsViewController: UIViewController {
     @objc private func deleteExpense() {
         SpendingFirebaseManager.shared.deleteSpendingItem(
                 from: self.expense.categoryId,
-                spendingItemId: self.expense.id
+                spendingItemId: self.expense.id,
+                travelId: travelId
             ) { [weak self] success in
                 guard let self = self else { return }
                 if success {
@@ -250,25 +301,34 @@ class ExpenseDetailsViewController: UIViewController {
     }
     
     @objc private func handleTravelDataChanged(notification: Notification) {
-            guard let userInfo = notification.userInfo,
-                  let updatedExpense = userInfo["expense"] as? SpendingItem,
-                  updatedExpense.id == self.expense.id else {
-                return
-            }
-
-            // Refresh the expense details
-            self.expense = updatedExpense
-
-            if let updatedCategory = categories.first(where: { $0.id == updatedExpense.categoryId }) {
-                self.category = updatedCategory
-            }
-
-            if let updatedSpender = participants.first(where: { $0.id == updatedExpense.spentByUserId }) {
-                self.spender = updatedSpender
-            }
-
-            configureWithExpense() // Update UI
+        guard let userInfo = notification.userInfo,
+              let updatedExpense = userInfo["expense"] as? SpendingItem,
+              updatedExpense.id == self.expense.id else {
+            return
         }
+
+        // Refresh the expense details
+        self.expense = updatedExpense
+
+        if let updatedCategory = categories.first(where: { $0.id == updatedExpense.categoryId }) {
+            self.category = updatedCategory
+        }
+
+        if let updatedSpender = participants.first(where: { $0.id == updatedExpense.spentByUserId }) {
+            self.spender = updatedSpender
+        }
+
+        // Refresh participantsLabel and settledLabel
+        let participantNames = participants
+            .filter { updatedExpense.participants.contains($0.id) }
+            .map { $0.displayName ?? $0.email }
+            .joined(separator: ", ")
+        participantsLabel.text = "Participants: \(participantNames.isEmpty ? "None" : participantNames)"
+        settledLabel.text = updatedExpense.isSettled ? "Settled" : "Not Settled"
+        settledLabel.textColor = updatedExpense.isSettled ? .systemGreen : .systemRed
+
+        configureWithExpense() // Update UI
+    }
 
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)

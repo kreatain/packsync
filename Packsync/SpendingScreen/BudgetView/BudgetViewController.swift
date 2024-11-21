@@ -115,6 +115,7 @@ class BudgetViewController: UIViewController {
             if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
                 let filteredSpendingItems = spendingItems.filter { $0.categoryId == activeCategory.id }
                 detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems, userIcons: userIcons) // Pass userIcons
+                detailVC.updateLabels()
             } else {
                 print("[BudgetViewController] No matching category found for active BudgetDetailViewController.")
             }
@@ -167,13 +168,19 @@ class BudgetViewController: UIViewController {
                 SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { categories in
                     DispatchQueue.main.async {
                         self.categories = categories
+                        self.spendingItems = self.spendingItems.filter { spendingItem in
+                            categories.contains(where: { $0.id == spendingItem.categoryId })
+                        }
                         self.calculateSummary()
                         self.tableView.reloadData()
 
-                        // Dynamically update BudgetDetailViewController
-                        if let selectedCategory = self.categories.first(where: { $0.id == self.categories.first?.id }) {
-                            let filteredSpendingItems = self.spendingItems.filter { $0.categoryId == selectedCategory.id }
-                            self.updateBudgetDetailViewController(with: selectedCategory, spendingItems: filteredSpendingItems)
+                        // Ensure detailVC updates reflect the latest data
+                        if let detailVC = self.navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
+                            if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
+                                let filteredSpendingItems = self.spendingItems.filter { $0.categoryId == activeCategory.id }
+                                detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems, userIcons: self.userIcons)
+                                detailVC.updateLabels()
+                            }
                         }
                     }
                 }
