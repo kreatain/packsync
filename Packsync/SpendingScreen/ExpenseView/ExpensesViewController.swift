@@ -224,33 +224,50 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let expense = expenses[indexPath.row]
+
+        if expense.isSettled {
+            // Display a gray box with a message for settled expenses
+            let settledAction = UIContextualAction(style: .normal, title: "Settled") { _, _, completionHandler in
+                // Notify the user that settled expenses are not editable
+                let alert = UIAlertController(
+                    title: "Settled Expense",
+                    message: "This expense has been settled and cannot be edited or deleted.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
+                completionHandler(true)
+            }
+            settledAction.backgroundColor = .lightGray
+            return UISwipeActionsConfiguration(actions: [settledAction])
+        }
+
+        // Normal swipe actions for non-settled expenses
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, completionHandler in
             guard let self = self else { return }
-            
+
             let alert = UIAlertController(title: "Confirm Delete", message: "Are you sure you want to delete this expense?", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
             alert.addAction(UIAlertAction(title: "Delete", style: .destructive) { _ in
                 let expenseToDelete = self.expenses[indexPath.row]
-                
+
                 guard let category = self.categories.first(where: { $0.spendingItemIds.contains(expenseToDelete.id) }) else {
                     completionHandler(false)
                     return
                 }
-                
-                // Ensure travelId is available
+
                 guard let travelId = self.travelPlan?.id else {
                     print("Error: Travel ID not found")
                     completionHandler(false)
                     return
                 }
-                
+
                 SpendingFirebaseManager.shared.deleteSpendingItem(from: category.id, spendingItemId: expenseToDelete.id, travelId: travelId) { success in
                     if success {
                         self.expenses.remove(at: indexPath.row)
                         tableView.deleteRows(at: [indexPath], with: .automatic)
                         self.updateTotalExpenseLabel()
-                        
-                        // Notify parent view controller about deletion
                         NotificationCenter.default.post(name: .travelDataChanged, object: nil)
                     } else {
                         print("Failed to delete expense.")
@@ -260,7 +277,7 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
             })
             self.present(alert, animated: true, completion: nil)
         }
-        
+
         let editAction = UIContextualAction(style: .normal, title: "Edit") { [weak self] _, _, completionHandler in
             guard let self = self else { return }
             let expenseToEdit = self.expenses[indexPath.row]
@@ -275,7 +292,7 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
             self.present(navController, animated: true, completion: nil)
             completionHandler(true)
         }
-        
+
         editAction.backgroundColor = .systemBlue
         return UISwipeActionsConfiguration(actions: [editAction, deleteAction])
     }

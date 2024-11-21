@@ -287,6 +287,30 @@ extension BudgetDetailViewController: UITableViewDataSource, UITableViewDelegate
             return nil
         }
 
+        let expense = spendingItems[indexPath.row]
+
+        if expense.isSettled {
+            // Display a gray "Settled" action with an alert notification
+            let settledAction = UIContextualAction(style: .normal, title: "Settled") { [weak self] _, _, completionHandler in
+                guard let self = self else {
+                    completionHandler(false)
+                    return
+                }
+                // Show alert notifying that settled expenses cannot be edited or deleted
+                let alert = UIAlertController(
+                    title: "Settled Expense",
+                    message: "This expense has been settled and cannot be edited or deleted.",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
+                completionHandler(true)
+            }
+            settledAction.backgroundColor = .lightGray
+            return UISwipeActionsConfiguration(actions: [settledAction])
+        }
+
+        // Regular swipe actions for non-settled expenses
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] _, _, completionHandler in
             guard let self = self else {
                 completionHandler(false)
