@@ -83,6 +83,14 @@ class EditTravelDetailViewController: UIViewController {
             } else {
                 print("Document successfully updated")
                 self?.delegate?.didUpdateTravel(updatedTravel)
+                
+                // Send travelDataChanged notification
+                NotificationCenter.default.post(
+                    name: .travelDataChanged,
+                    object: nil,
+                    userInfo: ["travelId": updatedTravel.id]
+                )
+                
                 self?.dismiss(animated: true, completion: nil)
             }
         }
@@ -112,7 +120,7 @@ class EditTravelDetailViewController: UIViewController {
         
         present(alert, animated: true)
     }
-
+    
     func deleteTravel() {
         guard let travel = travel else { return }
         
@@ -138,15 +146,15 @@ extension EditTravelDetailViewController: UIPickerViewDataSource, UIPickerViewDe
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1 // Single column
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return currencies.count
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         return currencies[row] // Assuming `currencies` is a predefined array
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         // Handle selection if needed
         print("Selected currency: \(currencies[row])")

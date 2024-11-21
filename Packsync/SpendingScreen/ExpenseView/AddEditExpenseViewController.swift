@@ -19,14 +19,14 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     private let payerButton = UIButton(type: .system)
     private let receiptButton = UIButton(type: .system)
     private let receiptImageView = UIImageView()
-
+    
     private let participantsLabel = UILabel()
     private let participantsButton = UIButton(type: .system)
     
     private let saveButton = UIButton(type: .system)
     
     private let categoryLabel = UILabel()
-
+    
     private var categories: [Category]
     private var participants: [User]
     private var travelId: String
@@ -38,7 +38,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     private var fixedCategory: Category?
     private var categoryPickerHeightConstraint: NSLayoutConstraint?
     private var receiptImageViewHeightConstraint: NSLayoutConstraint?
-
+    
     init(categories: [Category], participants: [User], travelId: String, currencySymbol: String, expense: SpendingItem? = nil, fixedCategory: Category? = nil) {
         self.categories = categories
         self.participants = participants
@@ -48,11 +48,11 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         self.fixedCategory = fixedCategory
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
@@ -63,7 +63,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             selectedParticipants = Set(participants.map { $0.id })
         }
         updateParticipantsButtonText()
-
+        
         // Pre-select the current user as the payer
         if selectedPayerId == nil, let currentUserId = Auth.auth().currentUser?.uid {
             selectedPayerId = currentUserId
@@ -85,7 +85,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             print("Tapped view: \(hitView)")
         }
     }
-
+    
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         if selectedReceiptURL != nil, expense == nil {
@@ -95,21 +95,30 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-
+        
         // Update the scrollView's contentSize dynamically
         scrollView.contentSize = contentView.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize)
     }
-
+    
     private func setupUI() {
         view.backgroundColor = .white
         view.addSubview(scrollView)
+        view.addSubview(saveButton)
         scrollView.addSubview(contentView)
         
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         contentView.translatesAutoresizingMaskIntoConstraints = false
+        saveButton.translatesAutoresizingMaskIntoConstraints = false
         
         categoryPickerHeightConstraint = categoryPicker.heightAnchor.constraint(equalToConstant: 100)
-
+        
+        saveButton.setTitle("Save", for: .normal)
+        saveButton.backgroundColor = .systemBlue
+        saveButton.setTitleColor(.white, for: .normal)
+        saveButton.layer.cornerRadius = 8
+        saveButton.addTarget(self, action: #selector(saveExpense), for: .touchUpInside)
+        saveButton.translatesAutoresizingMaskIntoConstraints = false
+        
         NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -121,36 +130,42 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
+            
+            saveButton.topAnchor.constraint(equalTo: contentView.bottomAnchor),
+            saveButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            saveButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            saveButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+            saveButton.heightAnchor.constraint(equalToConstant: 44),
         ])
-
+            
         amountTextField.placeholder = "Expense Amount (\(currencySymbol))"
         amountTextField.keyboardType = .decimalPad
         amountTextField.borderStyle = .roundedRect
         amountTextField.translatesAutoresizingMaskIntoConstraints = false
-
+        
         descriptionTextField.placeholder = "Description"
         descriptionTextField.borderStyle = .roundedRect
         descriptionTextField.translatesAutoresizingMaskIntoConstraints = false
-
+        
         dateLabel.text = "Expense Date"
         dateLabel.font = .boldSystemFont(ofSize: 16)
         dateLabel.translatesAutoresizingMaskIntoConstraints = false
-
+        
         datePicker.datePickerMode = .date
         datePicker.translatesAutoresizingMaskIntoConstraints = false
-
+        
         categoryLabel.font = .boldSystemFont(ofSize: 16)
         categoryLabel.translatesAutoresizingMaskIntoConstraints = false
-
+        
         categoryPicker.translatesAutoresizingMaskIntoConstraints = false
         categoryPicker.dataSource = self
         categoryPicker.delegate = self
-
+        
         payerLabel.text = "Paid By"
         payerLabel.font = .boldSystemFont(ofSize: 16)
         payerLabel.translatesAutoresizingMaskIntoConstraints = false
-
+        
         payerButton.setTitle("Select Payer", for: .normal)
         payerButton.setTitleColor(.systemBlue, for: .normal)
         payerButton.addTarget(self, action: #selector(showPayerPicker), for: .touchUpInside)
@@ -159,36 +174,29 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         participantsLabel.text = "Related To"
         participantsLabel.font = .boldSystemFont(ofSize: 16)
         participantsLabel.translatesAutoresizingMaskIntoConstraints = false
-
+        
         participantsButton.setTitle("All Members", for: .normal)
         participantsButton.setTitleColor(.systemBlue, for: .normal)
         participantsButton.addTarget(self, action: #selector(toggleParticipantSelector), for: .touchUpInside)
         participantsButton.translatesAutoresizingMaskIntoConstraints = false
-
+        
         receiptButton.setTitle("Upload Receipt", for: .normal)
         receiptButton.addTarget(self, action: #selector(showPhotoOptions), for: .touchUpInside)
         receiptButton.translatesAutoresizingMaskIntoConstraints = false
-
+        
         receiptImageView.translatesAutoresizingMaskIntoConstraints = false
         receiptImageView.contentMode = .scaleAspectFit
         receiptImageView.layer.borderWidth = 1
         receiptImageView.layer.borderColor = UIColor.lightGray.cgColor
-
+        
         receiptImageViewHeightConstraint = receiptImageView.heightAnchor.constraint(equalToConstant: 80)
         receiptImageViewHeightConstraint?.isActive = true
         receiptImageView.isHidden = false // Ensure it remains in the layout hierarchy
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(viewReceiptFullscreen))
-                receiptImageView.addGestureRecognizer(tapGesture)
-                receiptImageView.isUserInteractionEnabled = true
-
-        saveButton.setTitle("Save", for: .normal)
-        saveButton.backgroundColor = .systemBlue
-        saveButton.setTitleColor(.white, for: .normal)
-        saveButton.layer.cornerRadius = 8
-        saveButton.addTarget(self, action: #selector(saveExpense), for: .touchUpInside)
-        saveButton.translatesAutoresizingMaskIntoConstraints = false
-
+        receiptImageView.addGestureRecognizer(tapGesture)
+        receiptImageView.isUserInteractionEnabled = true
+        
         contentView.addSubview(amountTextField)
         contentView.addSubview(descriptionTextField)
         contentView.addSubview(dateLabel)
@@ -201,56 +209,50 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         contentView.addSubview(receiptImageView)
         contentView.addSubview(participantsLabel)
         contentView.addSubview(participantsButton)
-        contentView.addSubview(saveButton)
         
         NSLayoutConstraint.activate([
             descriptionTextField.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             descriptionTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             descriptionTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-
+            
             amountTextField.topAnchor.constraint(equalTo: descriptionTextField.bottomAnchor, constant: 20),
             amountTextField.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             amountTextField.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-
+            
             dateLabel.topAnchor.constraint(equalTo: amountTextField.bottomAnchor, constant: 15),
             dateLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-
+            
             datePicker.centerYAnchor.constraint(equalTo: dateLabel.centerYAnchor),
             datePicker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-
+            
             categoryLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 20),
             categoryLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-
+            
             categoryPicker.topAnchor.constraint(equalTo: categoryLabel.bottomAnchor, constant: 10),
             categoryPicker.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             categoryPicker.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             categoryPickerHeightConstraint!,
-
+            
             payerLabel.topAnchor.constraint(equalTo: categoryPicker.bottomAnchor, constant: 20),
             payerLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-
+            
             payerButton.centerYAnchor.constraint(equalTo: payerLabel.centerYAnchor),
             payerButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-
+            
             participantsLabel.topAnchor.constraint(equalTo: payerButton.bottomAnchor, constant: 20),
             participantsLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-
+            
             participantsButton.centerYAnchor.constraint(equalTo: participantsLabel.centerYAnchor),
             participantsButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-
+            
             receiptButton.topAnchor.constraint(equalTo: participantsLabel.bottomAnchor, constant: 20),
             receiptButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-
+            
             receiptImageView.topAnchor.constraint(equalTo: receiptButton.bottomAnchor, constant: 20),
             receiptImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             receiptImageView.widthAnchor.constraint(equalToConstant: 100),
             receiptImageView.heightAnchor.constraint(equalToConstant: 80),
             
-            saveButton.topAnchor.constraint(equalTo: receiptButton.bottomAnchor, constant: 20),
-            saveButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-            saveButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            saveButton.heightAnchor.constraint(equalToConstant: 44),
-            saveButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
         
         adjustForFixedCategory()
@@ -282,14 +284,14 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         receiptImageViewHeightConstraint?.constant = 0 // Collapse the height
         view.layoutIfNeeded() // Refresh the layout
     }
-
+    
     private func configureWithExpense() {
         guard let expense = expense else { 
             // If there's no existing expense, clear the receipt image
             hideReceiptImage()
             return 
         }
-
+        
         // Populate fields with existing expense data
         amountTextField.text = "\(expense.amount)"
         descriptionTextField.text = expense.description
@@ -304,14 +306,14 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             payerButton.setTitle(participant.displayName ?? participant.email, for: .normal)
             selectedPayerId = participant.id
         }
-
+        
         // Handle receipt image
         if let receiptURLString = expense.receiptURL, let receiptURL = URL(string: receiptURLString) {
             loadImageFromURL(receiptURL)
         } else {
             hideReceiptImage()
         }
-
+        
         // Update the participants button text dynamically
         updateParticipantsButtonText()
     }
@@ -325,7 +327,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             participantsButton.setTitle("Partial Members", for: .normal)
         }
     }
-
+    
     private func loadImageFromURL(_ url: URL) {
         DispatchQueue.global().async {
             if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
@@ -339,7 +341,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     private func clearReceiptImage() {
         hideReceiptImage() // Adjust layout to hide the image
     }
-
+    
     private func deleteReceiptFromStorage() {
         guard let selectedReceiptURL = selectedReceiptURL else { return }
         let storageRef = Storage.storage().reference(forURL: selectedReceiptURL)
@@ -361,10 +363,10 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         participantSelectorVC.delegate = self
         navigationController?.pushViewController(participantSelectorVC, animated: true)
     }
-
+    
     @objc private func showPhotoOptions() {
         let alertController = UIAlertController(title: "Select Photo", message: "Choose a photo from your library or take a new one.", preferredStyle: .actionSheet)
-
+        
         alertController.addAction(UIAlertAction(title: "Camera", style: .default) { _ in
             if UIImagePickerController.isSourceTypeAvailable(.camera) {
                 let imagePickerController = UIImagePickerController()
@@ -373,28 +375,28 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 self.present(imagePickerController, animated: true)
             }
         })
-
+        
         alertController.addAction(UIAlertAction(title: "Photo Library", style: .default) { _ in
             let imagePickerController = UIImagePickerController()
             imagePickerController.sourceType = .photoLibrary
             imagePickerController.delegate = self
             self.present(imagePickerController, animated: true)
         })
-
+        
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-
+        
         present(alertController, animated: true)
     }
     
     @objc private func viewReceiptFullscreen() {
-            guard let image = receiptImageView.image else { return }
-            let fullscreenVC = FullscreenImageViewController(image: image)
-            present(fullscreenVC, animated: true)
-        }
+        guard let image = receiptImageView.image else { return }
+        let fullscreenVC = FullscreenImageViewController(image: image)
+        present(fullscreenVC, animated: true)
+    }
     
     @objc private func showPayerPicker() {
         let alertController = UIAlertController(title: "Select Payer", message: nil, preferredStyle: .actionSheet)
-
+        
         for participant in participants {
             let action = UIAlertAction(title: participant.displayName ?? participant.email, style: .default) { _ in
                 self.payerButton.setTitle(participant.displayName ?? participant.email, for: .normal)
@@ -402,15 +404,14 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
             alertController.addAction(action)
         }
-
+        
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(alertController, animated: true)
     }
-
+    
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let selectedImage = info[.originalImage] as? UIImage {
-            receiptImageView.image = selectedImage
-            receiptImageView.isHidden = false // Show thumbnail only after adding a photo
+            showReceiptImage(selectedImage)
             uploadReceiptToStorage(selectedImage) { [weak self] url in
                 guard let self = self else { return }
                 self.selectedReceiptURL = url
@@ -418,7 +419,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         }
         picker.dismiss(animated: true)
     }
-
+    
     private func uploadReceiptToStorage(_ image: UIImage, completion: @escaping (String?) -> Void) {
         guard let imageData = image.jpegData(compressionQuality: 0.75) else {
             completion(nil)
@@ -437,7 +438,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
         }
     }
-
+    
     @objc private func saveExpense() {
         guard let amountText = amountTextField.text,
               let amount = Double(amountText),
@@ -447,21 +448,21 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             showAlert(title: "Error", message: "Please fill in all fields.")
             return
         }
-
+        
         // Validate the selected participants
         if selectedParticipants.isEmpty {
             showAlert(title: "Error", message: "Please select at least one participant.")
             return
         }
-
+        
         // Fetch the current user's ID
         guard let userId = Auth.auth().currentUser?.uid else {
             showAlert(title: "Error", message: "Failed to identify the current user.")
             return
         }
-
+        
         let selectedCategory: Category
-
+        
         if let fixedCategory = fixedCategory {
             // Use the fixed category if present
             selectedCategory = fixedCategory
@@ -474,9 +475,9 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
             selectedCategory = categories[selectedCategoryIndex]
         }
-
+        
         let date = ISO8601DateFormatter().string(from: datePicker.date)
-
+        
         // Check if we are editing an existing expense
         if let existingExpense = expense {
             // Update existing expense
@@ -492,7 +493,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 participants: Array(selectedParticipants),
                 travelId: travelId
             )
-
+            
             SpendingFirebaseManager.shared.updateSpendingItem(spendingItem: updatedExpense) { success in
                 if success {
                     NotificationCenter.default.post(
@@ -519,7 +520,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 participants: Array(selectedParticipants),
                 travelId: travelId
             )
-
+            
             SpendingFirebaseManager.shared.addSpendingItem(to: selectedCategory.id, spendingItem: newExpense) { success in
                 if success {
                     NotificationCenter.default.post(
@@ -536,7 +537,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
         }
     }
-
+    
     
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -561,11 +562,11 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return categories.count
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         let category = categories[row]
         return "\(category.emoji) \(category.name)"
@@ -574,12 +575,12 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return participants.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "ParticipantSelectorCell", for: indexPath) as? ParticipantSelectorCell else {
             fatalError("Failed to dequeue ParticipantSelectorCell")
         }
-
+        
         let participant = participants[indexPath.row]
         let isChecked = selectedParticipants.contains(participant.id)
         cell.configure(with: participant.displayName ?? participant.email, isChecked: isChecked)
@@ -588,21 +589,21 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-
+        
         let participant = participants[indexPath.row]
         if selectedParticipants.contains(participant.id) {
             selectedParticipants.remove(participant.id)
         } else {
             selectedParticipants.insert(participant.id)
         }
-
+        
         // Reload the cell for the updated checkbox state
         tableView.reloadRows(at: [indexPath], with: .automatic)
-
+        
         // Update the button text dynamically
         updateParticipantsButtonText()
     }
-
+    
 }
 
 extension AddEditExpenseViewController: ParticipantSelectorDelegate {

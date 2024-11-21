@@ -33,9 +33,9 @@ class OverviewViewController: UIViewController, ChartViewDelegate {
 
     private func setupUI() {
         let verticalOffset: CGFloat = 20
-        let chartSize: CGFloat = 260
+        let chartSize: CGFloat = 250
 
-        totalBudgetLabel.font = .boldSystemFont(ofSize: 16)
+        totalBudgetLabel.font = .boldSystemFont(ofSize: 18)
         totalBudgetLabel.textAlignment = .center
         totalBudgetLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(totalBudgetLabel)
@@ -53,7 +53,7 @@ class OverviewViewController: UIViewController, ChartViewDelegate {
         totalBudgetEmptyLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(totalBudgetEmptyLabel)
 
-        totalExpensesLabel.font = .boldSystemFont(ofSize: 16)
+        totalExpensesLabel.font = .boldSystemFont(ofSize: 18)
         totalExpensesLabel.textAlignment = .center
         totalExpensesLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(totalExpensesLabel)

@@ -145,14 +145,20 @@ class SettledExpensesViewController: UIViewController, UITableViewDelegate, UITa
         let hasReceipt = expense.receiptURL != nil && !expense.receiptURL!.isEmpty
         print("[CellForRowAt] Receipt \(hasReceipt ? "available" : "not available") for Expense ID: \(expense.id)")
 
+        // Determine if the expense is settled
+        let isSettled = expense.isSettled // Assuming this field exists in `SpendingItem`
+
         // Configure the cell
         cell.configure(
             with: expense,
             categoryEmoji: emoji,
             userIcon: userIcon,
             dateString: formattedDate(from: expense.date),
-            hasReceipt: hasReceipt
+            hasReceipt: hasReceipt,
+            isSettled: isSettled
         )
+
+        print("[CellForRowAt] Configured cell for Expense ID: \(expense.id) with settled status: \(isSettled)")
 
         return cell
     }

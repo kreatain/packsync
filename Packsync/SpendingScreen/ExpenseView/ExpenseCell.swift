@@ -1,10 +1,3 @@
-//
-//  ExpenseCell.swift
-//  Packsync
-//
-//  Created by Leo Yang on 11/18/24.
-//
-
 import UIKit
 
 class ExpenseCell: UITableViewCell {
@@ -14,6 +7,7 @@ class ExpenseCell: UITableViewCell {
     private let userIconView = UIImageView()
     private let dateLabel = UILabel()
     private let receiptIndicatorLabel = UILabel()
+    private let settledIndicatorLabel = UILabel()
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -38,7 +32,7 @@ class ExpenseCell: UITableViewCell {
         
         // Amount Label
         amountLabel.font = .boldSystemFont(ofSize: 16)
-        amountLabel.textColor = .systemGreen
+        amountLabel.textColor = .black
         amountLabel.textAlignment = .right
         amountLabel.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(amountLabel)
@@ -59,11 +53,18 @@ class ExpenseCell: UITableViewCell {
         
         // Receipt Indicator Label
         receiptIndicatorLabel.font = .systemFont(ofSize: 12)
-        receiptIndicatorLabel.textColor = .lightGray // Use a lighter color
-        receiptIndicatorLabel.textAlignment = .left // Align with the column
+        receiptIndicatorLabel.textColor = .lightGray
+        receiptIndicatorLabel.textAlignment = .left
         receiptIndicatorLabel.translatesAutoresizingMaskIntoConstraints = false
-        receiptIndicatorLabel.isHidden = true // Initially hidden
+        receiptIndicatorLabel.isHidden = true
         contentView.addSubview(receiptIndicatorLabel)
+        
+        // Settled Indicator Label
+        settledIndicatorLabel.font = .boldSystemFont(ofSize: 12)
+        settledIndicatorLabel.textColor = .systemBlue
+        settledIndicatorLabel.textAlignment = .center
+        settledIndicatorLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(settledIndicatorLabel)
         
         // Layout constraints
         NSLayoutConstraint.activate([
@@ -77,8 +78,11 @@ class ExpenseCell: UITableViewCell {
            userIconView.heightAnchor.constraint(equalToConstant: 40),
 
            amountLabel.trailingAnchor.constraint(equalTo: userIconView.leadingAnchor, constant: -10),
-           amountLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+           amountLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
            amountLabel.widthAnchor.constraint(equalToConstant: 80),
+
+           settledIndicatorLabel.trailingAnchor.constraint(equalTo: amountLabel.trailingAnchor),
+           settledIndicatorLabel.topAnchor.constraint(equalTo: amountLabel.bottomAnchor, constant: 5),
 
            descriptionLabel.leadingAnchor.constraint(equalTo: emojiLabel.trailingAnchor, constant: 10),
            descriptionLabel.trailingAnchor.constraint(equalTo: amountLabel.leadingAnchor, constant: -10),
@@ -90,11 +94,11 @@ class ExpenseCell: UITableViewCell {
 
            receiptIndicatorLabel.leadingAnchor.constraint(equalTo: dateLabel.leadingAnchor),
            receiptIndicatorLabel.trailingAnchor.constraint(equalTo: dateLabel.trailingAnchor),
-           receiptIndicatorLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 2) 
+           receiptIndicatorLabel.topAnchor.constraint(equalTo: dateLabel.bottomAnchor, constant: 2)
        ])
     }
 
-    func configure(with expense: SpendingItem, categoryEmoji: String, userIcon: UIImage?, dateString: String, hasReceipt: Bool) {
+    func configure(with expense: SpendingItem, categoryEmoji: String, userIcon: UIImage?, dateString: String, hasReceipt: Bool, isSettled: Bool) {
         // Set the emoji
         emojiLabel.text = categoryEmoji
 
@@ -115,6 +119,9 @@ class ExpenseCell: UITableViewCell {
         } else {
             receiptIndicatorLabel.isHidden = true
         }
+        
+        // Set the settled status
+        settledIndicatorLabel.text = isSettled ? "Settled" : "Unsettled"
+        settledIndicatorLabel.textColor = isSettled ? .systemGreen : .systemRed
     }
-    
 }

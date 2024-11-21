@@ -91,6 +91,6 @@ class TransactionCell: UITableViewCell {
         creditorIcon.image = creditorIconImage ?? UIImage(systemName: "person.circle")
         debtorLabel.text = transaction.debtor.displayName ?? transaction.debtor.email
         creditorLabel.text = transaction.creditor.displayName ?? transaction.creditor.email
-        amountLabel.text = String(format: "$%.2f", transaction.amount)
+        amountLabel.text = String(format: "%.2f", transaction.amount)
     }
 }

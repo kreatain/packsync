@@ -171,9 +171,21 @@ extension ExpensesViewController: UITableViewDataSource, UITableViewDelegate {
         // Use userIcons dictionary for the user icon
         let userIcon = userIcons[expense.spentByUserId] ?? UIImage(systemName: "person.circle") // Default icon
 
-        // Check if receipt exists and configure the cell
+        // Check if receipt exists
         let hasReceipt = expense.receiptURL != nil && !expense.receiptURL!.isEmpty
-        cell.configure(with: expense, categoryEmoji: emoji, userIcon: userIcon, dateString: dateString, hasReceipt: hasReceipt)
+
+        // Check if the expense is settled
+        let isSettled = expense.isSettled // Assuming `isSettled` is a Boolean field in `SpendingItem`
+
+        // Configure the cell with updated parameters
+        cell.configure(
+            with: expense,
+            categoryEmoji: emoji,
+            userIcon: userIcon,
+            dateString: dateString,
+            hasReceipt: hasReceipt,
+            isSettled: isSettled
+        )
 
         return cell
     }

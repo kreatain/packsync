@@ -260,8 +260,15 @@ extension BudgetDetailViewController: UITableViewDataSource, UITableViewDelegate
         // Check if the expense has a receipt
         let hasReceipt = expense.receiptURL != nil && !expense.receiptURL!.isEmpty
         
-        // Configure the cell
-        cell.configure(with: expense, categoryEmoji: category.emoji, userIcon: userIcon, dateString: dateString, hasReceipt: hasReceipt)
+        // Configure the cell with settlement status
+        cell.configure(
+            with: expense,
+            categoryEmoji: category.emoji,
+            userIcon: userIcon,
+            dateString: dateString,
+            hasReceipt: hasReceipt,
+            isSettled: expense.isSettled
+        )
 
         return cell
     }

@@ -9,6 +9,8 @@ import UIKit
 
 class SpendingViewController: UIViewController {
     private let spendingView = SpendingView() // Using SpendingView for layout
+    private let loadingIndicator = UIActivityIndicatorView(style: .large) // Add loading indicator
+    private var isLoading = false
     private var travelID: String? // Optional travelID parameter for specific travel plan
     private var travelPlan: Travel?
     private let noActivePlanLabel = UILabel() // Label to prompt user to set active plan
@@ -49,8 +51,11 @@ class SpendingViewController: UIViewController {
         setupSpendingView()
         setupTravelTitleLabel()
         setupNoActivePlanLabel()
+        setupLoadingIndicator()
         setupTabBarAction()
         loadTravelPlan()
+        
+        setupListeners()
         
         // Listen for active travel plan changes
         NotificationCenter.default.addObserver(self, selector: #selector(loadTravelPlan), name: .activeTravelPlanChanged, object: nil)
@@ -59,10 +64,50 @@ class SpendingViewController: UIViewController {
         
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+            super.viewDidDisappear(animated)
+            SpendingFirebaseManager.shared.stopAllListeners()
+        }
+
+    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         print("Title Label Frame:", travelTitleLabel.frame)
         print("Tab Bar Frame:", spendingView.tabBar.frame)
+    }
+    
+    private func setupListeners() {
+            guard let travelID = travelID else { return }
+
+            SpendingFirebaseManager.shared.startListeningToTravelPlan(for: travelID) { [weak self] updatedTravel in
+                guard let self = self, let updatedTravel = updatedTravel else { return }
+                self.travelPlan = updatedTravel
+                self.updateUIWithTravelPlan(updatedTravel)
+            }
+
+        }
+    
+    // MARK: - Setup Loading Indicator
+    private func setupLoadingIndicator() {
+        view.addSubview(loadingIndicator)
+        loadingIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
+    private func startLoading() {
+        isLoading = true
+        spendingView.isHidden = true
+        noActivePlanLabel.isHidden = true
+        loadingIndicator.startAnimating()
+    }
+    
+    private func stopLoading() {
+        isLoading = false
+        loadingIndicator.stopAnimating()
+        spendingView.isHidden = false
     }
     
     private func setupSpendingView() {
@@ -122,26 +167,34 @@ class SpendingViewController: UIViewController {
     @objc private func loadTravelPlan() {
         print("[SpendingViewController] loadTravelPlan called.")
         
+        // Start loading animation
+        startLoading()
+        
         if let travelID = travelID {
-            // Case 1: Using provided travel ID
             print("[SpendingViewController] Fetching travel plan with ID: \(travelID).")
             SpendingFirebaseManager.shared.fetchTravel(for: travelID) { [weak self] travelPlan in
-                guard let self = self, let travelPlan = travelPlan else {
-                    print("[SpendingViewController] No travel plan found for ID: \(travelID). Showing no active plan notice.")
-                    self?.showNoActivePlanNotice()
-                    return
+                guard let self = self else { return }
+                
+                if let travelPlan = travelPlan {
+                    print("[SpendingViewController] Travel plan fetched successfully.")
+                    self.populateTravelPlanData(for: travelPlan.id)
+                } else {
+                    print("[SpendingViewController] No travel plan found for ID: \(travelID).")
+                    DispatchQueue.main.async {
+                        self.stopLoading()
+                        self.showNoActivePlanNotice()
+                    }
                 }
-                print("[SpendingViewController] Travel plan fetched successfully.")
-                self.populateTravelPlanData(for: travelPlan.id) // Pass only the travelPlanId
             }
         } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
-            // Case 2: Using active travel plan
             print("[SpendingViewController] Using active travel plan with ID: \(activePlan.id).")
-            self.populateTravelPlanData(for: activePlan.id) // Pass only the travelPlanId
+            populateTravelPlanData(for: activePlan.id)
         } else {
-            // Case 3: No travel ID or active travel plan
-            print("[SpendingViewController] No travel ID or active travel plan available. Showing no active plan notice.")
-            showNoActivePlanNotice()
+            print("[SpendingViewController] No travel ID or active travel plan available.")
+            DispatchQueue.main.async {
+                self.stopLoading()
+                self.showNoActivePlanNotice()
+            }
         }
     }
     
@@ -255,6 +308,7 @@ class SpendingViewController: UIViewController {
                     self.spendingItems = spendingItems
                     self.balances = balances
                     self.participants = participants
+                    self.stopLoading()
                     
                     print("[SpendingViewController] Finished populating data. Updating child views.")
                     self.updateUIWithTravelPlan(travelPlan)

@@ -325,12 +325,25 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                   } else {
                       print("Successfully accepted invitation and added participant.")
                       NotificationCenter.default.post(name: .travelDataChanged, object: nil, userInfo: ["travelId": invitation.travelId])
+                      self.triggerFirebaseUpdate(for: invitation.travelId)
                   }
               }
               
               print("Invitation accepted.")
           }
       }
+    
+    private func triggerFirebaseUpdate(for travelId: String) {
+        let travelRef = db.collection("travelPlans").document(travelId)
+
+        travelRef.updateData(["lastModified": FieldValue.serverTimestamp()]) { error in
+            if let error = error {
+                print("Error triggering Firebase update for travel plan: \(error)")
+            } else {
+                print("Successfully triggered Firebase update for travel plan \(travelId).")
+            }
+        }
+    }
                            
     func showAlert(title:String,message:String) {
             let alert =

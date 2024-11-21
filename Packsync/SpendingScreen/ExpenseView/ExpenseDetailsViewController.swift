@@ -216,8 +216,8 @@ class ExpenseDetailsViewController: UIViewController {
         participantsLabel.text = "Participants: \(participantNames.isEmpty ? "None" : participantNames)"
 
         // Configure settledLabel
-        settledLabel.text = "Status: \(expense.isSettled ? "Settled" : "Editable")"
-        // settledLabel.textColor = expense.isSettled ? .systemGreen : .systemRed
+        settledLabel.text = "Status: \(expense.isSettled ? "Settled" : "Unsettled [Editable]")"
+        settledLabel.textColor = expense.isSettled ? .systemGreen : .systemRed
 
         // Configure receipt image
         if let receiptURLString = expense.receiptURL, let receiptURL = URL(string: receiptURLString) {
