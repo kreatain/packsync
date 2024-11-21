@@ -102,7 +102,7 @@ class AddANewTravelPlanView: UIView {
     
     func setupLabelCountryAndCity() {
         labelTravelCountryAndCity = UILabel()
-        labelTravelCountryAndCity.text = "Country, City"
+        labelTravelCountryAndCity.text = "City, Country"
         labelTravelCountryAndCity.font = .systemFont(ofSize: 16, weight: .medium)
         labelTravelCountryAndCity.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(labelTravelCountryAndCity)
