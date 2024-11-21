@@ -138,7 +138,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             saveButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
             saveButton.heightAnchor.constraint(equalToConstant: 44),
         ])
-            
+        
         amountTextField.placeholder = "Expense Amount (\(currencySymbol))"
         amountTextField.keyboardType = .decimalPad
         amountTextField.borderStyle = .roundedRect
@@ -478,7 +478,45 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
         
         let date = ISO8601DateFormatter().string(from: datePicker.date)
         
-        // Check if we are editing an existing expense
+        // Handle receipt upload asynchronously, if there's a receipt image
+        if let receiptImage = receiptImageView.image {
+            uploadReceiptToStorage(receiptImage) { [weak self] url in
+                guard let self = self else { return }
+                self.selectedReceiptURL = url
+                // Proceed with saving the expense after uploading receipt
+                self.addOrUpdateExpense(
+                    amount: amount,
+                    description: description,
+                    payerId: payerId,
+                    selectedCategory: selectedCategory,
+                    date: date,
+                    userId: userId,
+                    receiptURL: url
+                )
+            }
+        } else {
+            // No receipt image, proceed with saving
+            addOrUpdateExpense(
+                amount: amount,
+                description: description,
+                payerId: payerId,
+                selectedCategory: selectedCategory,
+                date: date,
+                userId: userId,
+                receiptURL: nil
+            )
+        }
+    }
+    
+    private func addOrUpdateExpense(
+        amount: Double,
+        description: String,
+        payerId: String,
+        selectedCategory: Category,
+        date: String,
+        userId: String,
+        receiptURL: String?
+    ) {
         if let existingExpense = expense {
             // Update existing expense
             let updatedExpense = SpendingItem(
@@ -486,10 +524,10 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 amount: amount,
                 description: description,
                 date: date,
-                addedByUserId: existingExpense.addedByUserId, // Retain the original user ID
+                addedByUserId: existingExpense.addedByUserId,
                 spentByUserId: payerId,
                 categoryId: selectedCategory.id,
-                receiptURL: selectedReceiptURL ?? existingExpense.receiptURL, // Use the updated receipt URL if available
+                receiptURL: receiptURL ?? existingExpense.receiptURL,
                 participants: Array(selectedParticipants),
                 travelId: travelId
             )
@@ -516,7 +554,7 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
                 addedByUserId: userId,
                 spentByUserId: payerId,
                 categoryId: selectedCategory.id,
-                receiptURL: selectedReceiptURL,
+                receiptURL: receiptURL,
                 participants: Array(selectedParticipants),
                 travelId: travelId
             )
@@ -537,6 +575,8 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
         }
     }
+    
+    
     
     
     private func showAlert(title: String, message: String) {
