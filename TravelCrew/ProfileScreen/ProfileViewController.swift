@@ -201,25 +201,31 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
 
      // MARK: - UITableViewDataSource
 
-     func tableView(_ tableView:UITableView,
-                    numberOfRowsInSection section:Int) -> Int {
-         return invitations.count
-     }
+    func tableView(_ tableView:UITableView,
+                   numberOfRowsInSection section:Int) -> Int {
+        return invitations.count
+    }
 
-     func tableView(_ tableView:UITableView,
-                    cellForRowAt indexPath:
-                    IndexPath) -> UITableViewCell {
-         let cell =
-             tableView.dequeueReusableCell(withIdentifier:"invitationCell",
-                for:indexPath)
-         let invitation =
-             invitations[indexPath.row]
-         
-         cell.textLabel?.text =
-         "Invitation from \(invitation.inviterName ?? "Unknown") for travel plan \(invitation.travelTitle)."
-         
-         return cell
-     }
+    func tableView(_ tableView:UITableView,
+                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier:"invitationCell", for:indexPath)
+        let invitation = invitations[indexPath.row]
+        
+        // Multiline text with a clear format
+        cell.textLabel?.text = """
+        You're invited to \(invitation.travelTitle) by \(invitation.inviterName ?? "Unknown"). 
+        Tap this message to view details!
+        """
+        
+        // Enable multiple lines and proper wrapping
+        cell.textLabel?.numberOfLines = 0
+        cell.textLabel?.lineBreakMode = .byWordWrapping
+        
+        // Optional: Add a padding effect if needed by customizing the cell
+        cell.textLabel?.textAlignment = .left // Ensure text alignment is appropriate
+        
+        return cell
+    }
 
      // MARK: - UITableViewDelegate
 
@@ -239,11 +245,13 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
      func showAcceptInvitationAlert(_ invitation:
                                      Invitation) {
          let alertController =
-             UIAlertController(title:"Accept Invitation",
-                message:"Do you want to accept the invitation from \(invitation.inviterName ?? "Unknown")?", preferredStyle:.alert)
+             UIAlertController(title:"Respond to Invitation",
+                message:"Do you want to accept or reject the invitation from \(invitation.inviterName ?? "Unknown")?", preferredStyle:.alert)
 
+         // Cancel action
           alertController.addAction(UIAlertAction(title:"Cancel", style:.cancel))
           
+         // Accept action
           alertController.addAction(UIAlertAction(title:"Accept", style:.default) { [weak self] _ in
               self?.acceptInvitation(invitation)
               
@@ -254,6 +262,18 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                   self?.profileView.tableViewInvitations.deleteRows(at:[indexPath], with:.automatic)
               }
           })
+         
+         // Reject action
+         alertController.addAction(UIAlertAction(title: "Reject", style: .destructive) { [weak self] _ in
+             self?.rejectInvitation(invitation)
+              
+             // Remove the invitation from the list and reload the table view if needed.
+             if let indexPath = self?.profileView.tableViewInvitations.indexPathForSelectedRow {
+                 self?.invitations.remove(at: indexPath.row)
+                 self?.profileView.tableViewInvitations.deleteRows(at: [indexPath], with: .automatic)
+             }
+         })
+
 
           present(alertController,
                   animated:true)
@@ -323,6 +343,18 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             }
             
             print("Invitation accepted.")
+        }
+    }
+    
+    
+    func rejectInvitation(_ invitation: Invitation) {
+        db.collection("invitations").document(invitation.id).updateData(["isAccepted": 2]) { error in
+            if let error = error {
+                print("Error rejecting invitation: \(error)")
+                self.showAlert(title: "Error", message: "Unable to reject the invitation. Please try again.")
+                return
+            }
+            print("Invitation rejected.")
         }
     }
     
