@@ -65,9 +65,9 @@ class SpendingViewController: UIViewController {
     }
     
     override func viewDidDisappear(_ animated: Bool) {
-            super.viewDidDisappear(animated)
-            SpendingFirebaseManager.shared.stopAllListeners()
-        }
+        super.viewDidDisappear(animated)
+        CentralizedFirebaseListener.shared.stopAllListeners()
+    }
 
     
     override func viewDidLayoutSubviews() {
@@ -77,15 +77,38 @@ class SpendingViewController: UIViewController {
     }
     
     private func setupListeners() {
-            guard let travelID = travelID else { return }
+        guard let travelID = travelID else { return }
 
-            SpendingFirebaseManager.shared.startListeningToTravelPlan(for: travelID) { [weak self] updatedTravel in
+        CentralizedFirebaseListener.shared.startListeningToAll(
+            for: travelID,
+            participantIds: travelPlan?.participantIds ?? [],
+            travelUpdate: { [weak self] updatedTravel in
                 guard let self = self, let updatedTravel = updatedTravel else { return }
                 self.travelPlan = updatedTravel
                 self.updateUIWithTravelPlan(updatedTravel)
+            },
+            categoryUpdate: { [weak self] updatedCategories in
+                self?.categories = updatedCategories
+                self?.refreshTravelData()
+            },
+            spendingItemsUpdate: { [weak self] updatedSpendingItems in
+                self?.spendingItems = updatedSpendingItems
+                self?.refreshTravelData()
+            },
+            balancesUpdate: { [weak self] updatedBalances in
+                self?.balances = updatedBalances
+                self?.refreshTravelData()
+            },
+            billboardUpdate: { [weak self] updatedBillboards in
+                // Handle billboard updates if necessary
+                self?.refreshTravelData()
+            },
+            participantsUpdate: { [weak self] updatedParticipants in
+                self?.participants = updatedParticipants
+                self?.refreshTravelData()
             }
-
-        }
+        )
+    }
     
     // MARK: - Setup Loading Indicator
     private func setupLoadingIndicator() {
