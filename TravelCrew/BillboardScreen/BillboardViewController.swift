@@ -11,6 +11,12 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     private var notices: [Billboard] = [] // Data source for the table view
     private var userNames: [String: String] = [:] // Dictionary to map authorId to displayName
     private var listener: ListenerRegistration?
+    var travelId: String?
+    private var participantCounts: [String: Int] = [:]
+    convenience init(travelId: String? = nil) {
+            self.init()
+            self.travelId = travelId
+        }
     override func loadView() {
         view = billboardView
     }
@@ -18,14 +24,34 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewController()
-        setupRealTimeListener()
+        
+
+        if let travelId = travelId {
+            preloadParticipantCount(for: travelId)
+            setupRealTimeListener(using: travelId)
+        } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
+            preloadParticipantCount(for: activeTravelId)
+            setupRealTimeListener(using: activeTravelId)
+        } else {
+            print("No active travel plan found and no travelId provided.")
+            showNoTravelPlanAlert()
+        }
     }
+    
     
     deinit {
             listener?.remove()
             print("Real-time listener removed.")
     }
 
+    private func showNoTravelPlanAlert() {
+            let alert = UIAlertController(title: "No Travel Plan", message: "Please select or create a travel plan to view the Billboard.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                self.navigationController?.popViewController(animated: true)
+            }))
+            present(alert, animated: true)
+        }
+    
     // Setup the view controller
     private func setupViewController() {
         title = "Billboard"
@@ -45,43 +71,39 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         billboardView.sendButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
     }
     
-    private func setupRealTimeListener() {
-        guard let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id else {
-            print("No active travel plan found.")
-            return
+    private func setupRealTimeListener(using travelId: String) {
+            let db = Firestore.firestore()
+            listener = db.collection("billboards")
+                .whereField("travelId", isEqualTo: travelId)
+                .order(by: "createdAt", descending: true)
+                .addSnapshotListener { [weak self] (querySnapshot, error) in
+                    if let error = error {
+                        print("Error listening for real-time updates: \(error.localizedDescription)")
+                        return
+                    }
+                    guard let documents = querySnapshot?.documents else {
+                        print("No documents found for travelId: \(travelId).")
+                        return
+                    }
+
+                    print("Real-time listener triggered for travelId: \(travelId). Documents count: \(documents.count)")
+                    self?.notices = documents.compactMap { document in
+                        try? document.data(as: Billboard.self)
+                    }
+                    DispatchQueue.main.async {
+                        self?.billboardView.tableView.reloadData()
+                    }
+                }
         }
-
-        let db = Firestore.firestore()
-
-        // Listen for changes to "notice", "vote", and "photo" types
-        listener = db.collection("billboards")
-            .whereField("travelId", isEqualTo: activeTravelId)
-            .whereField("type", in: ["notice", "vote", "photo"]) // Include "photo" type
-            .order(by: "createdAt", descending: true)
-            .addSnapshotListener { [weak self] (querySnapshot, error) in
-                if let error = error {
-                    print("Error listening for real-time updates: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let documents = querySnapshot?.documents else {
-                    print("No documents found.")
-                    return
-                }
-
-                print("Real-time listener triggered. Documents count: \(documents.count)")
-
-                // Parse the notices, votes, and photos
-                self?.notices = documents.compactMap { document in
-                    try? document.data(as: Billboard.self)
-                }
-
-                // Reload the table view on the main thread
-                DispatchQueue.main.async {
-                    self?.fetchUserNames()
-                    self?.billboardView.tableView.reloadData()
-                }
+    
+    private func preloadParticipantCount(for travelId: String) {
+        fetchTravelPlan(by: travelId) { [weak self] travelPlan in
+            guard let self = self else { return }
+            self.participantCounts[travelId] = travelPlan?.participantIds.count ?? 0
+            DispatchQueue.main.async {
+                self.billboardView.tableView.reloadData()
             }
+        }
     }
     
     
@@ -160,10 +182,49 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     }
 
     private func navigateToCreateVote() {
-        let createVoteVC = CreateVoteViewController()
+        let travelIdToPass = self.travelId ?? TravelPlanManager.shared.activeTravelPlan?.id
+        
+        guard let travelId = travelIdToPass else {
+            showNoTravelPlanAlert()
+            return
+        }
+        
+        let createVoteVC = CreateVoteViewController(travelId: travelId)
         navigationController?.pushViewController(createVoteVC, animated: true)
     }
     
+    private func fetchTravelPlan(by travelId: String, completion: @escaping (Travel?) -> Void) {
+        let db = Firestore.firestore()
+        
+        db.collection("travelPlans").document(travelId).getDocument { (document, error) in
+            if let error = error {
+                print("Error fetching travel plan: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            guard let document = document, document.exists, let travelPlan = try? document.data(as: Travel.self) else {
+                print("No travel plan found for travelId: \(travelId)")
+                completion(nil)
+                return
+            }
+            
+            completion(travelPlan)
+        }
+    }
+    
+    func fetchParticipantCount(for travelId: String?, completion: @escaping (Int) -> Void) {
+        guard let travelId = travelId ?? TravelPlanManager.shared.activeTravelPlan?.id else {
+            print("No travelId or activeTravelPlan available.")
+            completion(0)
+            return
+        }
+        
+        fetchTravelPlan(by: travelId) { travelPlan in
+            let participantCount = travelPlan?.participantIds.count ?? 0
+            completion(participantCount)
+        }
+    }
     @objc private func sendButtonTapped() {
         // Check if the input message is empty
         guard let message = billboardView.inputTextField.text, !message.isEmpty else {
@@ -171,9 +232,8 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
             return
         }
 
-        // Get the active travel plan ID
-        guard let travelId = TravelPlanManager.shared.activeTravelPlan?.id else {
-            print("No active travel plan found.")
+        guard let travelId = self.travelId ?? TravelPlanManager.shared.activeTravelPlan?.id else {
+            print("No travel ID available to send the notice.")
             return
         }
 
@@ -224,48 +284,69 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Dequeue the reusable cell
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "BillboardCell", for: indexPath) as? BillboardCell else {
             return UITableViewCell()
         }
 
+        // Safeguard against out-of-bounds errors
         guard indexPath.row < notices.count else {
             print("Index out of range. Row: \(indexPath.row), Count: \(notices.count)")
             return UITableViewCell()
         }
-        let item = notices[indexPath.row]
-        let authorName = userNames[item.authorId] ?? "Unknown"
+
+        let item = notices[indexPath.row] // Get the current notice
+        let authorName = userNames[item.authorId] ?? "Unknown" // Author name
         let dateFormatter = DateFormatter()
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .short
         let dateText = dateFormatter.string(from: item.createdAt)
-        let authorText = "\(authorName)  \(dateText)"
+        let authorText = "\(authorName)  \(dateText)" // Combine author name and date
 
-        
+        // Configure the cell based on the type of the notice
         if item.type == "notice" {
+            // Configure for 'notice' type
             let content = item.content ?? "No content available."
             cell.configureNotice(title: "Notice", authorText: authorText, content: content)
+
         } else if item.type == "vote" {
-            let choices = item.choices ?? []
-            let votes = item.votes ?? [:]
-            cell.configureVote(
-                title: item.title ?? "No title",
-                authorText: authorText,
-                choices: choices,
-                votes: votes,
-                voteId: item.id ?? "",
-                choiceSelectedHandler: { selectedChoice in
-                    self.handleChoiceSelection(billboardId: item.id ?? "", selectedChoice: selectedChoice)
-                }
-            )
+            // Configure for 'vote' type
+            let choices = item.choices ?? [] // Get the choices for the vote
+            let votes = item.votes ?? [:] // Get the votes dictionary
+            let nums = votes.values.reduce(0, +) // Total votes cast
+
+            // Fetch participant count dynamically or use preloaded count
+            let travelId = self.travelId ?? TravelPlanManager.shared.activeTravelPlan?.id
+            let totalNums = participantCounts[travelId ?? ""] ?? 0// Use cached participant count
+            
+      
+            
+                    cell.configureVote(
+                        title: item.title ?? "No title",
+                        authorText: authorText,
+                        choices: choices,
+                        votes: votes,
+                        voteId: item.id ?? "",
+                        nums: nums, // Total votes cast
+                        totalNums: totalNums, // Total participants
+                        choiceSelectedHandler: { selectedChoice in
+                            self.handleChoiceSelection(billboardId: item.id ?? "", selectedChoice: selectedChoice)
+                        }
+                    )
+                
+            
+
         } else if item.type == "photo" {
+            // Configure for 'photo' type
             if let photoUrl = item.photoUrl {
                 cell.configurePhoto(title: "Photo", authorText: authorText, photoUrl: photoUrl)
-                cell.layoutIfNeeded()
+                cell.layoutIfNeeded() // Ensure the layout updates properly
             }
         }
 
         return cell
     }
+    
     
     private func handleChoiceSelection(billboardId: String, selectedChoice: String) {
         let db = Firestore.firestore()
@@ -342,10 +423,11 @@ extension BillboardViewController: UIImagePickerControllerDelegate, UINavigation
     }
 
     private func addPhotoNoticeToFirestore(photoUrl: String) {
-        guard let travelId = TravelPlanManager.shared.activeTravelPlan?.id else {
-            print("No active travel plan found.")
-            return
-        }
+        guard let travelId = self.travelId ?? TravelPlanManager.shared.activeTravelPlan?.id else {
+                print("No travel ID available to add photo notice.")
+                return
+            }
+        
         guard let authorId = Auth.auth().currentUser?.uid else {
             print("User is not authenticated.")
             return
@@ -363,4 +445,53 @@ extension BillboardViewController: UIImagePickerControllerDelegate, UINavigation
 
         addNoticeToFirestore(notice)
     }
+}
+// MARK: - UITableViewDelegate
+extension BillboardViewController {
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, completionHandler) in
+            guard let self = self else { return }
+            self.deleteBillboard(at: indexPath)
+            completionHandler(true)
+        }
+        deleteAction.backgroundColor = .systemRed
+        return UISwipeActionsConfiguration(actions: [deleteAction])
+    }
+    
+    private func deleteBillboard(at indexPath: IndexPath) {
+        // Safely retrieve the item to delete
+        guard indexPath.row < notices.count else {
+            print("Index out of range. Row: \(indexPath.row), Count: \(notices.count)")
+            return
+        }
+
+        let billboardToDelete = notices[indexPath.row]
+        guard let documentId = billboardToDelete.id else {
+            print("Billboard ID is missing.")
+            return
+        }
+        
+        // Remove the item from the data source immediately to prevent the table from going out of sync
+        notices.remove(at: indexPath.row)
+        
+        // Update the table view
+        billboardView.tableView.deleteRows(at: [indexPath], with: .automatic)
+        
+        // Delete the item from Firestore
+        let db = Firestore.firestore()
+        db.collection("billboards").document(documentId).delete { [weak self] error in
+            if let error = error {
+                print("Error deleting billboard: \(error.localizedDescription)")
+                
+                // If Firestore deletion fails, re-add the item to the array and reload the table
+                self?.notices.insert(billboardToDelete, at: indexPath.row)
+                DispatchQueue.main.async {
+                    self?.billboardView.tableView.reloadData()
+                }
+            } else {
+                print("Billboard deleted successfully.")
+            }
+        }
+    }
+    
 }

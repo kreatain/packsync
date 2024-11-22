@@ -12,7 +12,15 @@ import FirebaseAuth
 class CreateVoteViewController: UIViewController {
 
     private let createVoteView = CreateVoteView()
+    var travelId: String
+    init(travelId: String) {
+            self.travelId = travelId
+            super.init(nibName: nil, bundle: nil)
+        }
 
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
     override func loadView() {
         view = createVoteView
     }
@@ -38,7 +46,6 @@ class CreateVoteViewController: UIViewController {
         print("Added a new choice text field.")
     }
 
-    // Action for the "Publish" button
     @objc private func publishTapped() {
         // Get the vote title and choices
         let title = createVoteView.titleTextField.text ?? ""
@@ -56,12 +63,7 @@ class CreateVoteViewController: UIViewController {
             return
         }
 
-        // Prepare the vote data
-        guard let travelId = TravelPlanManager.shared.activeTravelPlan?.id else {
-            print("No active travel plan found.")
-            return
-        }
-
+        // Use the travelId passed during initialization
         guard let authorId = Auth.auth().currentUser?.uid else {
             print("User is not authenticated.")
             return
@@ -76,7 +78,7 @@ class CreateVoteViewController: UIViewController {
         // Create the Billboard object for the vote
         let vote = Billboard(
             id: billboardId,
-            travelId: travelId,
+            travelId: self.travelId, // Use the travelId passed in
             type: "vote",
             title: title,
             choices: choices,
@@ -91,7 +93,7 @@ class CreateVoteViewController: UIViewController {
         // Navigate back to the previous screen
         navigationController?.popViewController(animated: true)
     }
-
+    
     // Helper method to send vote to Firestore
     private func addVoteToFirestore(_ vote: Billboard) {
         let db = Firestore.firestore()

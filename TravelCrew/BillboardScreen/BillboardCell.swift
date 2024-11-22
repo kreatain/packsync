@@ -148,12 +148,15 @@ class BillboardCell: UITableViewCell {
         self.layoutIfNeeded()
     }
     
-    func configureVote(title: String, authorText: String, choices: [String], votes: [String: Int], voteId: String, choiceSelectedHandler: @escaping (String) -> Void) {
+    func configureVote(title: String, authorText: String, choices: [String], votes: [String: Int], voteId: String,     nums: Int,
+    totalNums: Int, choiceSelectedHandler: @escaping (String) -> Void) {
         resetCell()
         self.choiceSelectedHandler = choiceSelectedHandler
         self.voteId = voteId
         titleLabel.text = "Vote"
         authorLabel.text = authorText
+        
+       
 
         // 显示 voteTitleLabel 和 stackView，隐藏 contentLabel
         voteTitleLabel.isHidden = false
@@ -161,10 +164,11 @@ class BillboardCell: UITableViewCell {
         contentLabel.isHidden = true
         photoImageView.isHidden = true
         
-
        
+            
+     
         // 配置 voteTitleLabel
-        voteTitleLabel.text = title
+        voteTitleLabel.text = "\(title) (\(nums)/\(totalNums) voted)"
         voteTitleLabel.font = UIFont.systemFont(ofSize: 16, weight: .bold)
         voteTitleLabel.textColor = .black
         voteTitleLabel.textAlignment = .left
@@ -173,6 +177,7 @@ class BillboardCell: UITableViewCell {
 
         // 清空 stackView 中的子视图
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
 
         // 检查是否已投票
         if hasVoted {
@@ -221,8 +226,11 @@ class BillboardCell: UITableViewCell {
 
             stackView.addArrangedSubview(choiceStackView)
         }
-
-        // 强制更新布局
+        
+        stackView.setNeedsLayout()
+        stackView.layoutIfNeeded()
+        self.contentView.setNeedsLayout()
+        self.contentView.layoutIfNeeded()
         self.setNeedsUpdateConstraints()
         self.updateConstraintsIfNeeded()
         self.setNeedsLayout()
@@ -297,6 +305,8 @@ class BillboardCell: UITableViewCell {
         stackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
 
         // 强制更新布局
+        self.setNeedsLayout()
+        self.layoutIfNeeded()
         self.setNeedsUpdateConstraints()
         self.updateConstraintsIfNeeded()
     }

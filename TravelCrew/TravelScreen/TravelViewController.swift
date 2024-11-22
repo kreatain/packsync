@@ -54,7 +54,9 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         } else {
             didTapActivePlanButton() // Default to placeholder message if no active plan
         }
+
         DispatchQueue.main.async {
+            self.travelView.otherPlansButton.sendActions(for: .touchUpInside)
             self.travelView.activePlanButton.sendActions(for: .touchUpInside)
         }
        
@@ -63,8 +65,18 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     deinit {
         NotificationCenter.default.removeObserver(self, name: .activeTravelPlanChanged, object: nil)
     }
- 
-    // MARK: - Fetch Travel Plans
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        // Ensure the correct tab is displayed when redirected
+        DispatchQueue.main.async {
+            self.travelView.otherPlansButton.sendActions(for: .touchUpInside)
+            
+            self.travelView.activePlanButton.sendActions(for: .touchUpInside)
+        }
+    }
+   
     func fetchTravelPlans() {
             guard let userId = Auth.auth().currentUser?.uid else {
                 print("User is not signed in.")
@@ -159,6 +171,13 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.activePlanButton.setTitleColor(.white, for: .normal)
         travelView.otherPlansButton.backgroundColor = .clear
         travelView.otherPlansButton.setTitleColor(.systemBlue, for: .normal)
+        
+        guard Auth.auth().currentUser != nil else {
+                print("User is not logged in. Hiding active plan detail view.")
+                travelView.activePlanDetailView.isHidden = true
+                travelView.labelText.isHidden = false
+                return
+            }
 
         if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             updateActivePlanDetailView(with: activePlan)
@@ -248,14 +267,26 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
             fetchTravelPlans()
             travelView.tableViewTravelPlans.isHidden = false
             travelView.buttonAddTravelPlan.isHidden = false
+            if let activePlan = TravelPlanManager.shared.activeTravelPlan {
+                updateActivePlanDetailView(with: activePlan)
+                travelView.activePlanDetailView.isHidden = false
+            } else {
+                travelView.activePlanDetailView.isHidden = true
+            }
             setupLeftBarButton(isLoggedin: true)
+            DispatchQueue.main.async {
+                        self.travelView.activePlanButton.sendActions(for: .touchUpInside)
+                    }
         } else {
             currentUser = nil
             travelPlanList.removeAll()
             travelView.tableViewTravelPlans.reloadData()
             travelView.tableViewTravelPlans.isHidden = true
             travelView.buttonAddTravelPlan.isHidden = true
-            travelView.labelText.isHidden = false
+
+            clearActivePlanDetailView()
+            travelView.activePlanDetailView.isHidden = true
+
             setupLeftBarButton(isLoggedin: false)
         }
     }

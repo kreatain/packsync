@@ -85,8 +85,15 @@ class TravelDetailViewController: UIViewController {
         navigationController?.pushViewController(spendingVC, animated: true)
     }
     
+    
     @objc func billboardButtonTapped() {
+        guard let travelId = travel?.id else {
+            print("No travel ID available to pass to BillboardViewController.")
+            return
+        }
+        
         let billboardVC = BillboardViewController()
+        billboardVC.travelId = travelId 
         navigationController?.pushViewController(billboardVC, animated: true)
     }
 }
