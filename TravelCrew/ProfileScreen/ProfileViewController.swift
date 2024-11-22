@@ -140,20 +140,37 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
     
     func fetchCurrentUser() {
         if let userId = Auth.auth().currentUser?.uid {
+            // User is logged in
+            profileView.labelLoginPrompt.isHidden = true
+            profileView.imageViewProfilePic.isHidden = false
+            profileView.buttonEditProfilePic.isHidden = false // Show the Edit button
+            profileView.labelNameText.isHidden = false
+            profileView.labelName.isHidden = false
+            profileView.labelEmailText.isHidden = false
+            profileView.labelEmail.isHidden = false
+            profileView.tableViewInvitations.isHidden = false
+
             db.collection("users").document(userId).getDocument { [weak self] (document, error) in
                 if let document = document, document.exists {
                     self?.currentUser = try? document.data(as: User.self)
                     self?.updateUI()
-                    self?.profileView.isHidden = false // Show profile view when user is signed in
                 } else {
                     print("Document does not exist or error occurred: \(String(describing: error))")
-                    self?.profileView.isHidden = true // Hide profile view if no document found
                 }
             }
         } else {
-            profileView.isHidden = true // Hide profile view when no user is signed in
+            // User is not logged in
+            profileView.labelLoginPrompt.isHidden = false
+            profileView.imageViewProfilePic.isHidden = true
+            profileView.buttonEditProfilePic.isHidden = true // Hide the Edit button
+            profileView.labelNameText.isHidden = true
+            profileView.labelName.isHidden = true
+            profileView.labelEmailText.isHidden = true
+            profileView.labelEmail.isHidden = true
+            profileView.tableViewInvitations.isHidden = true
         }
     }
+
 
     func updateUI() {
         profileView.labelName.text = currentUser?.displayName ?? "No Name"

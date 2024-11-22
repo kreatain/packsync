@@ -15,6 +15,7 @@ class ProfileView: UIView {
     var labelEmailText: UILabel!
     var labelEmail: UILabel!
     var tableViewInvitations: UITableView!
+    var labelLoginPrompt: UILabel!
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -22,6 +23,7 @@ class ProfileView: UIView {
         setupProfilePicture()
         setupLabels()
         setupTableView()
+        setupLoginPrompt() 
         initConstraints()
     }
 
@@ -75,6 +77,18 @@ class ProfileView: UIView {
         tableViewInvitations.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(tableViewInvitations)
     }
+    
+    func setupLoginPrompt() {
+        labelLoginPrompt = UILabel()
+        labelLoginPrompt.text = "Please create an account or log in to view Profile details."
+        labelLoginPrompt.textColor = .gray
+        labelLoginPrompt.textAlignment = .center
+        labelLoginPrompt.numberOfLines = 0
+        // labelLoginPrompt.font = .systemFont(ofSize: 16, weight: .regular) // Adjusted font size and weight
+        labelLoginPrompt.isHidden = true // Initially hidden
+        labelLoginPrompt.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelLoginPrompt)
+    }
 
     func initConstraints() {
         NSLayoutConstraint.activate([
@@ -82,10 +96,16 @@ class ProfileView: UIView {
             imageViewProfilePic.centerXAnchor.constraint(equalTo: self.centerXAnchor),
             imageViewProfilePic.widthAnchor.constraint(equalToConstant: 100),
             imageViewProfilePic.heightAnchor.constraint(equalToConstant: 100),
+            
+            // Login Prompt Constraints
+            labelLoginPrompt.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            labelLoginPrompt.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            labelLoginPrompt.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelLoginPrompt.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
 
             buttonEditProfilePic.topAnchor.constraint(equalTo: imageViewProfilePic.bottomAnchor, constant: 10),
             buttonEditProfilePic.centerXAnchor.constraint(equalTo: self.centerXAnchor),
-
+            
             // Set constraints for labels and buttons
             labelNameText.topAnchor.constraint(equalTo: buttonEditProfilePic.bottomAnchor, constant: 20),
             labelNameText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
