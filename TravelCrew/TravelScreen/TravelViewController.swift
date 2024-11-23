@@ -353,7 +353,7 @@ extension TravelViewController {
         // Initialize the detail view controller and pass the selected travel plan
         let travelDetailVC = TravelDetailViewController()
         travelDetailVC.travel = travelPlan
-        
+        print("travel view travle id: \(travelPlan.id)")
         // Navigate to the detail view controller
         navigationController?.pushViewController(travelDetailVC, animated: true)
     }

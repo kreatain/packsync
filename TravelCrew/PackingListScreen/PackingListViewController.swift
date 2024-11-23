@@ -15,19 +15,32 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
     var travel: Travel?
     private var packingItems: [PackingItem] = []
     private var listener: ListenerRegistration?
-
+    
+    private var travelID: String?
+    
+    // Initializer to accept travelID parameter
+    init(travelID: String? = nil) {
+        self.travelID = travelID
+        super.init(nibName: nil, bundle: nil)
+        print("[PackingViewController] Initialized with travelID: \(String(describing: travelID))")
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
         NotificationCenter.default.addObserver(self, selector: #selector(activeTravelPlanChanged), name: .activeTravelPlanChanged, object: nil)
         updateUI()
     }
-
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
         listener?.remove()
     }
-
+    
     private func setupUI() {
         view.backgroundColor = .systemBackground
         noActiveplanLabel.text = "Please select an active travel plan to view Packing list details."
@@ -43,13 +56,20 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
             noActiveplanLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
     }
-
+    
     @objc private func activeTravelPlanChanged() {
         updateUI()
     }
-
+    
     func updateUI() {
-        if let activePlan = TravelPlanManager.shared.activeTravelPlan {
+        print("Current travelID: \(String(describing: travelID))")
+        if let id = travelID {
+            fetchTravelPlanDetails(for: id) { [weak self] travelPlan in
+                guard let self = self, let travelPlan = travelPlan else { return }
+                self.showPackingListView(for: travelPlan)
+                self.fetchPackingItems(for: id)
+            }
+        } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             self.travel = activePlan
             showPackingListView(for: activePlan)
             fetchPackingItems(for: activePlan.id)
@@ -57,7 +77,31 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
             showNoActivePlanLabel()
         }
     }
-
+    
+    private func fetchTravelPlanDetails(for id: String, completion: @escaping (Travel?) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("travelPlans").document(id).getDocument { (document, error) in
+            if let document = document, document.exists {
+                let data = document.data()
+                let travelPlan = Travel(
+                    id: id,
+                    creatorName: data?["creatorName"] as? String ?? "",
+                    creatorId: data?["creatorId"] as? String ?? "",
+                    travelTitle: data?["travelTitle"] as? String ?? "",
+                    travelStartDate: data?["travelStartDate"] as? String ?? "",
+                    travelEndDate: data?["travelEndDate"] as? String ?? "",
+                    countryAndCity: data?["countryAndCity"] as? String ?? ""
+                )
+                completion(travelPlan)
+            } else {
+                print("Travel plan document does not exist")
+                completion(nil)
+            }
+        }
+    }
+    
+    
+    
     private func showPackingListView(for travelPlan: Travel) {
         noActiveplanLabel.isHidden = true
         if packingListView == nil {
@@ -73,33 +117,33 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         packingListView?.tableViewPackingList.dataSource = self
         packingListView?.buttonAddPackingItem.addTarget(self, action: #selector(addPackingItemTapped), for: .touchUpInside)
     }
-
+    
     private func showNoActivePlanLabel() {
         packingListView?.isHidden = true
         noActiveplanLabel.isHidden = false
         packingItems.removeAll()
         listener?.remove()
     }
-
+    
     @objc private func addPackingItemTapped() {
-        guard let activePlan = TravelPlanManager.shared.activeTravelPlan else {
-            print("Error: No active travel plan")
+        guard let travel = self.travel else {
+            print("Error: No travel plan available")
             return
         }
         let addPackingItemVC = AddPackingItemViewController()
-        addPackingItemVC.travel = activePlan
+        addPackingItemVC.travel = travel
         addPackingItemVC.delegate = self
         let navController = UINavigationController(rootViewController: addPackingItemVC)
         present(navController, animated: true, completion: nil)
     }
-
+    
     private func fetchPackingItems(for travelId: String) {
-        guard let travel = TravelPlanManager.shared.activeTravelPlan else { return }
+        //        guard let travel = TravelPlanManager.shared.activeTravelPlan else { return }
         let db = Firestore.firestore()
         listener?.remove()
-        listener = db.collection("travelPlans").document(travel.id).collection("packingItems")
-            .whereField("creatorId", isEqualTo: travel.creatorId)
-            .whereField("travelId", isEqualTo: travel.id)
+        listener = db.collection("travelPlans").document(travelId).collection("packingItems")
+        //            .whereField("creatorId", isEqualTo: travel.creatorId)
+        //            .whereField("travelId", isEqualTo: travel.id)
             .addSnapshotListener { [weak self] querySnapshot, error in
                 guard let self = self else { return }
                 if let error = error {
@@ -113,12 +157,13 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                 self.packingItems = documents.compactMap { queryDocumentSnapshot in
                     let data = queryDocumentSnapshot.data()
                     let id = queryDocumentSnapshot.documentID
+                    let creatorId = data["creatorId"] as? String ?? ""
                     let name = data["name"] as? String ?? ""
                     let itemNumber = data["itemNumber"] as? String ?? ""
                     let isPacked = data["isPacked"] as? Bool ?? false
                     let isPackedBy = data["isPackedBy"] as? String
                     let photoURL = data["photoURL"] as? String
-                    return PackingItem(id: id, creatorId: travel.creatorId, travelId: travel.id, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber, photoURL: photoURL)
+                    return PackingItem(id: id, creatorId: creatorId, travelId: travelId, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber, photoURL: photoURL)
                 }
                 self.packingItems.sort {
                     let firstLetter1 = $0.name.prefix(1).uppercased()
@@ -134,7 +179,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                 }
             }
     }
-
+    
     @objc func checkboxTapped(_ sender: UIButton) {
         let index = sender.tag
         guard index < packingItems.count else {
@@ -143,28 +188,28 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         }
         packingItems[index].isPacked.toggle()
         sender.isSelected = packingItems[index].isPacked
-        guard let travel = TravelPlanManager.shared.activeTravelPlan else {
+
+        guard let travel = self.travel else {
             print("Error: Travel object is nil")
             return
         }
+
         let db = Firestore.firestore()
         let id = packingItems[index].id
         let currentUser = Auth.auth().currentUser
+
         if let userId = currentUser?.uid {
             db.collection("users").document(userId).getDocument { [weak self] (document, error) in
                 if let document = document, document.exists {
                     let profilePicURL = document.data()?["profileImageUrl"] as? String
                     let displayName = document.data()?["displayName"] as? String ?? "Unknown User"
-                    let packedByValue: String
-                    if let profilePicURL = profilePicURL, !profilePicURL.isEmpty {
-                        packedByValue = profilePicURL
-                    } else {
-                        packedByValue = "\(displayName)"
-                    }
+                    let packedByValue = profilePicURL?.isEmpty == false ? profilePicURL! : displayName
+
                     let updateData: [String: Any] = [
                         "isPacked": self?.packingItems[index].isPacked ?? false,
                         "isPackedBy": (self?.packingItems[index].isPacked ?? false) ? packedByValue : NSNull()
                     ]
+
                     db.collection("travelPlans").document(travel.id).collection("packingItems").document(id).updateData(updateData) { error in
                         if let error = error {
                             print("Error updating document: \(error)")
@@ -185,8 +230,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                 }
             }
         }
-    }
-}
+    }}
 
 // MARK: - UITableViewDelegate, UITableViewDataSource
 extension PackingListViewController: UITableViewDelegate, UITableViewDataSource {

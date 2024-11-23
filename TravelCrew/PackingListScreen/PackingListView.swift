@@ -70,7 +70,6 @@ class PackingListView: UIView {
     
     func configure(with travel: Travel) {
         labelTravelTitle.text = "Packing List: \(travel.travelTitle)"
-        // You can add more configuration here if needed
     }
     
     
