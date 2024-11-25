@@ -41,9 +41,6 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         // Set up the log in/out button on the left bar
         setupLeftBarButton(isLoggedin: Auth.auth().currentUser != nil)
         
-        // Add observer for active travel plan changes
-        NotificationCenter.default.addObserver(self, selector: #selector(handleActivePlanChange), name: .activeTravelPlanChanged, object: nil)
-        
         // Add authentication state change listener
         handleAuth = Auth.auth().addStateDidChangeListener { [weak self] (auth, user) in
             self?.handleAuthStateChange(user: user)
@@ -59,6 +56,9 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
             self.travelView.otherPlansButton.sendActions(for: .touchUpInside)
             self.travelView.activePlanButton.sendActions(for: .touchUpInside)
         }
+        
+        // Add observer for active travel plan changes
+        NotificationCenter.default.addObserver(self, selector: #selector(handleActivePlanChange), name: .activeTravelPlanChanged, object: nil)
        
     }
     

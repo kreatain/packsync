@@ -10,13 +10,13 @@ import FirebaseFirestore
 import FirebaseAuth
 
 class PackingListViewController: UIViewController, EditPackingItemViewControllerDelegate {
-    private var packingListView: PackingListView?
-    private let noActiveplanLabel = UILabel()
+    var packingListView: PackingListView?
+    let noActiveplanLabel = UILabel()
     var travel: Travel?
-    private var packingItems: [PackingItem] = []
-    private var listener: ListenerRegistration?
-    
-    private var travelID: String?
+    var currentUser: User?
+    var packingItems: [PackingItem] = []
+    var listener: ListenerRegistration?
+    var travelID: String?
     
     // Initializer to accept travelID parameter
     init(travelID: String? = nil) {
@@ -33,6 +33,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         super.viewDidLoad()
         setupUI()
         NotificationCenter.default.addObserver(self, selector: #selector(activeTravelPlanChanged), name: .activeTravelPlanChanged, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(userDidLogout), name: .userDidLogout, object: nil)
         updateUI()
     }
     
@@ -41,44 +42,122 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         listener?.remove()
     }
     
-    private func setupUI() {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchCurrentUser() // Refresh user data when the view appears
+    }
+    
+    @objc func activeTravelPlanChanged() {
+        updateUI()
+    }
+    
+    func setupUI() {
         view.backgroundColor = .systemBackground
+        
+        // Initialize and configure noActiveplanLabel
         noActiveplanLabel.text = "Please select an active travel plan to view Packing list details."
         noActiveplanLabel.textColor = .gray
         noActiveplanLabel.textAlignment = .center
         noActiveplanLabel.numberOfLines = 0
         noActiveplanLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(noActiveplanLabel)
+        
         NSLayoutConstraint.activate([
             noActiveplanLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             noActiveplanLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             noActiveplanLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             noActiveplanLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
         ])
-    }
-    
-    @objc private func activeTravelPlanChanged() {
-        updateUI()
+        
+        // Initialize packingListView
+        packingListView = PackingListView(frame: view.bounds)
+        packingListView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        if let packingListView = packingListView {
+            view.addSubview(packingListView)
+        }
+        
+        // Initially hide the login prompt and no active plan label
+        packingListView?.labelLoginPrompt.isHidden = true
+        noActiveplanLabel.isHidden = true
     }
     
     func updateUI() {
-        print("Current travelID: \(String(describing: travelID))")
-        if let id = travelID {
-            fetchTravelPlanDetails(for: id) { [weak self] travelPlan in
-                guard let self = self, let travelPlan = travelPlan else { return }
-                self.showPackingListView(for: travelPlan)
-                self.fetchPackingItems(for: id)
-            }
-        } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
-            self.travel = activePlan
-            showPackingListView(for: activePlan)
-            fetchPackingItems(for: activePlan.id)
+        if Auth.auth().currentUser == nil {
+            // User is not logged in
+            userDidLogout()
         } else {
-            showNoActivePlanLabel()
+            // User is logged in
+            packingListView?.labelLoginPrompt.isHidden = true
+            packingListView?.tableViewPackingList.isHidden = false
+            packingListView?.buttonAddPackingItem.isHidden = false
+            packingListView?.labelTravelTitle.isHidden = false
+            
+            if let id = travelID {
+                fetchTravelPlanDetails(for: id) { [weak self] travelPlan in
+                    guard let self = self, let travelPlan = travelPlan else { return }
+                    self.showPackingListView(for: travelPlan)
+                    self.fetchPackingItems(for: id)
+                }
+            } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
+                self.travel = activePlan
+                showPackingListView(for: activePlan)
+                fetchPackingItems(for: activePlan.id)
+            } else {
+                // No active plan; show login prompt instead of no active plan label.
+                packingListView?.labelLoginPrompt.isHidden = false
+                showNoActivePlanLabel()
+            }
         }
     }
     
-    private func fetchTravelPlanDetails(for id: String, completion: @escaping (Travel?) -> Void) {
+    @objc func userDidLogout() {
+        DispatchQueue.main.async {
+            self.packingItems.removeAll()
+
+            self.packingListView?.tableViewPackingList.isHidden = true
+            self.packingListView?.buttonAddPackingItem.isHidden = true
+            self.packingListView?.labelTravelTitle.isHidden = true
+            self.noActiveplanLabel.isHidden = true
+            self.packingListView?.labelLoginPrompt.isHidden = false
+            self.listener?.remove()
+            self.packingListView?.tableViewPackingList.reloadData()
+        }
+    }
+
+    func showNoActivePlanLabel() {
+        packingListView?.isHidden = true
+        noActiveplanLabel.isHidden = false
+        packingItems.removeAll()
+        listener?.remove()
+        // Check if the user is logged out, show login prompt instead
+        if Auth.auth().currentUser == nil {
+            packingListView?.labelLoginPrompt.isHidden = false
+            noActiveplanLabel.isHidden = true
+        }
+    }
+ 
+    func fetchCurrentUser() {
+        let db = Firestore.firestore()
+        if let userId = Auth.auth().currentUser?.uid {
+            // User is logged in
+            packingListView?.labelLoginPrompt.isHidden = true
+            db.collection("users").document(userId).getDocument { [weak self] (document, error) in
+                if let document = document, document.exists {
+                    self?.currentUser = try? document.data(as: User.self)
+                    self?.updateUI()
+                } else {
+                    print("Document does not exist or error occurred: \(String(describing: error))")
+                }
+            }
+        } else {
+            // User is not logged in
+            packingListView?.labelLoginPrompt.isHidden = false
+            packingItems.removeAll()
+            updateUI() 
+        }
+    }
+    
+    func fetchTravelPlanDetails(for id: String, completion: @escaping (Travel?) -> Void) {
         let db = Firestore.firestore()
         db.collection("travelPlans").document(id).getDocument { (document, error) in
             if let document = document, document.exists {
@@ -100,9 +179,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         }
     }
     
-    
-    
-    private func showPackingListView(for travelPlan: Travel) {
+    func showPackingListView(for travelPlan: Travel) {
         noActiveplanLabel.isHidden = true
         if packingListView == nil {
             packingListView = PackingListView(frame: view.bounds)
@@ -118,14 +195,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         packingListView?.buttonAddPackingItem.addTarget(self, action: #selector(addPackingItemTapped), for: .touchUpInside)
     }
     
-    private func showNoActivePlanLabel() {
-        packingListView?.isHidden = true
-        noActiveplanLabel.isHidden = false
-        packingItems.removeAll()
-        listener?.remove()
-    }
-    
-    @objc private func addPackingItemTapped() {
+    @objc func addPackingItemTapped() {
         guard let travel = self.travel else {
             print("Error: No travel plan available")
             return
@@ -137,13 +207,10 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         present(navController, animated: true, completion: nil)
     }
     
-    private func fetchPackingItems(for travelId: String) {
-        //        guard let travel = TravelPlanManager.shared.activeTravelPlan else { return }
+    func fetchPackingItems(for travelId: String) {
         let db = Firestore.firestore()
         listener?.remove()
         listener = db.collection("travelPlans").document(travelId).collection("packingItems")
-        //            .whereField("creatorId", isEqualTo: travel.creatorId)
-        //            .whereField("travelId", isEqualTo: travel.id)
             .addSnapshotListener { [weak self] querySnapshot, error in
                 guard let self = self else { return }
                 if let error = error {

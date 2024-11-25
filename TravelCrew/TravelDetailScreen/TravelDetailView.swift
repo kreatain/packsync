@@ -13,7 +13,7 @@ class TravelDetailView: UIView {
     var labelDateRange: UILabel!
     var labelCountryAndCity: UILabel!
     var labelCurrency: UILabel!
-    var labelCreatorName: UILabel! // New label for creator's name
+    var labelCreatorName: UILabel!
     var buttonPackingList: UIButton!
     var buttonInviteFriend: UIButton!
     var buttonSpending: UIButton!

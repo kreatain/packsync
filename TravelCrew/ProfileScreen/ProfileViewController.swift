@@ -332,6 +332,8 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
                         let userDocument = try transaction.getDocument(userRef)
                         if let displayName = userDocument.data()?["displayName"] as? String {
                             travelPlan.participantNames.append(displayName)
+                            // Post notification with display name
+                            NotificationCenter.default.post(name: .friendAcceptedInvitation, object: nil, userInfo: ["displayName": displayName])
                         } else {
                             travelPlan.participantNames.append("Unknown User")
                         }
@@ -397,4 +399,8 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             present(alert,
                     animated:true)
         }
+}
+
+extension Notification.Name {
+    static let friendAcceptedInvitation = Notification.Name("friendAcceptedInvitation")
 }

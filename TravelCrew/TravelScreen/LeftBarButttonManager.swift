@@ -95,6 +95,7 @@ extension TravelViewController {
             do {
                 try Auth.auth().signOut()
                 // The auth state listener in TravelViewController will handle UI updates
+                NotificationCenter.default.post(name: .userDidLogout, object: nil)
             } catch {
                 print("Error occured during logout: \(error.localizedDescription)")
                 self?.showAlert(title: "Logout Error", message: "An error occurred while logging out. Please try again.")
@@ -123,5 +124,9 @@ extension TravelViewController {
         self.present(alert, animated: true, completion: nil)
     }
     
+}
+
+extension Notification.Name {
+    static let userDidLogout = Notification.Name("userDidLogout")
 }
 
