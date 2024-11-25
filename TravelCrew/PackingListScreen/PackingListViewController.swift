@@ -11,6 +11,7 @@ import FirebaseAuth
 
 class PackingListViewController: UIViewController, EditPackingItemViewControllerDelegate {
     var packingListView: PackingListView?
+    var travelTitleLabel = UILabel()
     let noActiveplanLabel = UILabel()
     var travel: Travel?
     var currentUser: User?
@@ -31,6 +32,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         setupUI()
         NotificationCenter.default.addObserver(self, selector: #selector(activeTravelPlanChanged), name: .activeTravelPlanChanged, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(userDidLogout), name: .userDidLogout, object: nil)
@@ -46,6 +48,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
         super.viewWillAppear(animated)
         fetchCurrentUser() // Refresh user data when the view appears
     }
+
     
     @objc func activeTravelPlanChanged() {
         updateUI()

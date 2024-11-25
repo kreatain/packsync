@@ -20,7 +20,7 @@ class TravelDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Travel Plan Details"
+        title = "Travel Details"
         
         if let travel = travel {
             detailView.configure(with: travel)

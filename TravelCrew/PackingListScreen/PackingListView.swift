@@ -64,7 +64,7 @@ class PackingListView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
+            labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: -32),
             labelTravelTitle.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelTravelTitle.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
@@ -87,7 +87,7 @@ class PackingListView: UIView {
     }
     
     func configure(with travel: Travel) {
-        labelTravelTitle.text = "Packing List: \(travel.travelTitle)"
+        labelTravelTitle.text = "\(travel.travelTitle)"
     }
     
     
