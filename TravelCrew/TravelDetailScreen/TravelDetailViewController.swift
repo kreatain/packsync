@@ -20,7 +20,7 @@ class TravelDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        title = "Travel Plan Details"
+        title = "Travel Details"
         
         if let travel = travel {
             detailView.configure(with: travel)
@@ -34,9 +34,10 @@ class TravelDetailViewController: UIViewController {
         detailView.buttonSpending.addTarget(self, action: #selector(spendingButtonTapped), for: .touchUpInside)
         detailView.buttonBillboard.addTarget(self, action: #selector(billboardButtonTapped), for: .touchUpInside)
 
+        // Add observer for friend acceptance notification
+            NotificationCenter.default.addObserver(self, selector: #selector(friendAcceptedInvitation(_:)), name: .friendAcceptedInvitation, object: nil)
     }
 
-    
     @objc func editTravelPlan() {
         guard let travel = travel else {
             print("No travel plan to edit")
@@ -49,7 +50,7 @@ class TravelDetailViewController: UIViewController {
         present(navController, animated: true, completion: nil)
     }
     
-    private func showAlert(title: String, message: String) {
+    func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
@@ -96,6 +97,17 @@ class TravelDetailViewController: UIViewController {
         let billboardVC = BillboardViewController()
         billboardVC.travelId = travelId 
         navigationController?.pushViewController(billboardVC, animated: true)
+    }
+    
+    @objc func friendAcceptedInvitation(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let displayName = userInfo["displayName"] as? String else { return }
+        
+        // Update participant names
+        if var travel = travel {
+            travel.participantNames.append(displayName)  // Assuming participantNames is mutable
+            detailView.labelFriendsList.text = "Participants: \(travel.participantNames.joined(separator: ", "))"
+        }
     }
 }
 

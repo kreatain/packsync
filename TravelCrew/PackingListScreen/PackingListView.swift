@@ -12,6 +12,7 @@ class PackingListView: UIView {
     var labelTravelTitle: UILabel!
     var tableViewPackingList: UITableView!
     var buttonAddPackingItem: UIButton!
+    var labelLoginPrompt: UILabel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,6 +21,7 @@ class PackingListView: UIView {
         setupLabelTravelTitle()
         setupTableViewPackingList()
         setupButtonAddPackingItem()
+        setupLoginPrompt()
         
         initConstraints()
     }
@@ -49,9 +51,20 @@ class PackingListView: UIView {
         self.addSubview(buttonAddPackingItem)
     }
     
+    func setupLoginPrompt() {
+        labelLoginPrompt = UILabel()
+        labelLoginPrompt.text = "Please create an account or log in to view Packing details."
+        labelLoginPrompt.textColor = .gray
+        labelLoginPrompt.textAlignment = .center
+        labelLoginPrompt.numberOfLines = 0
+        labelLoginPrompt.isHidden = true // Initially hidden
+        labelLoginPrompt.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(labelLoginPrompt)
+    }
+    
     func initConstraints() {
         NSLayoutConstraint.activate([
-            labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 20),
+            labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: -33),
             labelTravelTitle.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelTravelTitle.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             
@@ -60,16 +73,21 @@ class PackingListView: UIView {
             tableViewPackingList.trailingAnchor.constraint(equalTo: self.trailingAnchor),
             tableViewPackingList.bottomAnchor.constraint(equalTo: self.safeAreaLayoutGuide.bottomAnchor),
             
-            buttonAddPackingItem.topAnchor.constraint(equalTo: tableViewPackingList.bottomAnchor, constant: 20),
             buttonAddPackingItem.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             buttonAddPackingItem.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
-            buttonAddPackingItem.heightAnchor.constraint(equalToConstant: 45),
-            buttonAddPackingItem.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20)
+            buttonAddPackingItem.heightAnchor.constraint(equalToConstant: 44),
+            buttonAddPackingItem.bottomAnchor.constraint(lessThanOrEqualTo: self.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            
+            // Login Prompt Constraints
+            labelLoginPrompt.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            labelLoginPrompt.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            labelLoginPrompt.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            labelLoginPrompt.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
         ])
     }
     
     func configure(with travel: Travel) {
-        labelTravelTitle.text = "Packing List: \(travel.travelTitle)"
+        labelTravelTitle.text = "\(travel.travelTitle)"
     }
     
     

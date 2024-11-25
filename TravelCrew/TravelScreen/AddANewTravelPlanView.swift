@@ -168,10 +168,6 @@ class AddANewTravelPlanView: UIView {
         // Set toolbar as input accessory view for the text field
         textFieldTravelEndDate.inputAccessoryView = toolbar
     }
-
-
-
-    // You can reuse the formatDate function from the previous example
     
     func setupTextFieldCountryAndCity() {
         textFieldCountryAndCity = UITextField()
