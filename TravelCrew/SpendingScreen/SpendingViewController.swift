@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SpendingViewController: UIViewController {
     private let spendingView = SpendingView() // Using SpendingView for layout
@@ -57,6 +58,8 @@ class SpendingViewController: UIViewController {
         setupLoadingIndicator()
         setupTabBarAction()
         loadTravelPlan()
+        
+        showNoActivePlanNotice()
         
         // Add observer to listen for updates
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTravelData), name: .travelDataChanged, object: nil)
@@ -529,6 +532,12 @@ class SpendingViewController: UIViewController {
     private func showNoActivePlanNotice() {
         spendingView.isHidden = true
         noActivePlanLabel.isHidden = false
+
+        if Auth.auth().currentUser == nil {
+            noActivePlanLabel.text = "Please create an account or log in to view Spending details."
+        } else {
+            noActivePlanLabel.text = "Please select an active travel plan to view Spending details."
+        }
     }
     
     @objc private func tabChanged(_ sender: UISegmentedControl) {
