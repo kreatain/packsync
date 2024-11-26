@@ -132,7 +132,7 @@ class BudgetAddEditViewController: UIViewController {
                 self.handleCompletion(success: success)
             }
         } else {
-            let newCategory = Category(name: name, budgetAmount: budget, emoji: emoji)
+            let newCategory = Category(name: name, budgetAmount: budget, emoji: emoji, travelId: travelId)
             SpendingFirebaseManager.shared.addCategory(to: travelId, category: newCategory) { success in
                 self.handleCompletion(success: success)
             }

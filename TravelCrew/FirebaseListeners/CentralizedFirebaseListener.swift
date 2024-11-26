@@ -196,15 +196,27 @@ class CentralizedFirebaseListener {
                              balancesUpdate: @escaping ([Balance]) -> Void,
                              billboardUpdate: @escaping ([Billboard]) -> Void,
                              participantsUpdate: @escaping ([User]) -> Void) {
-        stopAllListeners() // Clear any previous listeners
+        print("[CentralizedFirebaseListener] Initializing all listeners for travelId: \(travelId).")
         
-        // Start individual listeners
+        stopAllListeners() // Clear any previous listeners
+
         travelPlanListener = listenToTravelPlan(for: travelId, onUpdate: travelUpdate)
+        print("[CentralizedFirebaseListener] Travel plan listener set.")
+
         categoryListeners.append(listenToCategories(for: travelId, onUpdate: categoryUpdate))
+        print("[CentralizedFirebaseListener] Category listeners set.")
+
         spendingItemListeners.append(listenToSpendingItems(for: travelId, onUpdate: spendingItemsUpdate))
+        print("[CentralizedFirebaseListener] Spending items listeners set.")
+
         balanceListeners.append(listenToBalances(for: travelId, onUpdate: balancesUpdate))
+        print("[CentralizedFirebaseListener] Balance listeners set.")
+
         billboardListeners.append(listenToBillboards(for: travelId, onUpdate: billboardUpdate))
+        print("[CentralizedFirebaseListener] Billboard listeners set.")
+
         participantListeners = listenToParticipants(for: participantIds, onUpdate: participantsUpdate)
+        print("[CentralizedFirebaseListener] Participant listeners set.")
     }
     
     

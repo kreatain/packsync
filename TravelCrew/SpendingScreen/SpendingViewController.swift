@@ -28,7 +28,7 @@ class SpendingViewController: UIViewController {
     private lazy var splitVC = SplitViewController()
     
     private let travelTitleLabel = UILabel() // Label to show the travel plan's name on top of the tab bar
-    
+    private var listenerInitialized: Bool = false
     
     // Initializer to accept travelID parameter
     init(travelID: String? = nil) {
@@ -55,8 +55,6 @@ class SpendingViewController: UIViewController {
         setupTabBarAction()
         loadTravelPlan()
         
-        setupListeners()
-        
         // Listen for active travel plan changes
         NotificationCenter.default.addObserver(self, selector: #selector(loadTravelPlan), name: .activeTravelPlanChanged, object: nil)
         // Add observer to listen for updates
@@ -68,7 +66,7 @@ class SpendingViewController: UIViewController {
         super.viewDidDisappear(animated)
         CentralizedFirebaseListener.shared.stopAllListeners()
     }
-
+    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -76,34 +74,63 @@ class SpendingViewController: UIViewController {
         print("Tab Bar Frame:", spendingView.tabBar.frame)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        print("[SpendingViewController] viewWillAppear triggered.")
+        
+        // Refresh content when the view appears
+        refreshTravelData() // This method will fetch the latest data
+    }
+    
     private func setupListeners() {
-        guard let travelID = travelID else { return }
-
+        guard let travelID = travelID else {
+            print("[SpendingViewController] setupListeners called but travelID is nil.")
+            return
+        }
+        
+        guard !listenerInitialized else {
+            print("[SpendingViewController] Listeners are already initialized for travelID: \(travelID).")
+            return
+        }
+        
+        print("[SpendingViewController] Setting up listeners for travelID: \(travelID)")
+        listenerInitialized = true // Mark listeners as initialized
+        
+        print("[SpendingViewController] Setting up listeners for travelID: \(travelID).")
+        
         CentralizedFirebaseListener.shared.startListeningToAll(
             for: travelID,
             participantIds: travelPlan?.participantIds ?? [],
             travelUpdate: { [weak self] updatedTravel in
-                guard let self = self, let updatedTravel = updatedTravel else { return }
+                guard let self = self, let updatedTravel = updatedTravel else { 
+                    print("[SpendingViewController] travelUpdate listener invoked but updatedTravel is nil.")
+                    return 
+                }
+                print("[SpendingViewController] travelUpdate listener invoked with travelTitle: \(updatedTravel.travelTitle).")
                 self.travelPlan = updatedTravel
                 self.updateUIWithTravelPlan(updatedTravel)
             },
             categoryUpdate: { [weak self] updatedCategories in
+                print("[SpendingViewController] categoryUpdate listener invoked with \(updatedCategories.count) categories.")
                 self?.categories = updatedCategories
                 self?.refreshTravelData()
             },
             spendingItemsUpdate: { [weak self] updatedSpendingItems in
+                print("[SpendingViewController] spendingItemsUpdate listener invoked with \(updatedSpendingItems.count) spending items.")
                 self?.spendingItems = updatedSpendingItems
                 self?.refreshTravelData()
             },
             balancesUpdate: { [weak self] updatedBalances in
+                print("[SpendingViewController] balancesUpdate listener invoked with \(updatedBalances.count) balances.")
                 self?.balances = updatedBalances
                 self?.refreshTravelData()
             },
             billboardUpdate: { [weak self] updatedBillboards in
-                // Handle billboard updates if necessary
+                print("[SpendingViewController] billboardUpdate listener invoked with \(updatedBillboards.count) billboards.")
                 self?.refreshTravelData()
             },
             participantsUpdate: { [weak self] updatedParticipants in
+                print("[SpendingViewController] participantsUpdate listener invoked with \(updatedParticipants.count) participants.")
                 self?.participants = updatedParticipants
                 self?.refreshTravelData()
             }
@@ -255,6 +282,9 @@ class SpendingViewController: UIViewController {
     private func populateTravelPlanData(for travelPlanId: String) {
         print("populateTravelPlanData called for travelPlan ID: \(travelPlanId)")
         
+        travelID = travelPlanId // Ensure travelID is updated here
+        setupListeners() // Call listeners setup after travelID is set
+        
         var localTravelPlan: Travel?
         var categories: [Category] = []
         var spendingItems: [SpendingItem] = []
@@ -366,6 +396,9 @@ class SpendingViewController: UIViewController {
                 participants: participants,
                 currencySymbol: travelPlan.currency
             )
+            overviewVC.view.setNeedsLayout()
+            overviewVC.view.layoutIfNeeded()
+            
             budgetVC.setTravelPlan(
                 travelPlan,
                 categories: categories,
@@ -374,6 +407,9 @@ class SpendingViewController: UIViewController {
                 currencySymbol: travelPlan.currency,
                 userIcons: userIcons
             )
+            budgetVC.view.setNeedsLayout()
+            budgetVC.view.layoutIfNeeded()
+            
             expensesVC.setTravelPlan(
                 travelPlan,
                 categories: categories,
@@ -382,6 +418,10 @@ class SpendingViewController: UIViewController {
                 currencySymbol: travelPlan.currency,
                 userIcons: userIcons
             )
+            expensesVC.view.setNeedsLayout()
+            expensesVC.view.layoutIfNeeded()
+            
+            
             splitVC.setTravelPlan(
                 travelPlan: travelPlan,
                 participants: self.participants,
@@ -392,6 +432,8 @@ class SpendingViewController: UIViewController {
                 userIcons: userIcons,
                 currencySymbol: travelPlan.currency
             )
+            splitVC.view.setNeedsLayout()
+            splitVC.view.layoutIfNeeded()
             
             // Restore the active tab
             switch currentTabIndex {

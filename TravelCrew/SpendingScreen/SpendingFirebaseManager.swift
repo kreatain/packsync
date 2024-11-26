@@ -377,49 +377,35 @@ class SpendingFirebaseManager {
         }
     }
     
+    // MARK: - Add Category
     func addCategory(to travelId: String, category: Category, completion: @escaping (Bool) -> Void) {
-        let categoryRef = db.collection("categories").document() // Generate a new document ID
-        var categoryToAdd = category // Create a mutable copy of the category
-        categoryToAdd.id = categoryRef.documentID // Set the category's ID to match the Firestore document ID
-        
+        let categoryRef = db.collection("categories").document()
+        var mutableCategory = category
+        mutableCategory.id = categoryRef.documentID
+        mutableCategory.travelId = travelId
+
         let travelPlanRef = db.collection("travelPlans").document(travelId)
-        
-        // Create the new category in Firestore
+
         do {
-            try categoryRef.setData(from: categoryToAdd) { error in
-                guard error == nil else {
-                    print("Error adding category: \(error!)")
+            try categoryRef.setData(from: mutableCategory) { error in
+                if let error = error {
+                    print("Error adding category: \(error.localizedDescription)")
                     completion(false)
                     return
                 }
-                
-                // Update the travelPlan to include the new category ID
+
                 travelPlanRef.updateData([
                     "categoryIds": FieldValue.arrayUnion([categoryRef.documentID])
                 ]) { error in
                     if let error = error {
-                        print("Error updating travel plan with new category ID: \(error)")
+                        print("Error updating travel plan: \(error.localizedDescription)")
                         completion(false)
                     } else {
-                        print("Successfully added category and updated travel plan.")
-                        
-                        // Post a notification about the change
-                        NotificationCenter.default.post(
-                            name: .travelDataChanged, // Custom notification name
-                            object: nil,
-                            userInfo: [
-                                "travelId": travelId,
-                                "categoryId": categoryRef.documentID,
-                                "categoryName": category.name
-                            ]
-                        )
-                        
                         completion(true)
                     }
                 }
             }
         } catch {
-            print("Error encoding category: \(error)")
             completion(false)
         }
     }
