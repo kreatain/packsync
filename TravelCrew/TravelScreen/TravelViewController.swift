@@ -102,9 +102,18 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
                     DispatchQueue.main.async {
                         print("Reloading travel plans table with \(self?.travelPlanList.count ?? 0) plans.")
                         self?.travelView.tableViewTravelPlans.reloadData()
+                        self?.updateActivePlanIfNeeded()
                     }
                 }
         }
+    
+    private func updateActivePlanIfNeeded() {
+        if let activePlan = TravelPlanManager.shared.activeTravelPlan,
+           let updatedPlan = travelPlanList.first(where: { $0.id == activePlan.id }) {
+            TravelPlanManager.shared.setActiveTravelPlan(updatedPlan)
+            updateActivePlanDetailView(with: updatedPlan)
+        }
+    }
     
     // MARK: - Handle Active Plan Change
     @objc func handleActivePlanChange() {
@@ -139,8 +148,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.activePlanDateLabel.text = "Date: \(activePlan.travelStartDate) - \(activePlan.travelEndDate)"
         travelView.activePlanLocationLabel.text = "Location: \(activePlan.countryAndCity)"
         travelView.activePlanParticipantIdsLabel.text = "Participants: \(activePlan.participantNames.joined(separator: ", "))"
-        
-        travelView.activePlanDetailView.isHidden = false
+        travelView.activePlanDescriptionLabel.text = "Please tap the bottom navigation bar to explore more about the active plan!"
     }
     
     // MARK: - Clear Active Plan Detail View
@@ -178,6 +186,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
                 travelView.labelText.isHidden = false
                 return
             }
+
 
         if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             updateActivePlanDetailView(with: activePlan)
@@ -224,6 +233,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.tableViewTravelPlans.reloadData()
         didTapActivePlanButton()
     }
+    
     private func saveActivePlanLocally(_ travelPlan: Travel) {
         let encoder = JSONEncoder()
         if let encodedData = try? encoder.encode(travelPlan) {

@@ -26,6 +26,7 @@ class TravelView: UIView {
     var activePlanDateLabel: UILabel!
     var activePlanLocationLabel: UILabel!
     var activePlanParticipantIdsLabel: UILabel!
+    var activePlanDescriptionLabel: UILabel!
     var placeholderView: UIView!
 
     weak var delegate: TravelViewDelegate?
@@ -130,8 +131,17 @@ class TravelView: UIView {
         activePlanParticipantIdsLabel = UILabel()
         activePlanParticipantIdsLabel.font = .systemFont(ofSize: 14)
         activePlanParticipantIdsLabel.textAlignment = .center
+        activePlanParticipantIdsLabel.numberOfLines = 0 // Allow multiple lines
         activePlanParticipantIdsLabel.translatesAutoresizingMaskIntoConstraints = false
         activePlanDetailView.addSubview(activePlanParticipantIdsLabel)
+        
+        activePlanDescriptionLabel = UILabel()
+        activePlanDescriptionLabel.font = .systemFont(ofSize: 14)
+        activePlanDescriptionLabel.textAlignment = .center
+        activePlanDescriptionLabel.textColor = .systemGray
+        activePlanDescriptionLabel.numberOfLines = 0 // Allow multiple lines
+        activePlanDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        activePlanDetailView.addSubview(activePlanDescriptionLabel)
     }
     // MARK: - Button Actions
 
@@ -185,7 +195,11 @@ class TravelView: UIView {
             activePlanParticipantIdsLabel.topAnchor.constraint(equalTo: activePlanLocationLabel.bottomAnchor, constant: 8),
             activePlanParticipantIdsLabel.leadingAnchor.constraint(equalTo: activePlanDetailView.leadingAnchor),
             activePlanParticipantIdsLabel.trailingAnchor.constraint(equalTo: activePlanDetailView.trailingAnchor),
-            activePlanParticipantIdsLabel.bottomAnchor.constraint(equalTo: activePlanDetailView.bottomAnchor, constant: -16),
+            
+            activePlanDescriptionLabel.topAnchor.constraint(equalTo: activePlanParticipantIdsLabel.bottomAnchor, constant: 16),
+            activePlanDescriptionLabel.leadingAnchor.constraint(equalTo: activePlanDetailView.leadingAnchor),
+            activePlanDescriptionLabel.trailingAnchor.constraint(equalTo: activePlanDetailView.trailingAnchor),
+            activePlanDescriptionLabel.bottomAnchor.constraint(equalTo: activePlanDetailView.bottomAnchor, constant: -16),
 
             tableViewTravelPlans.topAnchor.constraint(equalTo: segmentedControlView.bottomAnchor, constant: 16),
             tableViewTravelPlans.leadingAnchor.constraint(equalTo: self.leadingAnchor),

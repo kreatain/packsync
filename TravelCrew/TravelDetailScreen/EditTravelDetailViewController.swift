@@ -35,6 +35,9 @@ class EditTravelDetailViewController: UIViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Cancel", style: .plain, target: self, action: #selector(cancelEdit))
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(saveEdit))
         
+        editTravelView.startDatePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+        editTravelView.endDatePicker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
+
         editTravelView.buttonSave.addTarget(self, action: #selector(saveEdit), for: .touchUpInside)
         editTravelView.buttonDelete.addTarget(self, action: #selector(onDeleteTapped), for: .touchUpInside)
     }
@@ -45,13 +48,21 @@ class EditTravelDetailViewController: UIViewController {
     
     @objc func saveEdit() {
         guard let updatedTitle = editTravelView.textFieldTravelTitle.text,
-              let updatedStartDate = editTravelView.textFieldTravelStartDate.text,
-              let updatedEndDate = editTravelView.textFieldTravelEndDate.text,
-              let updatedCountryAndCity = editTravelView.textFieldCountryAndCity.text,
-              let creatorId = travel?.creatorId else {
+             let updatedStartDate = editTravelView.textFieldTravelStartDate.text,
+             let updatedEndDate = editTravelView.textFieldTravelEndDate.text,
+             let updatedCountryAndCity = editTravelView.textFieldCountryAndCity.text,
+             let creatorId = travel?.creatorId else {
             print("Invalid input")
             return
-        }
+            }
+
+            let startDate = editTravelView.startDatePicker.date
+            let endDate = editTravelView.endDatePicker.date
+
+            if endDate < startDate {
+            showAlert(title: "Invalid Date", message: "End date cannot be earlier than start date.")
+            return
+            }
         
         let selectedCurrencyRow = editTravelView.currencyPicker.selectedRow(inComponent: 0)
         let selectedCurrency = currencies[selectedCurrencyRow]
@@ -95,6 +106,35 @@ class EditTravelDetailViewController: UIViewController {
             }
         }
     }
+    
+    @objc func dateChanged(_ sender: UIDatePicker) {
+        let startDate = editTravelView.startDatePicker.date
+        let endDate = editTravelView.endDatePicker.date
+        
+        if endDate < startDate {
+            showAlert(title: "Invalid Date", message: "End date cannot be earlier than start date.")
+            sender.date = sender == editTravelView.startDatePicker ? endDate : startDate
+        }
+        
+        if sender == editTravelView.startDatePicker {
+            editTravelView.textFieldTravelStartDate.text = formatDate(startDate)
+        } else {
+            editTravelView.textFieldTravelEndDate.text = formatDate(endDate)
+        }
+    }
+    
+    func formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, yyyy"
+        return formatter.string(from: date)
+    }
+
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
+    }
+    
     
     func formatDateForFirestore(_ dateString: String) -> String {
         let inputFormatter = DateFormatter()
