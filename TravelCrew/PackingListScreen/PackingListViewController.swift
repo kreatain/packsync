@@ -120,8 +120,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
             self.packingListView?.tableViewPackingList.isHidden = true
             self.packingListView?.buttonAddPackingItem.isHidden = true
             self.packingListView?.labelTravelTitle.isHidden = true
-            self.noActiveplanLabel.isHidden = true
-            self.packingListView?.labelLoginPrompt.isHidden = false
+            self.noActiveplanLabel.text = "Please create an account or log in to view Packing details."
             self.listener?.remove()
             self.packingListView?.tableViewPackingList.reloadData()
         }
