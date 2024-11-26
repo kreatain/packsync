@@ -9,6 +9,16 @@ class BillboardView: UIView {
     let inputTextField = UITextField()
     let plusButton = UIButton(type: .system)
     let sendButton = UIButton(type: .system)
+    let labelLoginPrompt: UILabel = {
+            let label = UILabel()
+            label.text = "Please create an account or log in to view the Billboard."
+            label.textAlignment = .center
+            label.textColor = .gray
+            label.isHidden = true
+            label.numberOfLines = 0
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -23,6 +33,8 @@ class BillboardView: UIView {
     // Setup UI elements
     private func setupUI() {
         self.backgroundColor = .white
+        
+        addSubview(labelLoginPrompt)
 
         // TableView setup
         tableView.separatorStyle = .none
@@ -53,6 +65,12 @@ class BillboardView: UIView {
     private func setupConstraints() {
         NSLayoutConstraint.activate([
             // TableView constraints
+            
+            labelLoginPrompt.centerXAnchor.constraint(equalTo: centerXAnchor),
+            labelLoginPrompt.centerYAnchor.constraint(equalTo: centerYAnchor),
+            labelLoginPrompt.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
+            labelLoginPrompt.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            
             tableView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: trailingAnchor),

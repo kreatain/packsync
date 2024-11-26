@@ -64,7 +64,7 @@ class PackingListView: UIView {
     
     func initConstraints() {
         NSLayoutConstraint.activate([
-            labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: -20),
+            labelTravelTitle.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: -33),
             labelTravelTitle.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             labelTravelTitle.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             

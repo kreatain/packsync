@@ -12,6 +12,7 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     private var userNames: [String: String] = [:] // Dictionary to map authorId to displayName
     private var listener: ListenerRegistration?
     var travelId: String?
+    private let noActivePlanLabel = UILabel()
     private var participantCounts: [String: Int] = [:]
     convenience init(travelId: String? = nil) {
             self.init()
@@ -23,25 +24,39 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViewController()
+        
         
 
         if let travelId = travelId {
             preloadParticipantCount(for: travelId)
             setupRealTimeListener(using: travelId)
+            hideNoActivePlanNotice()
         } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
             preloadParticipantCount(for: activeTravelId)
             setupRealTimeListener(using: activeTravelId)
+            hideNoActivePlanNotice()
         } else {
             print("No active travel plan found and no travelId provided.")
-            showNoTravelPlanAlert()
+            showNoActivePlanNotice()
         }
+        
+        
+        checkLoginStatus()
+        setupNoActivePlanLabel()
+        
+        NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(activeTravelPlanDidChange),
+                name: .activeTravelPlanChanged,
+                object: nil
+            )
     }
     
     
     deinit {
             listener?.remove()
-            print("Real-time listener removed.")
+            NotificationCenter.default.removeObserver(self)
+            print("BillboardViewController deinitialized and listener removed.")
     }
 
     private func showNoTravelPlanAlert() {
@@ -51,6 +66,87 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
             }))
             present(alert, animated: true)
         }
+    
+    private func checkLoginStatus() {
+        if Auth.auth().currentUser == nil {
+            showLoginPrompt()
+        } else {
+            if travelId == nil, TravelPlanManager.shared.activeTravelPlan?.id == nil {
+                showNoActivePlanNotice()
+            } else {
+                hideNoActivePlanNotice()
+                setupViewController()
+                
+                if let travelId = travelId {
+                    preloadParticipantCount(for: travelId)
+                    setupRealTimeListener(using: travelId)
+                } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
+                    preloadParticipantCount(for: activeTravelId)
+                    setupRealTimeListener(using: activeTravelId)
+                } else {
+                    showNoActivePlanNotice()
+                }
+            }
+        }
+    }
+    
+    private func showNoActivePlanNotice() {
+        noActivePlanLabel.isHidden = false
+        billboardView.tableView.isHidden = true
+        billboardView.inputTextField.isHidden = true
+        billboardView.plusButton.isHidden = true
+        billboardView.sendButton.isHidden = true
+    }
+    
+    private func hideNoActivePlanNotice() {
+        noActivePlanLabel.isHidden = true
+        billboardView.tableView.isHidden = false
+        billboardView.inputTextField.isHidden = false
+        billboardView.plusButton.isHidden = false
+        billboardView.sendButton.isHidden = false
+    }
+    
+    private func setupNoActivePlanLabel() {
+        noActivePlanLabel.text = "Please select an active travel plan to view the Billboard."
+        noActivePlanLabel.textAlignment = .center
+        noActivePlanLabel.numberOfLines = 0
+        noActivePlanLabel.textColor = .gray
+        noActivePlanLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(noActivePlanLabel)
+        
+        NSLayoutConstraint.activate([
+            noActivePlanLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            noActivePlanLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            noActivePlanLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
+            noActivePlanLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20)
+        ])
+        noActivePlanLabel.isHidden = true
+    }
+    
+    private func showLoginPrompt() {
+        // Show the login prompt
+        billboardView.labelLoginPrompt.isHidden = false
+
+        // Hide other UI elements
+        billboardView.tableView.isHidden = true
+        billboardView.inputTextField.isHidden = true
+        billboardView.plusButton.isHidden = true
+        billboardView.sendButton.isHidden = true
+    }
+    
+    @objc private func activeTravelPlanDidChange() {
+        if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
+            self.travelId = activeTravelId
+            preloadParticipantCount(for: activeTravelId)
+            setupRealTimeListener(using: activeTravelId)
+            hideNoActivePlanNotice()
+        } else {
+            self.travelId = nil
+            showNoActivePlanNotice()
+        }
+        updateTitle()
+    }
+    
     
     // Setup the view controller
     private func setupViewController() {
@@ -69,32 +165,80 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         // Add actions for buttons
         billboardView.plusButton.addTarget(self, action: #selector(plusButtonTapped), for: .touchUpInside)
         billboardView.sendButton.addTarget(self, action: #selector(sendButtonTapped), for: .touchUpInside)
+        
+        updateTitle()
+    }
+    
+   
+    private func updateTitle() {
+        print("updateTitle called. travelId: \(String(describing: travelId))")
+        if let travelId = travelId {
+            fetchTravelPlanTitle(for: travelId) { [weak self] title in
+                DispatchQueue.main.async {
+                    print("Setting navigationItem title to: \(title)")
+                    self?.navigationItem.title = title
+                }
+            }
+        } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
+            fetchTravelPlanTitle(for: activeTravelId) { [weak self] title in
+                DispatchQueue.main.async {
+                    print("Setting navigationItem title to: \(title)")
+                    self?.navigationItem.title = title
+                }
+            }
+        } else {
+            print("No travelId or activeTravelId. Default title used.")
+            self.navigationItem.title = "Billboard"
+        }
+    }
+    
+    private func fetchTravelPlanTitle(for travelId: String, completion: @escaping (String) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("travelPlans").document(travelId).getDocument { document, error in
+            if let error = error {
+                print("Error fetching travel plan title: \(error.localizedDescription)")
+                completion("Billboard") // Default title in case of an error
+                return
+            }
+
+            if let document = document, let data = document.data(), let travelTitle = data["travelTitle"] as? String {
+                completion(travelTitle)
+            } else {
+                completion("Billboard") // Default title if data is missing
+            }
+        }
     }
     
     private func setupRealTimeListener(using travelId: String) {
-            let db = Firestore.firestore()
-            listener = db.collection("billboards")
-                .whereField("travelId", isEqualTo: travelId)
-                .order(by: "createdAt", descending: true)
-                .addSnapshotListener { [weak self] (querySnapshot, error) in
-                    if let error = error {
-                        print("Error listening for real-time updates: \(error.localizedDescription)")
-                        return
-                    }
-                    guard let documents = querySnapshot?.documents else {
-                        print("No documents found for travelId: \(travelId).")
-                        return
-                    }
-
-                    print("Real-time listener triggered for travelId: \(travelId). Documents count: \(documents.count)")
-                    self?.notices = documents.compactMap { document in
-                        try? document.data(as: Billboard.self)
-                    }
-                    DispatchQueue.main.async {
-                        self?.billboardView.tableView.reloadData()
-                    }
+        let db = Firestore.firestore()
+        listener = db.collection("billboards")
+            .whereField("travelId", isEqualTo: travelId)
+            .order(by: "createdAt", descending: true)
+            .addSnapshotListener { [weak self] (querySnapshot, error) in
+                if let error = error {
+                    print("Error listening for real-time updates: \(error.localizedDescription)")
+                    return
                 }
-        }
+                guard let documents = querySnapshot?.documents else {
+                    print("No documents found for travelId: \(travelId).")
+                    return
+                }
+
+                print("Real-time listener triggered for travelId: \(travelId). Documents count: \(documents.count)")
+                
+                self?.notices = documents.compactMap { document in
+                    try? document.data(as: Billboard.self)
+                }
+                
+                // Fetch all user names for author IDs
+                self?.fetchUserNames()
+                
+                DispatchQueue.main.async {
+                    self?.billboardView.tableView.reloadData()
+                }
+            }
+    }
+    
     
     private func preloadParticipantCount(for travelId: String) {
         fetchTravelPlan(by: travelId) { [weak self] travelPlan in
@@ -106,32 +250,29 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         }
     }
     
-    
     private func fetchUserNames() {
         let db = Firestore.firestore()
+
         let authorIds = Set(notices.map { $0.authorId })
+        print("Author IDs to fetch:", authorIds)
 
-        for authorId in authorIds {
-            if userNames[authorId] != nil {
-                continue
-            }
-
+        for authorId in authorIds where userNames[authorId] == nil {
             db.collection("users").document(authorId).getDocument { [weak self] (document, error) in
                 if let error = error {
-                    print("Error fetching user data: \(error.localizedDescription)")
+                    print("Error fetching user data for authorId \(authorId): \(error.localizedDescription)")
                     return
                 }
 
                 if let document = document, document.exists {
-                    print("Fetched user data: \(document.data() ?? [:])")
                     let displayName = document.data()?["displayName"] as? String ?? "Unknown"
                     self?.userNames[authorId] = displayName
+                    print("Fetched userName for authorId \(authorId): \(displayName)")
 
-                    // Reload the table view after fetching each user name
                     DispatchQueue.main.async {
                         self?.billboardView.tableView.reloadData()
-                        print("Table view reloaded after fetching user name.")
                     }
+                } else {
+                    print("User document for authorId \(authorId) not found.")
                 }
             }
         }
