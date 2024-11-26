@@ -29,6 +29,9 @@ class SpendingViewController: UIViewController {
     
     private let travelTitleLabel = UILabel() // Label to show the travel plan's name on top of the tab bar
     private var listenerInitialized: Bool = false
+    private var refreshInProgress = false
+    private var refreshTask: DispatchWorkItem?
+    
     
     // Initializer to accept travelID parameter
     init(travelID: String? = nil) {
@@ -55,10 +58,18 @@ class SpendingViewController: UIViewController {
         setupTabBarAction()
         loadTravelPlan()
         
-        // Listen for active travel plan changes
-        NotificationCenter.default.addObserver(self, selector: #selector(loadTravelPlan), name: .activeTravelPlanChanged, object: nil)
         // Add observer to listen for updates
         NotificationCenter.default.addObserver(self, selector: #selector(refreshTravelData), name: .travelDataChanged, object: nil)
+        
+        // Listen for ActiveTravelPlan change
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleActiveTravelPlanChange),
+            name: .activeTravelPlanChanged,
+            object: nil
+        )
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(userDidLogout), name: .userDidLogout, object: nil)
         
     }
     
@@ -78,9 +89,16 @@ class SpendingViewController: UIViewController {
         super.viewWillAppear(animated)
         print("[SpendingViewController] viewWillAppear triggered.")
         
-        // Refresh content when the view appears
-        refreshTravelData() // This method will fetch the latest data
+        // Stop existing listeners and set up new ones
+        CentralizedFirebaseListener.shared.stopAllListeners()
+        listenerInitialized = false
+        setupListeners()
+        
+        // Force refresh travel data
+        refreshTravelData()
+        loadTravelPlan()
     }
+    
     
     private func setupListeners() {
         guard let travelID = travelID else {
@@ -88,15 +106,7 @@ class SpendingViewController: UIViewController {
             return
         }
         
-        guard !listenerInitialized else {
-            print("[SpendingViewController] Listeners are already initialized for travelID: \(travelID).")
-            return
-        }
-        
-        print("[SpendingViewController] Setting up listeners for travelID: \(travelID)")
-        listenerInitialized = true // Mark listeners as initialized
-        
-        print("[SpendingViewController] Setting up listeners for travelID: \(travelID).")
+        CentralizedFirebaseListener.shared.stopAllListeners()
         
         CentralizedFirebaseListener.shared.startListeningToAll(
             for: travelID,
@@ -111,29 +121,66 @@ class SpendingViewController: UIViewController {
                 self.updateUIWithTravelPlan(updatedTravel)
             },
             categoryUpdate: { [weak self] updatedCategories in
-                print("[SpendingViewController] categoryUpdate listener invoked with \(updatedCategories.count) categories.")
-                self?.categories = updatedCategories
-                self?.refreshTravelData()
+                guard let self = self else { return }
+                self.categories = updatedCategories
+                self.notifyChildControllers()
             },
             spendingItemsUpdate: { [weak self] updatedSpendingItems in
-                print("[SpendingViewController] spendingItemsUpdate listener invoked with \(updatedSpendingItems.count) spending items.")
-                self?.spendingItems = updatedSpendingItems
-                self?.refreshTravelData()
+                guard let self = self else { return }
+                self.spendingItems = updatedSpendingItems
+                self.notifyChildControllers()
             },
             balancesUpdate: { [weak self] updatedBalances in
-                print("[SpendingViewController] balancesUpdate listener invoked with \(updatedBalances.count) balances.")
-                self?.balances = updatedBalances
-                self?.refreshTravelData()
-            },
-            billboardUpdate: { [weak self] updatedBillboards in
-                print("[SpendingViewController] billboardUpdate listener invoked with \(updatedBillboards.count) billboards.")
-                self?.refreshTravelData()
+                guard let self = self else { return }
+                self.balances = updatedBalances
+                self.notifyChildControllers()
             },
             participantsUpdate: { [weak self] updatedParticipants in
-                print("[SpendingViewController] participantsUpdate listener invoked with \(updatedParticipants.count) participants.")
-                self?.participants = updatedParticipants
-                self?.refreshTravelData()
+                guard let self = self else { return }
+                self.participants = updatedParticipants
+                self.notifyChildControllers()
             }
+        )
+    }
+    
+    private func notifyChildControllers() {
+        guard let travelPlan = travelPlan else {
+            print("[SpendingViewController] Error: travelPlan is nil. Cannot notify child controllers.")
+            return
+        }
+        
+        overviewVC.setTravelPlan(
+            travelPlan,
+            categories: categories,
+            spendingItems: spendingItems,
+            participants: participants,
+            currencySymbol: travelPlan.currency 
+        )
+        budgetVC.setTravelPlan(
+            travelPlan,
+            categories: categories,
+            spendingItems: spendingItems,
+            participants: participants,
+            currencySymbol: travelPlan.currency ,
+            userIcons: userIcons
+        )
+        expensesVC.setTravelPlan(
+            travelPlan,
+            categories: categories,
+            spendingItems: spendingItems,
+            participants: participants,
+            currencySymbol: travelPlan.currency ,
+            userIcons: userIcons
+        )
+        splitVC.setTravelPlan(
+            travelPlan: travelPlan,
+            participants: participants,
+            currentBalance: balances.first,
+            unsettledSpendingItems: spendingItems.filter { !$0.isSettled },
+            settledSpendingItems: spendingItems.filter { $0.isSettled },
+            categories: categories,
+            userIcons: userIcons,
+            currencySymbol: travelPlan.currency
         )
     }
     
@@ -216,35 +263,78 @@ class SpendingViewController: UIViewController {
     // MARK: - Load Travel Plan
     @objc private func loadTravelPlan() {
         print("[SpendingViewController] loadTravelPlan called.")
-        
-        // Start loading animation
         startLoading()
-        
-        if let travelID = travelID {
-            print("[SpendingViewController] Fetching travel plan with ID: \(travelID).")
+
+        // Track the source of travelID
+        if let explicitlySetTravelID = self.travelID {
+            print("[SpendingViewController] Using explicitly set travelID: \(explicitlySetTravelID)")
+        } else if let activeTravelPlan = TravelPlanManager.shared.activeTravelPlan {
+            print("[SpendingViewController] Using active travel plan ID: \(activeTravelPlan.id), Title: \(activeTravelPlan.travelTitle)")
+        } else {
+            print("[SpendingViewController] No travelID or active travel plan available.")
+        }
+
+        // Fetch travel ID
+        let travelIDToFetch = self.travelID ?? TravelPlanManager.shared.activeTravelPlan?.id
+
+        // Log the outcome
+        if let travelID = travelIDToFetch {
+            print("[SpendingViewController] Fetching travel plan with ID: \(travelID)")
             SpendingFirebaseManager.shared.fetchTravel(for: travelID) { [weak self] travelPlan in
                 guard let self = self else { return }
-                
                 if let travelPlan = travelPlan {
-                    print("[SpendingViewController] Travel plan fetched successfully.")
-                    self.populateTravelPlanData(for: travelPlan.id)
+                    print("[SpendingViewController] Travel plan fetched successfully: ID: \(travelPlan.id), Title: \(travelPlan.travelTitle)")
+                    self.populateTravelPlanData(for: travelPlan.id) {
+                        DispatchQueue.main.async {
+                            self.stopLoading()
+                        }
+                    }
                 } else {
-                    print("[SpendingViewController] No travel plan found for ID: \(travelID).")
+                    print("[SpendingViewController] No travel plan found for ID: \(travelID)")
                     DispatchQueue.main.async {
                         self.stopLoading()
                         self.showNoActivePlanNotice()
                     }
                 }
             }
-        } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
-            print("[SpendingViewController] Using active travel plan with ID: \(activePlan.id).")
-            populateTravelPlanData(for: activePlan.id)
         } else {
-            print("[SpendingViewController] No travel ID or active travel plan available.")
+            print("[SpendingViewController] No travel ID or active travel plan available to fetch.")
             DispatchQueue.main.async {
                 self.stopLoading()
                 self.showNoActivePlanNotice()
             }
+        }
+    }
+    
+    @objc private func handleActiveTravelPlanChange(notification: Notification) {
+        print("Active Travel changed, start loading new...")
+        self.travelID = nil
+        loadTravelPlan()
+
+    }
+    
+    @objc private func userDidLogout() {
+        DispatchQueue.main.async {
+            print("[SpendingViewController] User logged out. Resetting UI.")
+            
+            self.categories.removeAll()
+            self.spendingItems.removeAll()
+            self.participants.removeAll()
+            self.balances.removeAll()
+            
+            self.spendingView.isHidden = true
+            self.noActivePlanLabel.isHidden = true
+            self.travelTitleLabel.isHidden = true
+            self.loadingIndicator.stopAnimating()
+            self.listenerInitialized = false
+
+            // Reset the travelPlan and travelID to nil
+            self.travelPlan = nil
+            self.travelID = nil
+
+            // Display the login prompt if required
+            self.noActivePlanLabel.text = "Please create an account or log in to view Spending details."
+            self.noActivePlanLabel.isHidden = false
         }
     }
     
@@ -279,100 +369,84 @@ class SpendingViewController: UIViewController {
         }
     }
     
-    private func populateTravelPlanData(for travelPlanId: String) {
+    private func populateTravelPlanData(for travelPlanId: String, completion: @escaping () -> Void) {
         print("populateTravelPlanData called for travelPlan ID: \(travelPlanId)")
         
-        travelID = travelPlanId // Ensure travelID is updated here
-        setupListeners() // Call listeners setup after travelID is set
-        
-        var localTravelPlan: Travel?
-        var categories: [Category] = []
-        var spendingItems: [SpendingItem] = []
-        var balances: [Balance] = []
-        var participants: [User] = []
+        travelID = travelPlanId
+        setupListeners() // Setup listeners after travelID is updated
         
         let dispatchGroup = DispatchGroup()
+        var fetchedTravelPlan: Travel?
+        var fetchedCategories: [Category] = []
+        var fetchedSpendingItems: [SpendingItem] = []
+        var fetchedBalances: [Balance] = []
+        var fetchedParticipants: [User] = []
         
-        // Step 1: Fetch the latest travel plan from Firestore
+        // Fetch Travel Plan
         dispatchGroup.enter()
-        SpendingFirebaseManager.shared.fetchTravel(for: travelPlanId) { fetchedTravelPlan in
-            guard let fetchedTravelPlan = fetchedTravelPlan else {
-                print("Error: Failed to fetch the travel plan from Firestore.")
-                dispatchGroup.leave()
-                return
-            }
-            
-            localTravelPlan = fetchedTravelPlan
-            print("Fetched latest travel plan:")
-            print("""
-            - ID: \(fetchedTravelPlan.id)
-            - Title: \(fetchedTravelPlan.travelTitle)
-            - Category IDs: \(fetchedTravelPlan.categoryIds)
-            - Expense IDs: \(fetchedTravelPlan.expenseIds)
-            """)
+        SpendingFirebaseManager.shared.fetchTravel(for: travelPlanId) { travelPlan in
+            fetchedTravelPlan = travelPlan
             dispatchGroup.leave()
         }
         
-        // Wait for travel plan to be fetched before proceeding
+        // Wait for travel plan fetch
         dispatchGroup.notify(queue: .global()) {
-            guard let travelPlan = localTravelPlan else {
-                print("Error: Local travel plan is nil. Aborting data fetch.")
+            guard let travelPlan = fetchedTravelPlan else {
+                print("Error: No travel plan found.")
+                DispatchQueue.main.async {
+                    self.showNoActivePlanNotice()
+                    completion()
+                }
                 return
             }
             
-            // Step 2: Fetch categories using updated category IDs
+            // Fetch Categories
             dispatchGroup.enter()
-            print("Fetching categories for travel plan ID: \(travelPlan.id) with updated category IDs: \(travelPlan.categoryIds)")
-            SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { fetchedCategories in
-                categories = fetchedCategories
-                print("Fetched \(fetchedCategories.count) categories.")
+            SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { categories in
+                fetchedCategories = categories
                 dispatchGroup.leave()
             }
             
-            // Step 3: Fetch spending items using updated category IDs
+            // Fetch Spending Items
             dispatchGroup.enter()
-            print("Fetching spending items for updated category IDs: \(travelPlan.categoryIds)")
-            SpendingFirebaseManager.shared.fetchSpendingItemsByCategoryIds(categoryIds: travelPlan.categoryIds) { fetchedSpendingItems in
-                spendingItems = fetchedSpendingItems
-                print("Fetched \(fetchedSpendingItems.count) spending items.")
+            SpendingFirebaseManager.shared.fetchSpendingItemsByCategoryIds(categoryIds: travelPlan.categoryIds) { spendingItems in
+                fetchedSpendingItems = spendingItems
                 dispatchGroup.leave()
             }
             
-            // Step 4: Fetch balances using updated balance IDs
+            // Fetch Balances
             dispatchGroup.enter()
-            print("Fetching balances for travel plan ID: \(travelPlan.id) with updated balance IDs: \(travelPlan.balanceIds)")
-            SpendingFirebaseManager.shared.fetchBalances(for: travelPlan.id) { fetchedBalances in
-                balances = fetchedBalances
-                print("Fetched \(fetchedBalances.count) balances for travel plan ID \(travelPlan.id).")
+            SpendingFirebaseManager.shared.fetchBalances(for: travelPlan.id) { balances in
+                fetchedBalances = balances
                 dispatchGroup.leave()
             }
             
-            // Step 5: Fetch participants and their icons using updated participant IDs
+            // Fetch Participants and Icons
+            dispatchGroup.enter()
+            self.fetchParticipantsAndIcons(for: travelPlan.participantIds) { participants in
+                fetchedParticipants = participants
+                dispatchGroup.leave()
+            }
+            
+            // Notify when all fetches are done
             dispatchGroup.notify(queue: .main) {
-                dispatchGroup.enter()
-                self.fetchParticipantsAndIcons(for: travelPlan.participantIds) { fetchedParticipants in
-                    participants = fetchedParticipants
-                    dispatchGroup.leave()
-                }
+                self.travelPlan = travelPlan
+                self.categories = fetchedCategories
+                self.spendingItems = fetchedSpendingItems
+                self.balances = fetchedBalances
+                self.participants = fetchedParticipants
                 
-                dispatchGroup.notify(queue: .main) {
-                    self.travelPlan = travelPlan
-                    self.categories = categories
-                    self.spendingItems = spendingItems
-                    self.balances = balances
-                    self.participants = participants
-                    self.stopLoading()
-                    
-                    print("[SpendingViewController] Finished populating data. Updating child views.")
-                    self.updateUIWithTravelPlan(travelPlan)
-                }
+                print("[SpendingViewController] Finished populating data. Updating child views.")
+                self.updateUIWithTravelPlan(travelPlan)
+                completion()
             }
         }
     }
     
     private func updateUIWithTravelPlan(_ travelPlan: Travel) {
+        
         print("[SpendingViewController] Updating UI for travel plan: \(travelPlan.travelTitle).")
-        print("[SpendingViewController] Categories: \(categories.count), Spending Items: \(spendingItems.count), Participants: \(participants.count).")
+        print("[SpendingViewController] Current state: Categories: \(categories.count), Spending Items: \(spendingItems.count), Participants: \(participants.count).")
         
         travelTitleLabel.text = travelPlan.travelTitle
         spendingView.isHidden = false
@@ -502,20 +576,41 @@ class SpendingViewController: UIViewController {
     }
     
     @objc private func refreshTravelData() {
+        refreshTask?.cancel() // Cancel the previous task
+        refreshTask = nil
+        let newTask = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.performTravelDataRefresh()
+        }
+        refreshTask = newTask
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: newTask) // Debounce
+    }
+    
+    private func performTravelDataRefresh() {
+        guard !refreshInProgress else {
+            print("[SpendingViewController] refreshTravelData skipped: already in progress.")
+            return
+        }
+        
+        refreshInProgress = true
         print("[SpendingViewController] refreshTravelData called.")
         
         if let travelID = travelID {
-            // Case 1: Refresh using the provided travel ID
             print("[SpendingViewController] Refreshing travel data for ID: \(travelID).")
-            self.populateTravelPlanData(for: travelID)
+            populateTravelPlanData(for: travelID) {
+                self.refreshInProgress = false
+                print("[SpendingViewController] refreshTravelData completed for travel ID: \(travelID).")
+            }
         } else if let activePlan = TravelPlanManager.shared.activeTravelPlan {
-            // Case 2: Refresh using the active travel plan's ID
             print("[SpendingViewController] Refreshing active travel plan with ID: \(activePlan.id).")
-            self.populateTravelPlanData(for: activePlan.id)
+            populateTravelPlanData(for: activePlan.id) {
+                self.refreshInProgress = false
+                print("[SpendingViewController] refreshTravelData completed for active travel plan ID: \(activePlan.id).")
+            }
         } else {
-            // Case 3: No travel ID or active plan available
-            print("[SpendingViewController] No travel ID or active plan available for refresh. Showing no active plan notice.")
+            print("[SpendingViewController] No travel ID or active plan available for refresh.")
             showNoActivePlanNotice()
+            refreshInProgress = false
         }
     }
     

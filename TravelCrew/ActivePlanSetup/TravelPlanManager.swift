@@ -24,6 +24,7 @@ class TravelPlanManager {
     /// Clears the active travel plan, typically used when logging out or resetting.
     func clearActiveTravelPlan() {
         activeTravelPlan = nil
+        UserDefaults.standard.removeObject(forKey: "activePlanData")
         NotificationCenter.default.post(name: .activeTravelPlanChanged, object: nil)
     }
 }

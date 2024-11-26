@@ -12,16 +12,21 @@ import Firebase
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
-    ) -> Bool {
-        // Configure Firebase
-        FirebaseApp.configure()
-        configureFirestore()
-        
-        return true
-    }
-
+            _ application: UIApplication,
+            didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+        ) -> Bool {
+            // Configure Firebase
+            FirebaseApp.configure()
+            configureFirestore()
+            
+            // Clear the active travel plan if no user is logged in
+            if Auth.auth().currentUser == nil {
+                TravelPlanManager.shared.clearActiveTravelPlan()
+            }
+            
+            return true
+        }
+    
     // MARK: - Configure Firestore
     private func configureFirestore() {
         let db = Firestore.firestore()

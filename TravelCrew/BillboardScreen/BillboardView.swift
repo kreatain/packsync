@@ -11,7 +11,7 @@ class BillboardView: UIView {
     let sendButton = UIButton(type: .system)
     let labelLoginPrompt: UILabel = {
             let label = UILabel()
-            label.text = "Please create an account or log in to view the Billboard."
+            label.text = "Please create an account or log in to view Billboard details."
             label.textAlignment = .center
             label.textColor = .gray
             label.isHidden = true

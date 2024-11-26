@@ -26,12 +26,12 @@ class BudgetViewController: UIViewController {
         configureWithTravelPlan()
         
         // Add observer for travel data changes
-            NotificationCenter.default.addObserver(
-                self,
-                selector: #selector(handleTravelDataChanged),
-                name: .travelDataChanged,
-                object: nil
-            )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleTravelDataChanged),
+            name: .travelDataChanged,
+            object: nil
+        )
     }
     
     override func viewDidLayoutSubviews() {
@@ -48,7 +48,7 @@ class BudgetViewController: UIViewController {
         summaryLabel.numberOfLines = 0
         summaryLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(summaryLabel)
-
+        
         
         // Table View Setup
         tableView.register(CategoryCell.self, forCellReuseIdentifier: "CategoryCell")
@@ -66,18 +66,18 @@ class BudgetViewController: UIViewController {
         addButton.addTarget(self, action: #selector(addCategoryTapped), for: .touchUpInside)
         addButton.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(addButton)
-
+        
         // Constraints
         NSLayoutConstraint.activate([
             summaryLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
             summaryLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             summaryLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
-
+            
             tableView.topAnchor.constraint(equalTo: summaryLabel.bottomAnchor, constant: 20),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: addButton.topAnchor, constant: -20),
-
+            
             addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
@@ -88,6 +88,11 @@ class BudgetViewController: UIViewController {
     private func configureWithTravelPlan() {
         calculateSummary()
         tableView.reloadData()
+    }
+    
+    private func sortCategories() {
+        // Sort categories alphabetically by name
+        categories.sort { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
     
     func setTravelPlan(
@@ -104,9 +109,12 @@ class BudgetViewController: UIViewController {
         self.participants = participants
         self.currencySymbol = currencySymbol
         self.userIcons = userIcons // Pass down user icons
-
+        
         print("[BudgetViewController] Travel plan updated: \(travelPlan.travelTitle). Categories count: \(categories.count). Participants count: \(participants.count). Currency: \(currencySymbol).")
-
+        
+        // Sort categories before rendering
+        sortCategories()
+        
         tableView.reloadData() // Refresh the table
         
         // Update the active BudgetDetailViewController if it exists
@@ -127,12 +135,12 @@ class BudgetViewController: UIViewController {
             detailVC.updateCategory(category, spendingItems: spendingItems, userIcons: userIcons)
         }
     }
-
+    
     
     private func calculateSummary() {
-           totalBudget = categories.reduce(0) { $0 + $1.budgetAmount }
-           summaryLabel.text = "Total Budget: \(currencySymbol)  \(totalBudget)"
-       }
+        totalBudget = categories.reduce(0) { $0 + $1.budgetAmount }
+        summaryLabel.text = "Total Budget: \(currencySymbol)  \(totalBudget)"
+    }
     
     @objc private func addCategoryTapped() {
         guard let travelPlan = travelPlan else {
@@ -157,23 +165,26 @@ class BudgetViewController: UIViewController {
               travelPlan?.id == travelId else {
             return
         }
-
+        
         print("[BudgetViewController] Handling travel data change notification.")
-
+        
         SpendingFirebaseManager.shared.fetchTravel(for: travelId) { [weak self] travelPlan in
             guard let self = self, let travelPlan = travelPlan else { return }
             DispatchQueue.main.async {
                 self.travelPlan = travelPlan
-
+                
                 SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { categories in
                     DispatchQueue.main.async {
                         self.categories = categories
+                        // Sort categories before rendering
+                        self.sortCategories()
+                        
                         self.spendingItems = self.spendingItems.filter { spendingItem in
                             categories.contains(where: { $0.id == spendingItem.categoryId })
                         }
                         self.calculateSummary()
                         self.tableView.reloadData()
-
+                        
                         // Ensure detailVC updates reflect the latest data
                         if let detailVC = self.navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
                             if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
@@ -190,21 +201,30 @@ class BudgetViewController: UIViewController {
     
     private func showDeleteConfirmation(for indexPath: IndexPath) {
         let category = categories[indexPath.row]
+        
+        // Check if there are any settled spending items in this category
+        let settledSpendingItems = spendingItems.filter { $0.categoryId == category.id && $0.isSettled }
+        if !settledSpendingItems.isEmpty {
+            showAlert(title: "Cannot Delete", message: "This category has settled expenses and cannot be deleted.")
+            return
+        }
+        
         let alert = UIAlertController(
             title: "Confirm Deletion",
             message: "Are you sure you want to delete the category '\(category.name)'? This will also delete all associated spending items.",
             preferredStyle: .alert
         )
-
+        
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         let confirmAction = UIAlertAction(title: "Delete", style: .destructive) { [weak self] _ in
             guard let self = self, let travelPlan = self.travelPlan else { return }
-
+            
             SpendingFirebaseManager.shared.deleteCategory(from: travelPlan.id, categoryId: category.id) { success in
                 if success {
                     DispatchQueue.main.async {
                         // Update the data source first
                         self.categories.remove(at: indexPath.row)
+                        self.sortCategories()
                         
                         // Update the UI
                         self.tableView.deleteRows(at: [indexPath], with: .automatic)
@@ -219,7 +239,7 @@ class BudgetViewController: UIViewController {
                 }
             }
         }
-
+        
         alert.addAction(cancelAction)
         alert.addAction(confirmAction)
         present(alert, animated: true, completion: nil)
@@ -255,9 +275,9 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let category = categories[indexPath.row]
         guard let travelPlan = travelPlan else { return }
-
+        
         let filteredSpendingItems = spendingItems.filter { $0.categoryId == category.id }
-
+        
         if let detailVC = navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
             detailVC.updateCategory(category, spendingItems: filteredSpendingItems, userIcons: userIcons) // Pass userIcons here
             navigationController?.popToViewController(detailVC, animated: true)
@@ -280,7 +300,7 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
             guard let self = self else { return }
             let category = self.categories[indexPath.row]
             guard let travelPlan = self.travelPlan else { return }
-
+            
             // Create and present BudgetAddEditViewController as a modal
             let addEditVC = BudgetAddEditViewController(
                 category: category,
@@ -291,17 +311,17 @@ extension BudgetViewController: UITableViewDataSource, UITableViewDelegate {
             addEditVC.modalPresentationStyle = .formSheet
             addEditVC.modalTransitionStyle = .coverVertical
             self.present(addEditVC, animated: true)
-
+            
             completionHandler(true)
         }
         editAction.backgroundColor = .systemBlue
-
+        
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [weak self] (_, _, completionHandler) in
             guard let self = self else { return }
             self.showDeleteConfirmation(for: indexPath)
             completionHandler(true)
         }
-
+        
         return UISwipeActionsConfiguration(actions: [editAction, deleteAction])
     }
     

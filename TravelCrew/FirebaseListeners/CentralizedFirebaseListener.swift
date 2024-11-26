@@ -194,7 +194,6 @@ class CentralizedFirebaseListener {
                              categoryUpdate: @escaping ([Category]) -> Void,
                              spendingItemsUpdate: @escaping ([SpendingItem]) -> Void,
                              balancesUpdate: @escaping ([Balance]) -> Void,
-                             billboardUpdate: @escaping ([Billboard]) -> Void,
                              participantsUpdate: @escaping ([User]) -> Void) {
         print("[CentralizedFirebaseListener] Initializing all listeners for travelId: \(travelId).")
         
@@ -211,10 +210,7 @@ class CentralizedFirebaseListener {
 
         balanceListeners.append(listenToBalances(for: travelId, onUpdate: balancesUpdate))
         print("[CentralizedFirebaseListener] Balance listeners set.")
-
-        billboardListeners.append(listenToBillboards(for: travelId, onUpdate: billboardUpdate))
-        print("[CentralizedFirebaseListener] Billboard listeners set.")
-
+        
         participantListeners = listenToParticipants(for: participantIds, onUpdate: participantsUpdate)
         print("[CentralizedFirebaseListener] Participant listeners set.")
     }

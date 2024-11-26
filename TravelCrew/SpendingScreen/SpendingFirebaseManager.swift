@@ -379,33 +379,34 @@ class SpendingFirebaseManager {
     
     // MARK: - Add Category
     func addCategory(to travelId: String, category: Category, completion: @escaping (Bool) -> Void) {
+        let batch = db.batch()
         let categoryRef = db.collection("categories").document()
-        var mutableCategory = category
-        mutableCategory.id = categoryRef.documentID
-        mutableCategory.travelId = travelId
+        var categoryToAdd = category
+        categoryToAdd.id = categoryRef.documentID
 
         let travelPlanRef = db.collection("travelPlans").document(travelId)
 
+        // Add category to the categories collection
         do {
-            try categoryRef.setData(from: mutableCategory) { error in
-                if let error = error {
-                    print("Error adding category: \(error.localizedDescription)")
-                    completion(false)
-                    return
-                }
+            try batch.setData(from: categoryToAdd, forDocument: categoryRef)
 
-                travelPlanRef.updateData([
-                    "categoryIds": FieldValue.arrayUnion([categoryRef.documentID])
-                ]) { error in
-                    if let error = error {
-                        print("Error updating travel plan: \(error.localizedDescription)")
-                        completion(false)
-                    } else {
-                        completion(true)
-                    }
+            // Update travelPlans document with the new category ID
+            batch.updateData([
+                "categoryIds": FieldValue.arrayUnion([categoryRef.documentID])
+            ], forDocument: travelPlanRef)
+
+            // Commit the batch
+            batch.commit { error in
+                if let error = error {
+                    print("Error adding category with batch: \(error.localizedDescription)")
+                    completion(false)
+                } else {
+                    print("Category added successfully with batch.")
+                    completion(true)
                 }
             }
         } catch {
+            print("Error encoding category: \(error.localizedDescription)")
             completion(false)
         }
     }

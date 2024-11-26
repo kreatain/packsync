@@ -72,7 +72,7 @@ extension TravelViewController {
         //MARK: action buttons, add the actions to the alert controller
         signInAlert.addAction(signUpAction)
         signInAlert.addAction(signInAction)
-
+        
         // present the alert controller. In the completion closure, we write logic to handle if the user taps outside the alert.
         self.present(signInAlert, animated: true, completion: {() in
             // to hide the alerton tap outside, add a Gesture Recognizer on the superview (the screen which popped this alert) of the alert controller.
@@ -90,10 +90,14 @@ extension TravelViewController {
     
     @objc func onLogOutBarButtonTapped(){
         let logoutAlert = UIAlertController(title: "Logging out!", message: "Are you sure want to log out?",
-            preferredStyle: .actionSheet)
+                                            preferredStyle: .actionSheet)
         logoutAlert.addAction(UIAlertAction(title: "Yes, log out!", style: .default, handler: { [weak self] (_) in
             do {
+                // Clear the active travel plan
+                TravelPlanManager.shared.clearActiveTravelPlan()
+                
                 try Auth.auth().signOut()
+                
                 // The auth state listener in TravelViewController will handle UI updates
                 NotificationCenter.default.post(name: .userDidLogout, object: nil)
             } catch {
@@ -117,7 +121,7 @@ extension TravelViewController {
             }
         }
     }
-
+    
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))

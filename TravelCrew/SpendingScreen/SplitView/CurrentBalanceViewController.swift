@@ -242,16 +242,24 @@ class CurrentBalanceViewController: UIViewController, UITableViewDelegate, UITab
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        // Check if indexPath is valid
+        guard indexPath.row < transactions.count else {
+            print("Error: IndexPath.row (\(indexPath.row)) is out of range for transactions.count (\(transactions.count)).")
+            return UITableViewCell() // Return an empty cell to avoid crash
+        }
+
+        // Retrieve and configure the cell
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "TransactionCell", for: indexPath) as? TransactionCell else {
+            print("Error: Could not dequeue reusable cell with identifier 'TransactionCell'.")
             return UITableViewCell()
         }
-        
+
         let transaction = transactions[indexPath.row]
-        let debtorIcon = userIcons[transaction.debtor.id] // Retrieve from a preloaded dictionary of user icons
-        let creditorIcon = userIcons[transaction.creditor.id] // Same for creditor
-        
+        let debtorIcon = userIcons[transaction.debtor.id]
+        let creditorIcon = userIcons[transaction.creditor.id]
+
         cell.configure(with: transaction, debtorIconImage: debtorIcon, creditorIconImage: creditorIcon)
-        
         return cell
     }
+    
 }
