@@ -148,6 +148,8 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.activePlanDateLabel.text = "Date: \(activePlan.travelStartDate) - \(activePlan.travelEndDate)"
         travelView.activePlanLocationLabel.text = "Location: \(activePlan.countryAndCity)"
         travelView.activePlanParticipantIdsLabel.text = "Participants: \(activePlan.participantNames.joined(separator: ", "))"
+
+        travelView.activePlanDescriptionLabel.text = "Please tap the bottom navigation bar to explore more about the active plan!"
     }
     
     // MARK: - Clear Active Plan Detail View
