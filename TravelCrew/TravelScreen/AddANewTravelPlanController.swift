@@ -10,25 +10,23 @@ import FirebaseAuth
 import FirebaseFirestore
 
 class AddANewTravelViewController: UIViewController {
-    
     var currentUser: FirebaseAuth.User?
     let db = Firestore.firestore()
     let addANewTravelPlan = AddANewTravelPlanView()
     
-    // Currency options and selected currency
     let currencies = [
-            "USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "CNY (¥)", "INR (₹)", 
-            "AUD ($)", "CAD ($)", "CHF (₣)", "NZD ($)", "HKD ($)", "SGD ($)", 
-            "KRW (₩)", "ZAR (R)", "MXN ($)", "BRL (R$)", "RUB (₽)", "SEK (kr)", 
-            "NOK (kr)", "DKK (kr)", "PLN (zł)", "THB (฿)", "IDR (Rp)", "TRY (₺)", 
-            "ILS (₪)", "MYR (RM)", "SAR (﷼)", "AED (د.إ)", "EGP (£)", "VND (₫)", 
-            "PHP (₱)", "PKR (₨)", "LKR (₨)", "BDT (৳)", "CZK (Kč)", "HUF (Ft)", 
-            "RON (lei)", "UAH (₴)", "KZT (₸)", "NGN (₦)", "KES (KSh)", "TZS (TSh)", 
-            "GHS (GH₵)", "MAD (د.م.)", "DZD (دج)", "TND (د.ت)", "IQD (ع.د)", "OMR (ر.ع.)", 
-            "BHD (ب.د)", "QAR (ر.ق)", "KWD (د.ك)", "JOD (د.ا)", "LBP (ل.ل)", "BND ($)", 
-            "MOP (MOP$)", "TWD (NT$)", "THB (฿)", "KHR (៛)", "LAK (₭)", "MMK (K)", 
-            "AFN (؋)", "IRR (﷼)", "MDL (L)", "ISK (kr)", "BAM (KM)", "HRK (kn)"
-        ]
+        "USD ($)", "EUR (€)", "GBP (£)", "JPY (¥)", "CNY (¥)", "INR (₹)",
+        "AUD ($)", "CAD ($)", "CHF (₣)", "NZD ($)", "HKD ($)", "SGD ($)",
+        "KRW (₩)", "ZAR (R)", "MXN ($)", "BRL (R$)", "RUB (₽)", "SEK (kr)",
+        "NOK (kr)", "DKK (kr)", "PLN (zł)", "THB (฿)", "IDR (Rp)", "TRY (₺)",
+        "ILS (₪)", "MYR (RM)", "SAR (﷼)", "AED (د.إ)", "EGP (£)", "VND (₫)",
+        "PHP (₱)", "PKR (₨)", "LKR (₨)", "BDT (৳)", "CZK (Kč)", "HUF (Ft)",
+        "RON (lei)", "UAH (₴)", "KZT (₸)", "NGN (₦)", "KES (KSh)", "TZS (TSh)",
+        "GHS (GH₵)", "MAD (د.م.)", "DZD (دج)", "TND (د.ت)", "IQD (ع.د)", "OMR (ر.ع.)",
+        "BHD (ب.د)", "QAR (ر.ق)", "KWD (د.ك)", "JOD (د.ا)", "LBP (ل.ل)", "BND ($)",
+        "MOP (MOP$)", "TWD (NT$)", "THB (฿)", "KHR (៛)", "LAK (₭)", "MMK (K)",
+        "AFN (؋)", "IRR (﷼)", "MDL (L)", "ISK (kr)", "BAM (KM)", "HRK (kn)"
+    ]
     var selectedCurrency: String?
     
     override func loadView() {
@@ -40,18 +38,41 @@ class AddANewTravelViewController: UIViewController {
         
         title = "Add a new travel plan"
         
-        // Set the current user
         currentUser = Auth.auth().currentUser
         
-        // Configure the picker
         addANewTravelPlan.currencyPicker.dataSource = self
         addANewTravelPlan.currencyPicker.delegate = self
         addANewTravelPlan.buttonAdd.addTarget(self, action: #selector(onAddButtonTapped), for: .touchUpInside)
+        
+        addANewTravelPlan.textFieldTravelStartDate.addTarget(self, action: #selector(dateChanged), for: .editingDidEnd)
+        addANewTravelPlan.textFieldTravelEndDate.addTarget(self, action: #selector(dateChanged), for: .editingDidEnd)
+    }
+
+    @objc func dateChanged(_ sender: UITextField) {
+        guard let startDateString = addANewTravelPlan.textFieldTravelStartDate.text,
+              let endDateString = addANewTravelPlan.textFieldTravelEndDate.text,
+              !startDateString.isEmpty,
+              !endDateString.isEmpty else {
+            return
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM dd, yyyy"
+        
+        guard let startDate = dateFormatter.date(from: startDateString),
+              let endDate = dateFormatter.date(from: endDateString) else {
+            return
+        }
+        
+        if endDate < startDate {
+            showAlert(title: "Invalid Date", message: "End date cannot be earlier than start date.")
+            sender.text = ""
+        }
     }
 
     @objc func onAddButtonTapped() {
         guard let currentUser = currentUser else {
-            showAlert(message: "User not logged in")
+            showAlert(title: "Error", message: "User not logged in")
             return
         }
         
@@ -63,23 +84,21 @@ class AddANewTravelViewController: UIViewController {
               let travelEndDate = addANewTravelPlan.textFieldTravelEndDate.text,
               let travelCountryAndCity = addANewTravelPlan.textFieldCountryAndCity.text,
               !travelTitle.isEmpty, !travelStartDate.isEmpty, !travelEndDate.isEmpty, !travelCountryAndCity.isEmpty else {
-            showAlert(message: "Please fill in all fields")
+            showAlert(title: "Error", message: "Please fill in all fields")
             return
         }
         
         guard let selectedCurrency = selectedCurrency else {
-            showAlert(message: "Please select a currency.")
+            showAlert(title: "Error", message: "Please select a currency.")
             return
         }
         
-        // Check if travelCountryAndCity follows the pattern "city, country"
         let components = travelCountryAndCity.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
         guard components.count == 2, !components[0].isEmpty, !components[1].isEmpty else {
-            showAlert(message: "Please enter the location in the format 'City, Country'")
+            showAlert(title: "Error", message: "Please enter the location in the format 'City, Country'")
             return
         }
 
-        // Create a new Travel instance using the updated model structure
         let travel = Travel(
             id: UUID().uuidString,
             creatorName: creatorName,
@@ -100,7 +119,6 @@ class AddANewTravelViewController: UIViewController {
         saveTravelToFirestore(travel: travel)
     }
     
-
     func saveTravelToFirestore(travel: Travel) {
         let collectionTravelPlans = db.collection("travelPlans")
         
@@ -108,7 +126,7 @@ class AddANewTravelViewController: UIViewController {
             try collectionTravelPlans.document(travel.id).setData(from: travel) { error in
                 if let error = error {
                     print("Error adding document: \(error.localizedDescription)")
-                    self.showAlert(message: "Failed to save travel plan. Please try again.")
+                    self.showAlert(title: "Error", message: "Failed to save travel plan. Please try again.")
                 } else {
                     print("Document added successfully")
                     self.navigationController?.popViewController(animated: true)
@@ -116,12 +134,12 @@ class AddANewTravelViewController: UIViewController {
             }
         } catch {
             print("Error encoding travel data: \(error.localizedDescription)")
-            self.showAlert(message: "Failed to save travel plan. Please try again.")
+            self.showAlert(title: "Error", message: "Failed to save travel plan. Please try again.")
         }
     }
 
-    func showAlert(message: String) {
-        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
         present(alert, animated: true, completion: nil)
     }
