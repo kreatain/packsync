@@ -42,6 +42,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         billboardNavController.tabBarItem = UITabBarItem(title: "Billboard", image: UIImage(systemName: "signpost.right", withConfiguration: iconConfig), tag: 3)
         profileNavController.tabBarItem = UITabBarItem(title: "Profile", image: UIImage(systemName: "person", withConfiguration: iconConfig), tag: 5)
         
+        // Handle badge updates from ProfileViewController
+                profileVC.onBadgeUpdate = { hasPendingInvitations in
+                    DispatchQueue.main.async {
+                        profileNavController.tabBarItem.badgeValue = hasPendingInvitations ? "•" : nil
+                    }
+                }
+
+        
         // Create tab bar controller and set view controllers
         let tabBarController = UITabBarController()
         tabBarController.viewControllers = [ travelsNavController, packingNavController, spendingNavController, billboardNavController, profileNavController,]
@@ -58,6 +66,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Set tab bar controller as root view controller
         window?.rootViewController = tabBarController
     }
+    
     func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
         if let navController = viewController as? UINavigationController,
            let packingVC = navController.topViewController as? PackingListViewController {
