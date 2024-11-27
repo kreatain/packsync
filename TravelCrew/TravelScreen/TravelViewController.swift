@@ -1,9 +1,3 @@
-//
-//  TravelViewController.swift
-//  Packsync
-//
-//  Created by Xi Jia on 11/7/24.
-//
 
 import UIKit
 import FirebaseFirestore
@@ -34,7 +28,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         travelView.tableViewTravelPlans.dataSource = self
         travelView.tableViewTravelPlans.delegate = self
         travelView.tableViewTravelPlans.separatorStyle = .none
-        
+        updateLoginPromptVisibility()
         // Add target for the "Add Travel Plan" button at the bottom
         travelView.buttonAddTravelPlan.addTarget(self, action: #selector(addTravelButtonTapped), for: .touchUpInside)
         
@@ -51,6 +45,11 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         } else {
             didTapActivePlanButton() // Default to placeholder message if no active plan
         }
+        if Auth.auth().currentUser != nil {
+                travelView.loginPromptLabel.isHidden = true
+            } else {
+                travelView.loginPromptLabel.isHidden = false
+            }
 
         DispatchQueue.main.async {
             self.travelView.otherPlansButton.sendActions(for: .touchUpInside)
@@ -68,12 +67,39 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-
+        updateLoginPromptVisibility()
         // Ensure the correct tab is displayed when redirected
         DispatchQueue.main.async {
             self.travelView.otherPlansButton.sendActions(for: .touchUpInside)
             
             self.travelView.activePlanButton.sendActions(for: .touchUpInside)
+        }
+
+    }
+    
+    func updateLoginPromptVisibility() {
+        if Auth.auth().currentUser == nil {
+            travelView.loginPromptLabel.isHidden = false
+            travelView.tableViewTravelPlans.isHidden = true
+            travelView.buttonAddTravelPlan.isHidden = true
+            travelView.activePlanDetailView.isHidden = true
+            travelView.activePlanButton.isHidden = true
+            travelView.otherPlansButton.isHidden = true
+            travelView.segmentedControlView.isHidden = true
+        } else {
+            travelView.loginPromptLabel.isHidden = true
+            travelView.tableViewTravelPlans.isHidden = false
+            travelView.buttonAddTravelPlan.isHidden = false
+            travelView.activePlanButton.isHidden = false
+            travelView.otherPlansButton.isHidden = false
+            travelView.segmentedControlView.isHidden = false
+                    
+            if let activePlan = TravelPlanManager.shared.activeTravelPlan {
+                updateActivePlanDetailView(with: activePlan)
+                travelView.activePlanDetailView.isHidden = false
+            } else {
+                travelView.activePlanDetailView.isHidden = true
+            }
         }
     }
    
@@ -120,7 +146,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             updateActivePlanDetailView(with: activePlan)
             // Hide the placeholder message
-            travelView.labelText.isHidden = true
+            travelView.activePlanLabel.isHidden = true
         } else {
             displayNoActivePlanMessage()
             // Hide the active plan details view
@@ -175,7 +201,10 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     // MARK: - TravelViewDelegate Methods
 
     func didTapActivePlanButton() {
-        print("Switched to Active Plan tab.")
+        guard Auth.auth().currentUser != nil else {
+                print("User not logged in, hiding active plan details.")
+                return
+            }
 
         travelView.activePlanButton.backgroundColor = .systemBlue
         travelView.activePlanButton.setTitleColor(.white, for: .normal)
@@ -185,11 +214,13 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         guard Auth.auth().currentUser != nil else {
                 print("User is not logged in. Hiding active plan detail view.")
                 travelView.activePlanDetailView.isHidden = true
-                travelView.labelText.isHidden = false
+                travelView.loginPromptLabel.isHidden = false
+                travelView.activePlanLabel.isHidden = true
                 return
             }
 
 
+        travelView.loginPromptLabel.isHidden = true
         if let activePlan = TravelPlanManager.shared.activeTravelPlan {
             updateActivePlanDetailView(with: activePlan)
             travelView.activePlanDetailView.isHidden = false
@@ -203,13 +234,23 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     func didTapOtherPlansButton() {
-        print("Switched to All Plans tab.")
+        guard Auth.auth().currentUser != nil else {
+                print("User not logged in, hiding all plans.")
+                return
+            }
 
         travelView.otherPlansButton.backgroundColor = .systemBlue
         travelView.otherPlansButton.setTitleColor(.white, for: .normal)
         travelView.activePlanButton.backgroundColor = .clear
         travelView.activePlanButton.setTitleColor(.systemBlue, for: .normal)
 
+        guard Auth.auth().currentUser != nil else {
+                travelView.loginPromptLabel.isHidden = false
+                travelView.tableViewTravelPlans.isHidden = true
+                return
+            }
+
+        travelView.loginPromptLabel.isHidden = true
         // Show only the list view of all plans and hide the active plan view
         travelView.tableViewTravelPlans.isHidden = false
         travelView.activePlanDetailView.isHidden = true
@@ -272,33 +313,43 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         let addTravelViewController = AddANewTravelViewController()
         navigationController?.pushViewController(addTravelViewController, animated: true)
     }
+
     
     func handleAuthStateChange(user: FirebaseAuth.User?) {
         if let user = user {
             currentUser = user
             fetchTravelPlans()
+
+            updateLoginPromptVisibility()
+   
+            travelView.loginPromptLabel.isHidden = true
             travelView.tableViewTravelPlans.isHidden = false
             travelView.buttonAddTravelPlan.isHidden = false
+
             if let activePlan = TravelPlanManager.shared.activeTravelPlan {
                 updateActivePlanDetailView(with: activePlan)
                 travelView.activePlanDetailView.isHidden = false
             } else {
                 travelView.activePlanDetailView.isHidden = true
             }
+
             setupLeftBarButton(isLoggedin: true)
             DispatchQueue.main.async {
-                        self.travelView.activePlanButton.sendActions(for: .touchUpInside)
-                    }
+                self.travelView.activePlanButton.sendActions(for: .touchUpInside)
+            }
         } else {
             currentUser = nil
             travelPlanList.removeAll()
             travelView.tableViewTravelPlans.reloadData()
+
+   
+            travelView.loginPromptLabel.isHidden = false
             travelView.tableViewTravelPlans.isHidden = true
             travelView.buttonAddTravelPlan.isHidden = true
-
             clearActivePlanDetailView()
             travelView.activePlanDetailView.isHidden = true
 
+            updateLoginPromptVisibility()
             setupLeftBarButton(isLoggedin: false)
         }
     }

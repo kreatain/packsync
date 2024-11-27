@@ -1,9 +1,3 @@
-//
-//  TravelView.swift
-//  Packsync
-//
-//  Created by Xi Jia on 11/7/24.
-//
 
 import UIKit
 
@@ -16,7 +10,9 @@ class TravelView: UIView {
     
     // UI Elements
     var tableViewTravelPlans: UITableView!
-    var labelText: UILabel!
+
+    var activePlanLabel: UILabel!
+    var loginPromptLabel: UILabel!
     var buttonAddTravelPlan: UIButton!
     var segmentedControlView: UIView!
     var activePlanButton: UIButton!
@@ -36,7 +32,8 @@ class TravelView: UIView {
         self.backgroundColor = .white
         
         // Setup UI components
-        setupLabelText()
+        setupActivePlanLabel()
+        setupLoginPromptLabel()
         setupSegmentedControl()
         setupTableViewTravelPlans()
         setupButtonAddTravelPlan()
@@ -44,6 +41,7 @@ class TravelView: UIView {
         
         // Initialize constraints
         initConstraints()
+        segmentedControlView.isHidden = true
     }
 
     required init?(coder: NSCoder) {
@@ -52,12 +50,24 @@ class TravelView: UIView {
 
     // MARK: - Setup Methods
 
-    func setupLabelText() {
-        labelText = UILabel()
-        labelText.font = .boldSystemFont(ofSize: 18)
-        labelText.textAlignment = .center
-        labelText.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(labelText)
+    
+    func setupActivePlanLabel() {
+            activePlanLabel = UILabel()
+            activePlanLabel.font = .boldSystemFont(ofSize: 18)
+            activePlanLabel.textAlignment = .center
+            activePlanLabel.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview(activePlanLabel)
+    }
+        
+    func setupLoginPromptLabel() {
+            loginPromptLabel = UILabel()
+            loginPromptLabel.text = "Please create an account or log in to manage your travel with friends!"
+
+            loginPromptLabel.textColor = .gray
+            loginPromptLabel.textAlignment = .center
+            loginPromptLabel.numberOfLines = 0
+            loginPromptLabel.translatesAutoresizingMaskIntoConstraints = false
+            self.addSubview(loginPromptLabel)
     }
     
     func setupSegmentedControl() {
@@ -157,15 +167,24 @@ class TravelView: UIView {
 
     func initConstraints() {
         NSLayoutConstraint.activate([
-            labelText.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
-            labelText.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
-            labelText.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
+            
 
-            segmentedControlView.topAnchor.constraint(equalTo: labelText.bottomAnchor, constant: 16),
+            loginPromptLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            loginPromptLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            loginPromptLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
+            loginPromptLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+                    
+                  
+            activePlanLabel.topAnchor.constraint(equalTo: self.safeAreaLayoutGuide.topAnchor, constant: 8),
+            activePlanLabel.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
+            activePlanLabel.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
+
+                 
+            segmentedControlView.topAnchor.constraint(equalTo: activePlanLabel.bottomAnchor, constant: 16),
             segmentedControlView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
             segmentedControlView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
             segmentedControlView.heightAnchor.constraint(equalToConstant: 44),
-
+            
             activePlanButton.leadingAnchor.constraint(equalTo: segmentedControlView.leadingAnchor),
             activePlanButton.topAnchor.constraint(equalTo: segmentedControlView.topAnchor),
             activePlanButton.bottomAnchor.constraint(equalTo: segmentedControlView.bottomAnchor),

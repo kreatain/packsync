@@ -25,24 +25,10 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-
-        if let travelId = travelId {
-            preloadParticipantCount(for: travelId)
-            setupRealTimeListener(using: travelId)
-            hideNoActivePlanNotice()
-        } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
-            preloadParticipantCount(for: activeTravelId)
-            setupRealTimeListener(using: activeTravelId)
-            hideNoActivePlanNotice()
-        } else {
-            print("No active travel plan found and no travelId provided.")
-            showNoActivePlanNotice()
-        }
-        
-        
-        checkLoginStatus()
+        setupViewController()
         setupNoActivePlanLabel()
+ 
+        
         
         NotificationCenter.default.addObserver(
                 self,
@@ -50,6 +36,14 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
                 name: .activeTravelPlanChanged,
                 object: nil
             )
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        
+        checkLoginStatus()
+        
+ 
     }
     
     
@@ -67,28 +61,26 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
             present(alert, animated: true)
         }
     
+    
     private func checkLoginStatus() {
         if Auth.auth().currentUser == nil {
             showLoginPrompt()
+            return
+        }
+        
+        if let travelId = travelId {
+            hideNoActivePlanNotice()
+            preloadParticipantCount(for: travelId)
+            setupRealTimeListener(using: travelId)
+        } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
+            hideNoActivePlanNotice()
+            preloadParticipantCount(for: activeTravelId)
+            setupRealTimeListener(using: activeTravelId)
         } else {
-            if travelId == nil, TravelPlanManager.shared.activeTravelPlan?.id == nil {
-                showNoActivePlanNotice()
-            } else {
-                hideNoActivePlanNotice()
-                setupViewController()
-                
-                if let travelId = travelId {
-                    preloadParticipantCount(for: travelId)
-                    setupRealTimeListener(using: travelId)
-                } else if let activeTravelId = TravelPlanManager.shared.activeTravelPlan?.id {
-                    preloadParticipantCount(for: activeTravelId)
-                    setupRealTimeListener(using: activeTravelId)
-                } else {
-                    showNoActivePlanNotice()
-                }
-            }
+            showNoActivePlanNotice()
         }
     }
+    
     
     private func showNoActivePlanNotice() {
         noActivePlanLabel.isHidden = false
@@ -96,10 +88,12 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
         billboardView.inputTextField.isHidden = true
         billboardView.plusButton.isHidden = true
         billboardView.sendButton.isHidden = true
+        billboardView.labelLoginPrompt.isHidden = true
     }
     
     private func hideNoActivePlanNotice() {
         noActivePlanLabel.isHidden = true
+        billboardView.labelLoginPrompt.isHidden = true
         billboardView.tableView.isHidden = false
         billboardView.inputTextField.isHidden = false
         billboardView.plusButton.isHidden = false
@@ -125,9 +119,10 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     
     private func showLoginPrompt() {
         // Show the login prompt
-        billboardView.labelLoginPrompt.isHidden = false
 
-        // Hide other UI elements
+        billboardView.labelLoginPrompt.isHidden = false
+        noActivePlanLabel.isHidden = true
+       
         billboardView.tableView.isHidden = true
         billboardView.inputTextField.isHidden = true
         billboardView.plusButton.isHidden = true
