@@ -152,6 +152,7 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             profileView.labelEmailText.isHidden = false
             profileView.labelEmail.isHidden = false
             profileView.tableViewInvitations.isHidden = false
+            self.navigationItem.title = "Profile" // Set title when user is logged in
             
             db.collection("users").document(userId).getDocument { [weak self] (document, error) in
                 if let document = document, document.exists {
@@ -171,6 +172,7 @@ class ProfileViewController: UIViewController, UITableViewDataSource, UITableVie
             profileView.labelEmailText.isHidden = true
             profileView.labelEmail.isHidden = true
             profileView.tableViewInvitations.isHidden = true
+            self.navigationItem.title = nil // Hide title when no user is logged in
         }
     }
     
