@@ -94,6 +94,10 @@ class SplitViewController: UIViewController {
             userIcons: userIcons,
             currencySymbol: currencySymbol
         )
+        currentBalanceVC.view.setNeedsLayout()
+        currentBalanceVC.view.layoutIfNeeded()
+        currentBalanceVC.updateUI() // Trigger UI update explicitly
+        
         settledExpensesVC.configure(
             settledSpendingItems: settledSpendingItems,
             unsettledSpendingItems: unsettledSpendingItems, // Pass unsettled spending items
@@ -103,6 +107,9 @@ class SplitViewController: UIViewController {
             userIcons: userIcons,
             travelId: travelPlan.id 
         )
+        settledExpensesVC.view.setNeedsLayout()
+        settledExpensesVC.view.layoutIfNeeded()
+        settledExpensesVC.updateUI() // Trigger UI update explicitly
         
         // Reload the currently active tab's view
         if tabBar.selectedSegmentIndex == 0 {

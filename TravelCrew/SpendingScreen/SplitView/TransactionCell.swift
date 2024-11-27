@@ -23,6 +23,15 @@ class TransactionCell: UITableViewCell {
         setupUI()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        debtorLabel.text = nil
+        creditorLabel.text = nil
+        amountLabel.text = nil
+        debtorIcon.image = nil
+        creditorIcon.image = nil
+    }
+    
     private func setupUI() {
         // Configure icons
         [debtorIcon, creditorIcon].forEach {
@@ -87,6 +96,7 @@ class TransactionCell: UITableViewCell {
     }
     
     func configure(with transaction: (debtor: User, creditor: User, amount: Double), debtorIconImage: UIImage?, creditorIconImage: UIImage?) {
+        print("[DEBUG] Configuring cell with transaction: \(transaction)")
         debtorIcon.image = debtorIconImage ?? UIImage(systemName: "person.circle")
         creditorIcon.image = creditorIconImage ?? UIImage(systemName: "person.circle")
         debtorLabel.text = transaction.debtor.displayName ?? transaction.debtor.email

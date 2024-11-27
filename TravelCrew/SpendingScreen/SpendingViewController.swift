@@ -20,7 +20,7 @@ class SpendingViewController: UIViewController {
     private var categories: [Category] = []
     private var spendingItems: [SpendingItem] = []
     private var participants: [User] = []
-    private var balances: [Balance] = []
+    private var currentBalance: Balance?
     private var userIcons: [String: UIImage] = [:] // Dictionary to store user icons by user ID
     
     private lazy var overviewVC = OverviewViewController()
@@ -135,8 +135,11 @@ class SpendingViewController: UIViewController {
             },
             balancesUpdate: { [weak self] updatedBalances in
                 guard let self = self else { return }
-                self.balances = updatedBalances
-                self.notifyChildControllers()
+                print("[SpendingViewController] Active balance fetched and updated.")
+                if let activeBalance = updatedBalances.first(where: { !$0.isSet }) {
+                    self.currentBalance = activeBalance // Update the active balance
+                    self.notifyChildControllers()
+                }
             },
             participantsUpdate: { [weak self] updatedParticipants in
                 guard let self = self else { return }
@@ -178,7 +181,7 @@ class SpendingViewController: UIViewController {
         splitVC.setTravelPlan(
             travelPlan: travelPlan,
             participants: participants,
-            currentBalance: balances.first,
+            currentBalance: currentBalance,
             unsettledSpendingItems: spendingItems.filter { !$0.isSettled },
             settledSpendingItems: spendingItems.filter { $0.isSettled },
             categories: categories,
@@ -323,7 +326,6 @@ class SpendingViewController: UIViewController {
             self.categories.removeAll()
             self.spendingItems.removeAll()
             self.participants.removeAll()
-            self.balances.removeAll()
             
             self.spendingView.isHidden = true
             self.noActivePlanLabel.isHidden = true
@@ -384,6 +386,7 @@ class SpendingViewController: UIViewController {
         var fetchedSpendingItems: [SpendingItem] = []
         var fetchedBalances: [Balance] = []
         var fetchedParticipants: [User] = []
+        var fetchedActiveBalance: Balance?
         
         // Fetch Travel Plan
         dispatchGroup.enter()
@@ -417,12 +420,12 @@ class SpendingViewController: UIViewController {
                 dispatchGroup.leave()
             }
             
-            // Fetch Balances
-            dispatchGroup.enter()
-            SpendingFirebaseManager.shared.fetchBalances(for: travelPlan.id) { balances in
-                fetchedBalances = balances
-                dispatchGroup.leave()
-            }
+            // Fetch Active Balance
+                dispatchGroup.enter()
+                SpendingFirebaseManager.shared.ensureActiveBalance(for: travelPlanId) { activeBalance in
+                    fetchedActiveBalance = activeBalance
+                    dispatchGroup.leave()
+                }
             
             // Fetch Participants and Icons
             dispatchGroup.enter()
@@ -436,7 +439,7 @@ class SpendingViewController: UIViewController {
                 self.travelPlan = travelPlan
                 self.categories = fetchedCategories
                 self.spendingItems = fetchedSpendingItems
-                self.balances = fetchedBalances
+                self.currentBalance = fetchedActiveBalance
                 self.participants = fetchedParticipants
                 
                 print("[SpendingViewController] Finished populating data. Updating child views.")

@@ -448,26 +448,21 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             showAlert(title: "Error", message: "Please fill in all fields.")
             return
         }
-        
-        // Validate the selected participants
+
         if selectedParticipants.isEmpty {
             showAlert(title: "Error", message: "Please select at least one participant.")
             return
         }
-        
-        // Fetch the current user's ID
+
         guard let userId = Auth.auth().currentUser?.uid else {
             showAlert(title: "Error", message: "Failed to identify the current user.")
             return
         }
-        
+
         let selectedCategory: Category
-        
         if let fixedCategory = fixedCategory {
-            // Use the fixed category if present
             selectedCategory = fixedCategory
         } else {
-            // Otherwise, get the selected category from the picker
             let selectedCategoryIndex = categoryPicker.selectedRow(inComponent: 0)
             guard selectedCategoryIndex >= 0 && selectedCategoryIndex < categories.count else {
                 showAlert(title: "Error", message: "Please select a valid category.")
@@ -475,27 +470,27 @@ class AddEditExpenseViewController: UIViewController, UIPickerViewDataSource, UI
             }
             selectedCategory = categories[selectedCategoryIndex]
         }
-        
+
         let date = ISO8601DateFormatter().string(from: datePicker.date)
-        
-        // Handle receipt upload asynchronously, if there's a receipt image
+
         if let receiptImage = receiptImageView.image {
             uploadReceiptToStorage(receiptImage) { [weak self] url in
                 guard let self = self else { return }
-                self.selectedReceiptURL = url
-                // Proceed with saving the expense after uploading receipt
-                self.addOrUpdateExpense(
-                    amount: amount,
-                    description: description,
-                    payerId: payerId,
-                    selectedCategory: selectedCategory,
-                    date: date,
-                    userId: userId,
-                    receiptURL: url
-                )
+                if let url = url {
+                    self.addOrUpdateExpense(
+                        amount: amount,
+                        description: description,
+                        payerId: payerId,
+                        selectedCategory: selectedCategory,
+                        date: date,
+                        userId: userId,
+                        receiptURL: url
+                    )
+                } else {
+                    self.showAlert(title: "Error", message: "Failed to upload receipt. Try again.")
+                }
             }
         } else {
-            // No receipt image, proceed with saving
             addOrUpdateExpense(
                 amount: amount,
                 description: description,

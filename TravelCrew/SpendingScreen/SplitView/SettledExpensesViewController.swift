@@ -107,7 +107,7 @@ class SettledExpensesViewController: UIViewController, UITableViewDelegate, UITa
         tableView.isHidden = settledSpendingItems.isEmpty
     }
     
-    private func updateUI() {
+    func updateUI() {
         noDataLabel.isHidden = !settledSpendingItems.isEmpty
         tableView.isHidden = settledSpendingItems.isEmpty
         
