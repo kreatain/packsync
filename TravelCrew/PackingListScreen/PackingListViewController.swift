@@ -106,8 +106,8 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                 showPackingListView(for: activePlan)
                 fetchPackingItems(for: activePlan.id)
             } else {
-                // No active plan; show login prompt instead of no active plan label.
-                packingListView?.labelLoginPrompt.isHidden = false
+                // No active plan; show no active plan label.
+//                packingListView?.labelLoginPrompt.text = "Please select an active travel plan to view Packing list details."
                 showNoActivePlanLabel()
             }
         }
@@ -307,14 +307,31 @@ extension PackingListViewController: UITableViewDelegate, UITableViewDataSource 
         return packingItems.count
     }
 
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        guard let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath) as? PackingItemCell else {
+//            return UITableViewCell()
+//        }
+//        let packingItem = packingItems[indexPath.row]
+//        cell.configure(with: packingItem)
+//        cell.checkboxButton.tag = indexPath.row
+//        cell.checkboxButton.addTarget(self, action: #selector(checkboxTapped(_:)), for: .touchUpInside)
+//        return cell
+//    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath) as? PackingItemCell else {
             return UITableViewCell()
         }
-        let packingItem = packingItems[indexPath.row]
-        cell.configure(with: packingItem)
-        cell.checkboxButton.tag = indexPath.row
-        cell.checkboxButton.addTarget(self, action: #selector(checkboxTapped(_:)), for: .touchUpInside)
+        
+        if indexPath.row < packingItems.count {
+            let packingItem = packingItems[indexPath.row]
+            cell.configure(with: packingItem)
+            cell.checkboxButton.tag = indexPath.row
+            cell.checkboxButton.addTarget(self, action: #selector(checkboxTapped(_:)), for: .touchUpInside)
+        } else {
+            // Configure cell with default or empty state
+            cell.configure(with: PackingItem(id: "", creatorId: "", travelId: "", name: "", isPacked: false, isPackedBy: nil, itemNumber: "", photoURL: nil))
+        }
+        
         return cell
     }
 
