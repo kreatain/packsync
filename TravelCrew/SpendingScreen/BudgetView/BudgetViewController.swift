@@ -9,6 +9,8 @@ class BudgetViewController: UIViewController {
     private var travelPlan: Travel?
     private var totalBudget: Double = 0
     private var currencySymbol: String = "$" // Default to USD
+    private var isUpdatingSummary = false
+    private var updateSummaryWorkItem: DispatchWorkItem?
     
     private let summaryLabel = UILabel()
     private let tableView = UITableView()
@@ -32,6 +34,10 @@ class BudgetViewController: UIViewController {
             name: .travelDataChanged,
             object: nil
         )
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: .travelDataChanged, object: nil)
     }
     
     override func viewDidLayoutSubviews() {
@@ -104,7 +110,11 @@ class BudgetViewController: UIViewController {
         userIcons: [String: UIImage]
     ) {
         self.travelPlan = travelPlan
+        
+        print("Categories before updating: \(categories.count)")
         self.categories = categories
+        print("Categories after updating: \(self.categories.count)")
+        
         self.spendingItems = spendingItems
         self.participants = participants
         self.currencySymbol = currencySymbol
@@ -114,6 +124,7 @@ class BudgetViewController: UIViewController {
         
         // Sort categories before rendering
         sortCategories()
+        calculateSummary()
         
         tableView.reloadData() // Refresh the table
         
@@ -138,8 +149,11 @@ class BudgetViewController: UIViewController {
     
     
     private func calculateSummary() {
-        totalBudget = categories.reduce(0) { $0 + $1.budgetAmount }
-        summaryLabel.text = "Total Budget: \(currencySymbol)  \(totalBudget)"
+        print("[calculateSummary] Calculating total budget from categories: \(categories.map { "\($0.name): \($0.budgetAmount)" })")
+        let calculatedBudget = categories.reduce(0) { $0 + $1.budgetAmount }
+        totalBudget = calculatedBudget
+        summaryLabel.text = "Total Budget: \(currencySymbol) \(totalBudget)"
+        print("[calculateSummary] Updated total budget to \(totalBudget) \(currencySymbol)")
     }
     
     @objc private func addCategoryTapped() {
@@ -159,47 +173,65 @@ class BudgetViewController: UIViewController {
     }
     
     // Handle travel data changes
+//    @objc private func handleTravelDataChanged(notification: Notification) {
+//        guard let userInfo = notification.userInfo,
+//              let travelId = userInfo["travelId"] as? String,
+//              travelPlan?.id == travelId else {
+//            print("[BudgetViewController] Ignored travel data change for unrelated travel ID.")
+//            return
+//        }
+//        
+//        print("[BudgetViewController] Handling travel data change for ID: \(travelId)")
+//        SpendingFirebaseManager.shared.fetchTravel(for: travelId) { [weak self] travelPlan in
+//            guard let self = self, let travelPlan = travelPlan else { return }
+//            DispatchQueue.main.async {
+//                self.travelPlan = travelPlan
+//                
+//                SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { categories in
+//                    DispatchQueue.main.async {
+//                        self.categories = categories
+//                        // Sort categories before rendering
+//                        self.sortCategories()
+//                        
+//                        self.spendingItems = self.spendingItems.filter { spendingItem in
+//                            categories.contains(where: { $0.id == spendingItem.categoryId })
+//                        }
+//                        self.calculateSummary()
+//                        self.tableView.reloadData()
+//                        
+//                        // Ensure detailVC updates reflect the latest data
+//                        if let detailVC = self.navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
+//                            if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
+//                                let filteredSpendingItems = self.spendingItems.filter { $0.categoryId == activeCategory.id }
+//                                detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems, userIcons: self.userIcons)
+//                                detailVC.updateLabels()
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     @objc private func handleTravelDataChanged(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let travelId = userInfo["travelId"] as? String,
+              let categories = userInfo["categories"] as? [Category],
               travelPlan?.id == travelId else {
+            print("[BudgetViewController] Ignored travel data change for unrelated travel ID.")
             return
         }
         
-        print("[BudgetViewController] Handling travel data change notification.")
-        
-        SpendingFirebaseManager.shared.fetchTravel(for: travelId) { [weak self] travelPlan in
-            guard let self = self, let travelPlan = travelPlan else { return }
-            DispatchQueue.main.async {
-                self.travelPlan = travelPlan
-                
-                SpendingFirebaseManager.shared.fetchCategoriesByIds(categoryIds: travelPlan.categoryIds) { categories in
-                    DispatchQueue.main.async {
-                        self.categories = categories
-                        // Sort categories before rendering
-                        self.sortCategories()
-                        
-                        self.spendingItems = self.spendingItems.filter { spendingItem in
-                            categories.contains(where: { $0.id == spendingItem.categoryId })
-                        }
-                        self.calculateSummary()
-                        self.tableView.reloadData()
-                        
-                        // Ensure detailVC updates reflect the latest data
-                        if let detailVC = self.navigationController?.viewControllers.first(where: { $0 is BudgetDetailViewController }) as? BudgetDetailViewController {
-                            if let activeCategory = categories.first(where: { $0.id == detailVC.getCategoryId() }) {
-                                let filteredSpendingItems = self.spendingItems.filter { $0.categoryId == activeCategory.id }
-                                detailVC.updateCategory(activeCategory, spendingItems: filteredSpendingItems, userIcons: self.userIcons)
-                                detailVC.updateLabels()
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        print("[BudgetViewController] Travel data changed for travel ID: \(travelId)")
+        self.categories = categories
+        self.calculateSummary()
     }
     
     private func showDeleteConfirmation(for indexPath: IndexPath) {
+        guard indexPath.row < categories.count else {
+            print("Error: IndexPath.row (\(indexPath.row)) is out of range for categories.count (\(categories.count)).")
+            return
+        }
+
         let category = categories[indexPath.row]
         
         // Check if there are any settled spending items in this category
@@ -222,15 +254,19 @@ class BudgetViewController: UIViewController {
             SpendingFirebaseManager.shared.deleteCategory(from: travelPlan.id, categoryId: category.id) { success in
                 if success {
                     DispatchQueue.main.async {
-                        // Update the data source first
-                        self.categories.remove(at: indexPath.row)
-                        self.sortCategories()
-                        
-                        // Update the UI
-                        self.tableView.deleteRows(at: [indexPath], with: .automatic)
-                        
-                        // Recalculate the summary
-                        self.calculateSummary()
+                        // Ensure indexPath is still valid
+                        if indexPath.row < self.categories.count {
+                            self.categories.remove(at: indexPath.row)
+                            self.sortCategories()
+                            
+                            // Update the UI
+                            self.tableView.deleteRows(at: [indexPath], with: .automatic)
+                            
+                            // Recalculate the summary
+                            self.calculateSummary()
+                        } else {
+                            print("Error: IndexPath.row (\(indexPath.row)) became invalid after deletion.")
+                        }
                     }
                 } else {
                     DispatchQueue.main.async {

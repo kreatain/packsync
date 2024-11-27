@@ -142,7 +142,17 @@ class BudgetAddEditViewController: UIViewController {
     private func handleCompletion(success: Bool) {
         if success {
             print("Category added/updated successfully. Refreshing travel plan...")
-            NotificationCenter.default.post(name: .travelDataChanged, object: nil)
+            
+            // Post the notification with additional details in userInfo
+            let userInfo: [String: Any] = [
+                "travelId": travelId,
+                "categories": [category ?? Category(name: textFieldName.text!,
+                                                    budgetAmount: Double(textFieldBudget.text!)!,
+                                                    emoji: emojiTextField.text!,
+                                                    travelId: travelId)]
+            ]
+            NotificationCenter.default.post(name: .travelDataChanged, object: nil, userInfo: userInfo)
+            
             DispatchQueue.main.async {
                 self.dismiss(animated: true) // Dismiss the modal instead of popping the navigation controller
             }
