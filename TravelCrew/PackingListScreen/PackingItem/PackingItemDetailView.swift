@@ -93,16 +93,18 @@ class PackingItemDetailView: UIView {
             itemNumberLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             
             packedByLabel.topAnchor.constraint(equalTo: itemNumberLabel.bottomAnchor, constant: 10),
-                packedByLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
-                packedByLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            itemImageView.topAnchor.constraint(equalTo: packedByLabel.bottomAnchor, constant: 20),
-                        itemImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-                        itemImageView.widthAnchor.constraint(equalToConstant: 200),
-                        itemImageView.heightAnchor.constraint(equalToConstant: 200),
+            packedByLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            packedByLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            
+            uploadPhotoButton.topAnchor.constraint(equalTo: packedByLabel.bottomAnchor, constant: 20),
+            uploadPhotoButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            
+            itemImageView.topAnchor.constraint(equalTo: uploadPhotoButton.bottomAnchor, constant: 20),
+            itemImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            itemImageView.widthAnchor.constraint(equalToConstant: 200),
+            itemImageView.heightAnchor.constraint(equalToConstant: 200),
 
-                        uploadPhotoButton.topAnchor.constraint(equalTo: itemImageView.bottomAnchor, constant: 20),
-                        uploadPhotoButton.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-                        uploadPhotoButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
+            itemImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
 
         ])
     }

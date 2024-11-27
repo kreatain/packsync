@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "CDE339F8-20D0-49A9-B081-9BED1C506565"
+            uuid = "62B1267F-79EF-455E-B410-21A4AD5CC51B"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "TravelCrew/PackingListScreen/PackingListViewController.swift"
+            filePath = "TravelCrew/PackingListScreen/PackingListView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "317"
-            endingLineNumber = "317"
-            landmarkName = "tableView(_:cellForRowAt:)"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
+            landmarkName = "init(frame:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

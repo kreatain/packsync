@@ -106,8 +106,9 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                 showPackingListView(for: activePlan)
                 fetchPackingItems(for: activePlan.id)
             } else {
-                // No active plan; show no active plan label.
-//                packingListView?.labelLoginPrompt.text = "Please select an active travel plan to view Packing list details."
+                // No active plan
+                noActiveplanLabel.text = "Please select an active travel plan to view Packing list details."
+                packingListView?.labelLoginPrompt.isHidden = true
                 showNoActivePlanLabel()
             }
         }
@@ -234,15 +235,7 @@ class PackingListViewController: UIViewController, EditPackingItemViewController
                     let photoURL = data["photoURL"] as? String
                     return PackingItem(id: id, creatorId: creatorId, travelId: travelId, name: name, isPacked: isPacked, isPackedBy: isPackedBy, itemNumber: itemNumber, photoURL: photoURL)
                 }
-                self.packingItems.sort {
-                    let firstLetter1 = $0.name.prefix(1).uppercased()
-                    let firstLetter2 = $1.name.prefix(1).uppercased()
-                    if $0.isPacked == $1.isPacked {
-                        return firstLetter1 < firstLetter2
-                    } else {
-                        return !$0.isPacked
-                    }
-                }
+
                 DispatchQueue.main.async {
                     self.packingListView?.tableViewPackingList.reloadData()
                 }
@@ -306,17 +299,7 @@ extension PackingListViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return packingItems.count
     }
-
-//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        guard let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath) as? PackingItemCell else {
-//            return UITableViewCell()
-//        }
-//        let packingItem = packingItems[indexPath.row]
-//        cell.configure(with: packingItem)
-//        cell.checkboxButton.tag = indexPath.row
-//        cell.checkboxButton.addTarget(self, action: #selector(checkboxTapped(_:)), for: .touchUpInside)
-//        return cell
-//    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "PackingItemCell", for: indexPath) as? PackingItemCell else {
             return UITableViewCell()
@@ -371,3 +354,4 @@ extension PackingListViewController: PackingListViewControllerDelegate {
         }
     }
 }
+
