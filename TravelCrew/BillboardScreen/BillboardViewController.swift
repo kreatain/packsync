@@ -65,6 +65,7 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     private func checkLoginStatus() {
         if Auth.auth().currentUser == nil {
             showLoginPrompt()
+            self.navigationItem.title = nil
             return
         }
         
@@ -101,7 +102,7 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
     }
     
     private func setupNoActivePlanLabel() {
-        noActivePlanLabel.text = "Please select an active travel plan to view the Billboard."
+        noActivePlanLabel.text = "Please select an active travel plan to view Billboard details."
         noActivePlanLabel.textAlignment = .center
         noActivePlanLabel.numberOfLines = 0
         noActivePlanLabel.textColor = .gray
@@ -167,6 +168,10 @@ class BillboardViewController: UIViewController, UITableViewDataSource, UITableV
    
     private func updateTitle() {
         print("updateTitle called. travelId: \(String(describing: travelId))")
+        if Auth.auth().currentUser == nil {
+            self.navigationItem.title = nil
+                return
+            }
         if let travelId = travelId {
             fetchTravelPlanTitle(for: travelId) { [weak self] title in
                 DispatchQueue.main.async {

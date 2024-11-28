@@ -79,6 +79,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     
     func updateLoginPromptVisibility() {
         if Auth.auth().currentUser == nil {
+            title = nil
             travelView.loginPromptLabel.isHidden = false
             travelView.tableViewTravelPlans.isHidden = true
             travelView.buttonAddTravelPlan.isHidden = true
@@ -87,6 +88,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
             travelView.otherPlansButton.isHidden = true
             travelView.segmentedControlView.isHidden = true
         } else {
+            title = "Travel Plans"
             travelView.loginPromptLabel.isHidden = true
             travelView.tableViewTravelPlans.isHidden = false
             travelView.buttonAddTravelPlan.isHidden = false
