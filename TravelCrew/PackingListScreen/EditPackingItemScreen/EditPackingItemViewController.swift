@@ -46,6 +46,12 @@ class EditPackingItemViewController: UIViewController {
             return
         }
         
+        // Validate that itemNumber is a number
+        guard let _ = Int(count) else {
+            showAlert(message: "Item count must be a valid number.")
+            return
+        }
+        
         updatedItem.name = name
         updatedItem.itemNumber = count
         
@@ -62,6 +68,12 @@ class EditPackingItemViewController: UIViewController {
                 self?.dismiss(animated: true, completion: nil)
             }
         }
+    }
+    
+    func showAlert(message: String) {
+        let alert = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     @objc func deleteButtonTapped() {

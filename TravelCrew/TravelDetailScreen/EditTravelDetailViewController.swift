@@ -55,6 +55,13 @@ class EditTravelDetailViewController: UIViewController {
             print("Invalid input")
             return
             }
+            
+            // Validate country and city format
+            let components = updatedCountryAndCity.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+            guard components.count == 2, !components[0].isEmpty, !components[1].isEmpty else {
+                showAlert(title: "Invalid Location", message: "Please enter the location in the format 'City, Country'")
+                return
+            }
 
             let startDate = editTravelView.startDatePicker.date
             let endDate = editTravelView.endDatePicker.date

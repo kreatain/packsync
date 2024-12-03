@@ -35,6 +35,12 @@ class AddPackingItemViewController: UIViewController {
             return
         }
         
+        // Validate that itemNumber is a number
+        guard let itemNumber = Int(itemNumber) else {
+            showAlert(message: "Item count must be a valid number.")
+            return
+        }
+        
         // Create new PackingItem using travel's creatorId and travelId
         let newItem = PackingItem(
             id: UUID().uuidString,
@@ -43,7 +49,7 @@ class AddPackingItemViewController: UIViewController {
             name: itemName,
             isPacked: false,
             isPackedBy: nil,  // Initially, the item is not packed by anyone
-            itemNumber: itemNumber
+            itemNumber: String(itemNumber)
         )
         
         savePackingItemToFirestore(newItem)
