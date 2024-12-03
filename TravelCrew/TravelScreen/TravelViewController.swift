@@ -23,6 +23,8 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
         title = "Travel Plans"
         view.backgroundColor = .white
         
+        navigationItem.largeTitleDisplayMode = .always
+        
         // Set delegate for TravelView and TableView
         travelView.delegate = self
         travelView.tableViewTravelPlans.dataSource = self
@@ -79,7 +81,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
     
     func updateLoginPromptVisibility() {
         if Auth.auth().currentUser == nil {
-            title = nil
+            
             travelView.loginPromptLabel.isHidden = false
             travelView.tableViewTravelPlans.isHidden = true
             travelView.buttonAddTravelPlan.isHidden = true
@@ -88,7 +90,7 @@ class TravelViewController: UIViewController, UITableViewDataSource, UITableView
             travelView.otherPlansButton.isHidden = true
             travelView.segmentedControlView.isHidden = true
         } else {
-            title = "Travel Plans"
+    
             travelView.loginPromptLabel.isHidden = true
             travelView.tableViewTravelPlans.isHidden = false
             travelView.buttonAddTravelPlan.isHidden = false
